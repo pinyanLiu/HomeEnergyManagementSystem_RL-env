@@ -1,6 +1,7 @@
+import imp
 import pymysql as pm
 import pandas as pd 
-
+from random import choice
 class ImportData:
     def __init__(self,host,user,passwd,db,port=3306,charset='utf8'):
         self.host = host
@@ -51,7 +52,8 @@ class ImportData:
 
 if __name__=='__main__':
     EPData = ImportData(host="140.124.42.65",user= "root",passwd= "fuzzy314",db= "Cems_data")
-    print(EPData.experimentData['BaseParameter'])
-    print(EPData.experimentData['GridPrice'])
-    print(EPData.experimentData['PV'])
-    print(EPData.experimentData['Load'])
+#    print(EPData.experimentData['BaseParameter'].loc[EPData.experimentData['BaseParameter']['parameter_name']=='batteryCapacity',['value']])
+    # print(EPData.experimentData['GridPrice'])
+    # print(EPData.experimentData['PV'])
+    # print(EPData.experimentData['Load'])
+    print(EPData.experimentData['Load'].iloc[:,1])
