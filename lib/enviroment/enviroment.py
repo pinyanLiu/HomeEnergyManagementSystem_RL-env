@@ -11,11 +11,11 @@ class HemsEnv(Env):
         '''
         self.info = info
         self.BaseParameter = info.experimentData['BaseParameter']
-        self.GridPrice = info.experimentData['GridPrice']
-        self.PV = info.experimentData['PV']
+        self.GridPrice = info.experimentData['GridPrice'].loc[:,['price_value']].tolist()
+        self.PV = info.experimentData['PV'].tolist()
         #pick one day from 360 days
         i = randint(1,360)
-        self.Load = info.experimentData['Load'].iloc[:,i]
+        self.Load = info.experimentData['Load'].iloc[:,i].tolist()
         #action we take (charge , discharge , stay)
         self.action_space = spaces.Discrete(3)
         #observation space
@@ -35,6 +35,7 @@ class HemsEnv(Env):
         )
         self.observationSpace = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
         self.state = None
+        
     def step(self,action):
         '''
         interaction of each state(changes while taking action)
@@ -45,9 +46,9 @@ class HemsEnv(Env):
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action),err_msg
 
-        #STATE
-        sampleTime,load,pv,soc,price = self.state
-        sampleTime = sampleTime+1
+        #STATE (sampleTime,Load,PV,SOC,pricePerHour)
+        sampleTime,load,pv,soc,pricePerHour = self.state
+
 
 
         #interaction
@@ -55,30 +56,26 @@ class HemsEnv(Env):
         if action == 0 and soc != 1:
             # 0. charging
             soc = soc+0.1
-            #calculate the cost at this sampletime (multiple 0.25 is for transforming price per hour into per min)
-            cost = price * 0.25 ( load + 0.1*self.BaseParameter['BaseParameter'].loc[self.BaseParameter['BaseParameter']['parameter_name']=='batteryCapacity',['value']] - pv  )
+            #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
+            cost = pricePerHour * 0.25 ( load + 0.1*self.BaseParameter['BaseParameter'].loc[self.BaseParameter['BaseParameter']['parameter_name']=='batteryCapacity',['value']] - pv  )
 
         #prevent the agent still want to discharge while the battery is lack of electricity
         elif action == 1 and soc != 0:
             # 1. discharging
             soc = soc-0.1
-            #calculate the cost at this sampletime (multiple 0.25 is for transforming price per hour into per min)
-            cost = price * 0.25 ( load - 0.1*self.BaseParameter['BaseParameter'].loc[self.BaseParameter['BaseParameter']['parameter_name']=='batteryCapacity',['value']] - pv  )
+            #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
+            cost = pricePerHour * 0.25 ( load - 0.1*self.BaseParameter['BaseParameter'].loc[self.BaseParameter['BaseParameter']['parameter_name']=='batteryCapacity',['value']] - pv  )
 
             # 2.stay
         else :
-            #calculate the cost at this sampletime (multiple 0.25 is for transforming price per hour into per min)
-            cost = price * 0.25 ( load - pv  )
+            #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
+            cost = pricePerHour * 0.25 ( load - pv  )
             
+        #change to next state
+        sampleTime = sampleTime+1
+        self.state = {'sampleTime':sampleTime,'load': self.Load[self.state['sampleTime']],'pv': self.PV[self.state['sampleTime']],'SOC':soc,'pricePerHour':self.GridPrice[self.state['sampleTime']]}
 
-
-            #check if all day is done
-        if self.all_day_long <= 0:
-            done = True
-        else:
-            done = False
-
-
+        #check if all day is done
         done = bool(
             sampleTime ==95
         )
@@ -93,9 +90,9 @@ class HemsEnv(Env):
 
 
 
-
         #set placeholder for infomation
         info = {}
+
         return self.state,reward,done,info
 
         
@@ -105,11 +102,13 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
+
+        #pick one day from 360 days
+        i = randint(1,360)
+        self.Load = self.info.experimentData['Load'].iloc[:,i]
         #reset state
-        self.state = {'sample time':0,'grid price': self.info['grid price'][0],'PV': self.info['PV'][0],'SOC':0.2,'Pload':self.info['Pload'][0]}
-        #reset time_block
-        self.all_day_long = 96
-        return np.array(self.state,dtype=np.float32)
+        self.state = {'sampleTime':0,'load': self.Load[self.state['sampleTime']],'pv': self.PV[self.state['sampleTime']],'SOC':self.BaseParameter['BaseParameter'].loc[self.BaseParameter['BaseParameter']['parameter_name']=='SOCinit',['value']],'pricePerHour':self.GridPrice[self.state['sampleTime']]}
+        return self.state
 
 
 if __name__ == '__main__':

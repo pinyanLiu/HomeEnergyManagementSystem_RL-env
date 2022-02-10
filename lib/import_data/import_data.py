@@ -53,7 +53,7 @@ class ImportData:
 if __name__=='__main__':
     EPData = ImportData(host="140.124.42.65",user= "root",passwd= "fuzzy314",db= "Cems_data")
 #    print(EPData.experimentData['BaseParameter'].loc[EPData.experimentData['BaseParameter']['parameter_name']=='batteryCapacity',['value']])
-    # print(EPData.experimentData['GridPrice'])
+    print(EPData.experimentData['GridPrice'])
     # print(EPData.experimentData['PV'])
     # print(EPData.experimentData['Load'])
-    print(EPData.experimentData['Load'].iloc[:,1])
+    #print(EPData.experimentData['Load'].iloc[:,1])
