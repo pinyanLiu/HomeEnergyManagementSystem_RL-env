@@ -63,7 +63,12 @@ class HemsEnv(Env):
         assert self.action_space.contains(action),err_msg
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour)
-        sampleTime,load,pv,soc,pricePerHour = self.state
+        
+        sampleTime = self.state['sampleTime']
+        load = self.state['load']
+        pv = self.state['pv']
+        soc = self.state['SOC']
+        pricePerHour = self.state['pricePerHour']
 
 
 
