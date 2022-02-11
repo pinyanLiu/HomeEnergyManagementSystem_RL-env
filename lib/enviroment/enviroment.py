@@ -18,18 +18,34 @@ class HemsEnv(Env):
         self.Load = info.experimentData['Load'].iloc[:,i].tolist()
         #action we take (charge , discharge , stay)
         self.action_space = spaces.Discrete(3)
-        #observation space
+        #observation space ( Only SOC matters )
         upperLimit = np.array(
             [
+                #timeblock
+                96,
+                #load
+                np.finfo(np.float32).max,
+                #PV
+                np.finfo(np.float32).max,
+                #SOC
                 self.BaseParameter['BaseParameter'].loc[self.BaseParameter['BaseParameter']['parameter_name']=='SOCmax',['value']],
-                self.BaseParameter['BaseParameter'].loc[self.BaseParameter['BaseParameter']['parameter_name']=='PowerMaxCharge',['value']],
+                #pricePerHour
+                np.finfo(np.float32).max,
             ],
             dtype=np.float32,
         )
         lowerLimit = np.array(
             [
+                #timeblock
+                0,
+                #load
+                np.finfo(np.float32).min,
+                #PV
+                np.finfo(np.float32).min,
+                #SOC
                 self.BaseParameter['BaseParameter'].loc[self.BaseParameter['BaseParameter']['parameter_name']=='SOCmin',['value']],
-                self.BaseParameter['BaseParameter'].loc[self.BaseParameter['BaseParameter']['parameter_name']=='PowerMaxdisCharge',['value']],
+                #pricePerHour
+                np.finfo(np.float32).min,
             ],
             dtype=np.float32,
         )
