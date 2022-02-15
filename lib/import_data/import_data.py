@@ -1,7 +1,6 @@
-import imp
 import pymysql as pm
 import pandas as pd 
-from random import choice
+
 class ImportData:
     def __init__(self,host,user,passwd,db,port=3306,charset='utf8'):
         self.host = host
