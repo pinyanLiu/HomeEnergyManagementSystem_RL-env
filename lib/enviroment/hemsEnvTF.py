@@ -1,6 +1,7 @@
 from  gym.envs.enviroment.import_data import ImportData 
 from  gym import Env
 from  gym import spaces
+from gym import make
 import numpy as np
 from  yaml import load , SafeLoader
 from random import randint
@@ -31,6 +32,7 @@ class HemsEnv(Env):
         #action we take (charge , discharge , stay)
         self.action_space = spaces.Discrete(3)
         #observation space ( Only SOC matters )
+        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -61,7 +63,7 @@ class HemsEnv(Env):
             ],
             dtype=np.float32,
         )
-        self.observationSpace = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
+        self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
         self.state = None
         
     def step(self,action):
@@ -76,33 +78,35 @@ class HemsEnv(Env):
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour)
         
-        sampleTime = self.state['sampleTime']
-        load = self.state['load']
-        pv = self.state['pv']
-        soc = self.state['SOC']
-        pricePerHour = self.state['pricePerHour']
+        # sampleTime = self.state['sampleTime']
+        # load = self.state['load']
+        # pv = self.state['pv']
+        # soc = self.state['SOC']
+        # pricePerHour = self.state['pricePerHour']
 
-
+        sampleTime,load,pv,soc,pricePerHour = self.state
 
         #interaction
 
         # if energy supply is greater than consumption
-        if pv > load:
+        if pv > load and (soc + 0.1) < 1:
             soc = soc + 0.1
+            cost = 0
+        elif pv >load and (soc+0.1) >=1 :
             cost = 0
         
         # if energy supply is less than consumption
         else:
                 # 0. charging
                 #prevent the agent still want to charge while the battery is full of electricity
-            if action == 0 and soc < 1:
+            if action == 0 and (soc + 0.1) < 1:
                 soc = soc+0.1
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
                 cost = pricePerHour * 0.25 *( load + 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
 
                 # 1. discharging
                 #prevent the agent still want to discharge while the battery is lack of electricity
-            elif action == 1 and soc >= 0:
+            elif action == 1 and (soc-0.1) >= 0:
                 soc = soc-0.1
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
                 cost = pricePerHour * 0.25 *( load - 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
@@ -113,9 +117,9 @@ class HemsEnv(Env):
                 cost = pricePerHour * 0.25 *( load - pv  )
             
         #change to next state
-        sampleTime = sampleTime+1
-        self.state = {'sampleTime':sampleTime,'load': self.Load[self.state['sampleTime']],'pv': self.PV[self.state['sampleTime']],'SOC':soc,'pricePerHour':self.GridPrice[self.state['sampleTime']]}
-
+        sampleTime = int(sampleTime+1)
+        #self.state = {'sampleTime':sampleTime,'load': self.Load[self.state['sampleTime']],'pv': self.PV[self.state['sampleTime']],'SOC':soc,'pricePerHour':self.GridPrice[self.state['sampleTime']]}
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
         #check if all day is done
         done = bool(
             sampleTime == 95
@@ -145,14 +149,14 @@ class HemsEnv(Env):
             reward.append(r2)
 
 
-        totalReward = sum(reward)
+        reward = sum(reward)
 
 
 
         #set placeholder for infomation
         info = {}
 
-        return self.state,totalReward,done,info
+        return self.state,reward,done,info
 
         
     def render(self):
@@ -163,14 +167,22 @@ class HemsEnv(Env):
         '''
 
         #pick one day from 360 days
-        i = randint(1,360)
+        i = randint(1,359)
         self.Load = self.info.experimentData['Load'].iloc[:,i]
         #reset state
-        self.state = {'sampleTime':0,'load': self.Load[0],'pv': self.PV[0],'SOC': float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),'pricePerHour':self.GridPrice[0]}
+        #self.state = {'sampleTime':0,'load': self.Load[0],'pv': self.PV[0],'SOC': float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),'pricePerHour':self.GridPrice[0]}
+        self.state=np.array([0,self.Load[0],self.PV[0],float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),self.GridPrice[0]])
         return self.state
 
 
 if __name__ == '__main__':
-    env = HemsEnv()
-    env.action_space.sample()
-    env.observationSpace.sample()
+    env = make("Hems-v0")
+#     # Initialize episode
+    states = env.reset()
+    done = False
+    step = 0
+    while not done: # Episode timestep
+        print(states)
+        actions = env.action_space.sample()
+        states, reward, done , info = env.step(action=actions)
+        

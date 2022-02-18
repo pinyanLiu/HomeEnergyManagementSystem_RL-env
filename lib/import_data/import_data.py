@@ -22,8 +22,13 @@ class ImportData:
         print('disconnect mysql')
         
     def __mysqlInit__(self):
-        self.conn = pm.connect(host=self.host,port=self.port,user=self.user,passwd=self.passwd,db=self.db,charset=self.charset)
-        self.cursor = self.conn.cursor()
+        try:
+            self.conn = pm.connect(host=self.host,port=self.port,user=self.user,passwd=self.passwd,db=self.db,charset=self.charset)
+            self.cursor = self.conn.cursor()
+            print(" connect to mysql successfully")
+        except:
+            print("fail to connet to mysql")
+
 
     def __importBaseParameter__(self):
         self.cursor.execute("SELECT * FROM BaseParameter")
