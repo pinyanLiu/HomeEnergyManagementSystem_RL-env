@@ -52,7 +52,7 @@ agent = dict(
         saver=dict(directory='saver_dir', load=False, frequency=50),
         summarizer=dict(directory='summaries',
         # list of labels, or 'all'
-        summaries=["graph", "losses", "reward", "entropy"]),       
+        summaries='all'),       
         # Do not record agent-environment interaction trace
         recorder=None
     )
@@ -60,9 +60,9 @@ agent = dict(
 runner = Runner(
     agent=agent,
     environment=dict(environment='gym', level='Hems-v0'),
-    max_episode_timesteps=1000,
+    max_episode_timesteps=30000,
 )
 
-runner.run(num_episodes=500)
+runner.run(num_episodes=29999)
 runner.agent.save(directory='saved-model', format='saved-model')
 runner.close()
