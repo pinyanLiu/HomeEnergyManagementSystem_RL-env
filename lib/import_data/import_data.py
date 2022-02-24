@@ -2,7 +2,7 @@ import pymysql as pm
 import pandas as pd 
 
 class ImportData:
-    def __init__(self,host,user,passwd,db,port=3306,charset='utf8'):
+    def __init__(self,host,user,passwd,db,mode,port=3306,charset='utf8'):
         self.host = host
         self.port = port
         self.user = user
@@ -13,7 +13,10 @@ class ImportData:
         self.BaseParameter = self.__importBaseParameter__()
         self.GridPrice = self.__importGridPrice__()
         self.PV = self.__importPhotoVoltaic__()
-        self.Load = self.__importLoad__()
+        if mode == 'Training':
+            self.Load = self.__importTrainingLoad__()
+        elif mode == 'Testing':
+            self.Load = self.__importTestingLoad__()
         self.experimentData = {'BaseParameter':self.BaseParameter,'GridPrice':self.GridPrice,'PV':self.PV,'Load':self.Load}
 
     def __del__(self):
@@ -48,16 +51,15 @@ class ImportData:
         PhotoVoltaic.columns = [column[0] for column in self.cursor.description]
         return PhotoVoltaic
 
-    def __importLoad__(self):
-        self.cursor.execute("SELECT * FROM sum_of_total_load_per15min")
-        sum_of_total_load_per15min = pd.DataFrame(self.cursor.fetchall())
-        sum_of_total_load_per15min.columns = [column[0] for column in self.cursor.description]
-        return sum_of_total_load_per15min
+    def __importTrainingLoad__(self):
+        self.cursor.execute("SELECT * FROM TrainingData")
+        TrainingData = pd.DataFrame(self.cursor.fetchall())
+        TrainingData.columns = [column[0] for column in self.cursor.description]
+        return TrainingData
 
-if __name__=='__main__':
-    EPData = ImportData(host="140.124.42.65",user= "root",passwd= "fuzzy314",db= "Cems_data")
-#    print(EPData.experimentData['BaseParameter'].loc[EPData.experimentData['BaseParameter']['parameter_name']=='batteryCapacity',['value']])
-    print(EPData.experimentData['GridPrice'])
-    # print(EPData.experimentData['PV'])
-    # print(EPData.experimentData['Load'])
-    #print(EPData.experimentData['Load'].iloc[:,1])
+    def __importTestingLoad__(self):
+        self.cursor.execute("SELECT * FROM TestingData")
+        TestingData = pd.DataFrame(self.cursor.fetchall())
+        TestingData.columns = [column[0] for column in self.cursor.description]
+        return TestingData
+
