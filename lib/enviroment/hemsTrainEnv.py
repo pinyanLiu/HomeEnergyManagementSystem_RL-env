@@ -106,38 +106,34 @@ class HemsEnv(Env):
         sampleTime,load,pv,soc,pricePerHour = self.state
         
         #interaction
-        try:
-            # if energy supply is greater than consumption
-            if pv > load and (soc + 0.1) < 1:
-                soc = soc + 0.1
-                cost = pricePerHour * 0.25 *( load - pv  )
-            elif pv >load and (soc+0.1) >=1 :
-                cost = pricePerHour * 0.25 *( load - pv  )
-            
-            # if energy supply is less than consumption
-            else:
-                    # 0. charging
-                    #prevent the agent still want to charge while the battery is full of electricity
-                if action == 0 and (soc + 0.1) < 1:
-                    soc = soc+0.1
-                    #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
-                    cost = pricePerHour * 0.25 *( load + 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
+        # if energy supply is greater than consumption
+        if pv > load and (soc + 0.1) < 1:
+            soc = soc + 0.1
+            cost = 0
+        elif pv >load and (soc+0.1) >=1 :
+            cost = 0
+        
+        # if energy supply is less than consumption
+        else:
+                # 0. charging
+                #prevent the agent still want to charge while the battery is full of electricity
+            if action == 0 and (soc + 0.1) <= 1:
+                soc = soc+0.1
+                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
+                cost = pricePerHour * 0.25 *( load + 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
 
-                    # 1. discharging
-                    #prevent the agent still want to discharge while the battery is lack of electricity
-                elif action == 1 and (soc-0.1) >= 0:
-                    soc = soc-0.1
-                    #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
-                    cost = pricePerHour * 0.25 *( load - 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
+                # 1. discharging
+                #prevent the agent still want to discharge while the battery is lack of electricity
+            elif action == 1 and (soc-0.1) >= 0:
+                soc = soc-0.1
+                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
+                cost = pricePerHour * 0.25 *( load - 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
 
-                    # 2.stay
-                else :
-                    #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
-                    cost = pricePerHour * 0.25 *( load - pv  )
-            
-        except :
-            print(sampleTime,load,pv,soc,pricePerHour)
-            print(type(sampleTime),type(load),type(pv),type(soc),type(pricePerHour))
+                # 2.stay
+            else :
+                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
+                cost = pricePerHour * 0.25 *( load - pv  )
+
 
         #change to next state
         sampleTime = int(sampleTime+1)
@@ -152,7 +148,7 @@ class HemsEnv(Env):
         reward = []
         if not done:
             #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc == 1 and action == 1) or (soc == 0 and action == -1) :
+            if (soc >= 1 and action == 1) or (soc <= 0 and action == -1) :
                 reward.append(-10000)
             # reward 1
             r1 = -cost

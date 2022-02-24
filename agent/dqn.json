@@ -28,9 +28,9 @@
     "max_episode_timesteps": 96,
     "batch_size": 16,
     "network": "auto",
-    "memory": 288,
-    "update_frequency": 0.25,
-    "learning_rate": 0.001,
+    "memory": 480,
+    "update_frequency": 0.027,
+    "learning_rate": 0.0001,
     "discount": 0.95,
     "return_processing": null,
     "predict_terminal_values": false,
@@ -43,8 +43,7 @@
     "config": null,
     "saver": {
         "directory": "saver_dir",
-        "load": false,
-        "frequency": 200
+        "frequency": 10000
     },
     "summarizer": {
         "directory": "summaries",
