@@ -13,7 +13,7 @@
 - Using my own mysql Database for the training and testing data , "import_data.py" is for grabbing them from the server.
 
 ## details in hemsTrainEnv
-- __init__(self)
+- __init__()
     1. import experiment parameters , training dataset from mysql database
     1. set the Observation space
 
@@ -26,10 +26,10 @@
     | pricePerHour    |   infinity         |  -infinity     |
     3. set the Action space
     which is a Discrete space of three actions "charge" , "discharge" , and "stay".  
-- step(self,action)
+- step(action)
     1. step() is literally for go through one step in the env . Which returns you the next state , the reward you get from this state (through the action you feed in) , whether the whole episode is done or not (96 time step for each episode) .
     2. the mathematical formula for building reward functions, please regard to https://app.heptabase.com/w/16a6f10f040b1a8ec108a0ce0f1a13556489be7c8a6885489f4f7489e4baf789
-- reset(self)
+- reset()
     1. For initializing the Env into $S_0$
     2. Which will randomly pick a training dataset from 360 days 
 
