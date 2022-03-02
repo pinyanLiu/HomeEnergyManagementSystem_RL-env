@@ -1,4 +1,4 @@
-#RL Environment for Home Energy Management system
+# RL Environment for Home Energy Management system
 
 ## introduction
 
@@ -16,8 +16,9 @@
 - __init__(self)
     1. import experiment parameters , training dataset from mysql database
     1. set the Observation space
+
     | name | upper Limit   | lower Limit |
-    | :--- |    :---:      | :---: |
+    | --- |    ---    | --- |
     | sampletime    |     96       |   0    | 
     | load consumption   |     infinity       | -infinity      | 
     | photovoltaic    |    infinity        |   -infinity    | 
@@ -34,6 +35,3 @@
 
 
     
-
-
- 
