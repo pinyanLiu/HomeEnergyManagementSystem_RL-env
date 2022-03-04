@@ -172,6 +172,8 @@ def main():
     fig.tight_layout()
     fig.savefig('pic/plot.png')
 
+    network = agent.get_architecture()
+    print(network)
     # Close agent and environment
     agent.close()
     environment.close()

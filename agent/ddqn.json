@@ -1,5 +1,5 @@
 {
-    "agent": "ddqn",
+    "agent": "double_dqn",
     "states": {
         "type": "float",
         "shape": [
@@ -27,22 +27,44 @@
     },
     "max_episode_timesteps": 96,
     "batch_size": 16,
-    "network": "auto",
+    "network": [
+        {
+            "type": "dense",
+            "size": 50,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 256,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 25,
+            "activation": "sigmoid"
+        }
+    ],
     "memory": 540,
     "start_updating": 64,
     "update_frequency": 0.002,
     "learning_rate": {
         "type": "exponential",
-        "unit": "timesteps",
-        "num_steps": 1000,
+        "unit": "episodes",
+        "num_steps": 2000,
         "initial_value": 0.01,
-        "decay_rate": 0.5
+        "decay_rate": 0.95
     },
     "discount": 0.95,
     "return_processing": null,
     "predict_terminal_values": false,
     "state_preprocessing": "linear_normalization",
-    "exploration": 0.25,
+    "exploration": {
+        "type": "exponential",
+        "unit": "episodes",
+        "num_steps": 2000,
+        "initial_value": 0.01,
+        "decay_rate": 0.95
+    },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
     "entropy_regularization": 0.0,
