@@ -1,5 +1,5 @@
 {
-    "agent": "dqn",
+    "agent": "ddqn",
     "states": {
         "type": "float",
         "shape": [
@@ -26,9 +26,10 @@
         "num_values": 3
     },
     "max_episode_timesteps": 96,
-    "batch_size": 32,
+    "batch_size": 16,
     "network": "auto",
     "memory": 540,
+    "start_updating": 64,
     "update_frequency": 0.002,
     "learning_rate": {
         "type": "exponential",
