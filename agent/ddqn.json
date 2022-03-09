@@ -26,29 +26,17 @@
         "num_values": 3
     },
     "max_episode_timesteps": 96,
-    "batch_size": 16,
+    "batch_size": 32,
     "network": "auto",
     "memory": 540,
     "start_updating": 64,
     "update_frequency": 0.002,
-    "learning_rate": {
-        "type": "linear",
-        "unit": "episodes",
-        "num_steps": 1000,
-        "initial_value": 0.999,
-        "final_value": 0.01
-    },
+    "learning_rate": 0.0001,
     "discount": 0.95,
     "return_processing": null,
     "predict_terminal_values": false,
     "state_preprocessing": "linear_normalization",
-    "exploration": {
-        "type": "linear",
-        "unit": "episodes",
-        "num_steps": 1000,
-        "initial_value": 0.999,
-        "final_value": 0.1
-    },
+    "exploration": 0.2,
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
     "entropy_regularization": 0.0,
