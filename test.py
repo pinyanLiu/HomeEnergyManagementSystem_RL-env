@@ -10,6 +10,7 @@ def main():
     soc = []
     load = []
     pv = []
+    totalReward = 0
     monthlySoc = pd.DataFrame()
     monthlyLoad = pd.DataFrame()
     monthlyPv = pd.DataFrame()
@@ -27,6 +28,7 @@ def main():
             load.append(states[1])
             pv.append(states[2])
             soc.append(states[3])
+            totalReward += reward
             remain = [load[i]-pv[i] for i in range(len(load))]
             if i == 11:
                 price.append(states[4])
@@ -39,7 +41,7 @@ def main():
         load.clear()
         pv.clear()
         soc.clear()
-        
+    print('Agent average episode reward: ', totalReward/12 )
 
 #plot the result
 

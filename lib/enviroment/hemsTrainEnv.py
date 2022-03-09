@@ -1,4 +1,3 @@
-from cmath import e
 from  gym.envs.Hems.import_data import ImportData 
 from  gym import Env
 from  gym import spaces
@@ -6,6 +5,7 @@ from gym import make
 import numpy as np
 from  yaml import load , SafeLoader
 from random import randint
+
 class HemsEnv(Env):
     def __init__(self) :
         '''
@@ -15,7 +15,7 @@ class HemsEnv(Env):
         #
         # The information of ip should   'NOT'   upload to github
         #
-        with open("mysqlData.yaml","r") as f:
+        with open("yaml/mysqlData.yaml","r") as f:
             self.mysqlData = load(f,SafeLoader)
 
         self.host = self.mysqlData['host']
@@ -107,32 +107,32 @@ class HemsEnv(Env):
         
         #interaction
         # if energy supply is greater than consumption
-        if pv > load and (soc + 0.1) < 1:
-            soc = soc + 0.1
-            cost = 0
-        elif pv >load and (soc+0.1) >=1 :
-            cost = 0
+        if pv > load :
+            cost = 0.001
+
         
         # if energy supply is less than consumption
         else:
                 # 0. charging
                 #prevent the agent still want to charge while the battery is full of electricity
-            if action == 0 and (soc + 0.1) <= 1:
+            if action == 0 and (soc + 0.1) < 1:
                 soc = soc+0.1
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
+                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
                 cost = pricePerHour * 0.25 *( load + 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
 
                 # 1. discharging
                 #prevent the agent still want to discharge while the battery is lack of electricity
             elif action == 1 and (soc-0.1) >= 0:
                 soc = soc-0.1
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
+
+                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
                 cost = pricePerHour * 0.25 *( load - 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
 
                 # 2.stay
             else :
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
                 cost = pricePerHour * 0.25 *( load - pv  )
+            
 
 
         #change to next state
@@ -148,24 +148,38 @@ class HemsEnv(Env):
         reward = []
         if not done:
             #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc >= 1 and action == 1) or (soc <= 0 and action == -1) :
-                reward.append(-10000)
+            if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
+                reward.append(-1)
             # reward 1
-            r1 = -cost
+            r1 = -cost/10000
             reward.append(r1)
+            #reward 2
+            if cost / (pricePerHour*0.25) >= 20000:
+                reward.append(-5)
+            else:    
+                reward.append(0.0625)
+
+
 
         # if done
         else : 
-            if (soc >= 1 and action == 1) or (soc <= 0 and action == -1) :
-                reward.append(-10000)
+            if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
+                reward.append(-1)
             # reward 1
-            r1 = -cost
+            r1 = -cost/10000
             reward.append(r1)
-            # reward 2
+            #reward 2
+            if cost / (pricePerHour*0.25) >= 20000:
+                reward.append(-5)
+            else:    
+                reward.append(0.0625)
+
+
+            # reward 3
             if soc >= float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]):
-                r2 = 100000
+                r2 = 25
             else:
-                r2 = -50000    
+                r2 = -25   
             reward.append(r2)
 
 

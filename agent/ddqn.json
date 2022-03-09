@@ -27,43 +27,27 @@
     },
     "max_episode_timesteps": 96,
     "batch_size": 16,
-    "network": [
-        {
-            "type": "dense",
-            "size": 50,
-            "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 256,
-            "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 25,
-            "activation": "sigmoid"
-        }
-    ],
+    "network": "auto",
     "memory": 540,
     "start_updating": 64,
     "update_frequency": 0.002,
     "learning_rate": {
-        "type": "exponential",
+        "type": "linear",
         "unit": "episodes",
-        "num_steps": 2000,
-        "initial_value": 0.01,
-        "decay_rate": 0.95
+        "num_steps": 1000,
+        "initial_value": 0.999,
+        "final_value": 0.01
     },
     "discount": 0.95,
     "return_processing": null,
     "predict_terminal_values": false,
     "state_preprocessing": "linear_normalization",
     "exploration": {
-        "type": "exponential",
+        "type": "linear",
         "unit": "episodes",
-        "num_steps": 2000,
-        "initial_value": 0.01,
-        "decay_rate": 0.95
+        "num_steps": 1000,
+        "initial_value": 0.999,
+        "final_value": 0.1
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
@@ -72,7 +56,8 @@
     "config": null,
     "saver": {
         "directory": "saver_dir",
-        "frequency": 5000
+        "frequency": 1,
+        "unit": "episodes"
     },
     "summarizer": {
         "directory": "summaries",
