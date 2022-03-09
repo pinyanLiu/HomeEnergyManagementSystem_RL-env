@@ -26,7 +26,7 @@
         "num_values": 3
     },
     "max_episode_timesteps": 96,
-    "batch_size": 32,
+    "batch_size": 16,
     "network": "auto",
     "memory": 540,
     "start_updating": 64,

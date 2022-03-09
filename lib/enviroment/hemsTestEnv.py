@@ -1,4 +1,5 @@
 from  gym.envs.Hems.import_data import ImportData 
+from tensorforce import Agent,Environment
 from  gym import Env
 from  gym import spaces
 from gym import make
@@ -150,7 +151,7 @@ class HemsEnv(Env):
             reward.append(r1)
             # reward 2
             if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-6)
+                reward.append(-5)
             else:    
                 reward.append(0.0625)
 
@@ -165,7 +166,7 @@ class HemsEnv(Env):
             reward.append(r1)
             #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-6)
+                reward.append(-5)
             else:    
                 reward.append(0.0625)
             # reward 2
@@ -227,15 +228,17 @@ class HemsEnv(Env):
 
 
 if __name__ == '__main__':
-    env = make("Hems-v1")
-#     # Initialize episode
-    states = env.reset()
-    done = False
-    step = 0
-    Totalreward = 0
-    while not done: # Episode timestep
-        actions = env.action_space.sample()
-        states, reward, done , info = env.step(action=actions)
-        Totalreward += reward
-    print(states)
+    environment=Environment.create(environment='gym',level='Hems-v1')
+    totalReward = 0
+    price = []
+    for i in range(12):
+        states = environment.reset()
+
+        terminal = False
+        while not terminal:
+            actions = np.random.randint(3)
+            states, terminal, reward = environment.execute(actions=actions)
+            totalReward += reward
+
+    print('random average episode reward: ', totalReward/12 )
         
