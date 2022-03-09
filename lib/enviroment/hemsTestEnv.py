@@ -150,7 +150,7 @@ class HemsEnv(Env):
             reward.append(r1)
             # reward 2
             if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-5)
+                reward.append(-6)
             else:    
                 reward.append(0.0625)
 
@@ -165,7 +165,7 @@ class HemsEnv(Env):
             reward.append(r1)
             #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-5)
+                reward.append(-6)
             else:    
                 reward.append(0.0625)
             # reward 2
@@ -237,5 +237,5 @@ if __name__ == '__main__':
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
         Totalreward += reward
-    print("Random agent average reward: " , Totalreward/12  )
+    print(states)
         
