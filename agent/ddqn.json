@@ -1,5 +1,5 @@
 {
-    "agent": "double_dqn",
+    "agent": "dueling_dqn",
     "states": {
         "type": "float",
         "shape": [
@@ -30,22 +30,17 @@
     "network": [
         {
             "type": "dense",
-            "size": 64,
+            "size": 40,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 64,
+            "size": 40,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 64,
-            "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 64,
+            "size": 40,
             "activation": "relu"
         }
     ],
