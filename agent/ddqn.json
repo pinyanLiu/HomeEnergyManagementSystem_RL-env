@@ -36,6 +36,11 @@
         {
             "type": "dense",
             "size": 64,
+            "activation": "tanh"
+        },
+        {
+            "type": "dense",
+            "size": 64,
             "activation": "relu"
         }
     ],
