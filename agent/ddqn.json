@@ -27,7 +27,18 @@
     },
     "max_episode_timesteps": 96,
     "batch_size": 16,
-    "network": "auto",
+    "network": [
+        {
+            "type": "dense",
+            "size": 64,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 64,
+            "activation": "relu"
+        }
+    ],
     "memory": 540,
     "start_updating": 64,
     "update_frequency": 0.002,
