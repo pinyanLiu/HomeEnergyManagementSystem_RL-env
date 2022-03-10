@@ -1,5 +1,4 @@
 from  gym.envs.Hems.import_data import ImportData 
-from tensorforce import Agent,Environment
 from  gym import Env
 from  gym import spaces
 from gym import make
@@ -145,7 +144,7 @@ class HemsEnv(Env):
         if not done:
             #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
             if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
-                reward.append(-1)
+                reward.append(-2)
             # reward 1
             r1 = -cost/10000
             reward.append(r1)
@@ -160,7 +159,7 @@ class HemsEnv(Env):
         # if done
         else : 
             if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
-                reward.append(-1)
+                reward.append(-2)
             # reward 1
             r1 = -cost/10000
             reward.append(r1)
@@ -228,17 +227,15 @@ class HemsEnv(Env):
 
 
 if __name__ == '__main__':
-    environment=Environment.create(environment='gym',level='Hems-v1')
-    totalReward = 0
-    price = []
-    for i in range(12):
-        states = environment.reset()
-
-        terminal = False
-        while not terminal:
-            actions = np.random.randint(3)
-            states, terminal, reward = environment.execute(actions=actions)
-            totalReward += reward
-
-    print('random average episode reward: ', totalReward/12 )
+    env = make("Hems-v1")
+#     # Initialize episode
+    states = env.reset()
+    done = False
+    step = 0
+    Totalreward = 0
+    while not done: # Episode timestep
+        actions = env.action_space.sample()
+        states, reward, done , info = env.step(action=actions)
+        Totalreward += reward
+    print(states)
         

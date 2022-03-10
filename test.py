@@ -29,7 +29,7 @@ def main():
             pv.append(states[2])
             soc.append(states[3])
             totalReward += reward
-            remain = [load[i]-pv[i] for i in range(len(load))]
+            remain = [load[j]-pv[j] for j in range(len(load))]
             if i == 11:
                 price.append(states[4])
 

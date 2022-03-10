@@ -4,6 +4,7 @@ from  gym import spaces
 from gym import make
 import numpy as np
 from  yaml import load , SafeLoader
+from random import randint
 
 class HemsEnv(Env):
     def __init__(self) :
@@ -21,38 +22,39 @@ class HemsEnv(Env):
         self.user = self.mysqlData['user']
         self.passwd = self.mysqlData['passwd']
         self.db = self.mysqlData['db']
-        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db,mode = 'Testing')
+        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db,mode='Training')
+        
         self.BaseParameter = self.info.experimentData['BaseParameter']
         self.GridPrice = self.info.experimentData['GridPrice']['price_value'].tolist()
+        #pick one day from 360 days
+        i = randint(0,359)
+        self.Load = self.info.experimentData['Load'].iloc[:,i].tolist()
 
-        #each month pick one day for testing
-        self.i = 0
-        self.Load = self.info.experimentData['Load'].iloc[:,self.i].tolist()
-        if self.i % 12 == 0:
+        if i / 12 == 0:
             self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif self.i % 12 == 1:
+        elif i / 12 == 1:
             self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif self.i % 12 == 2:
+        elif i / 12 == 2:
             self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif self.i % 12 == 3:
+        elif i / 12 == 3:
             self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif self.i % 12 == 4:
+        elif i / 12 == 4:
             self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif self.i % 12 == 5:
+        elif i / 12 == 5:
             self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif self.i % 12 == 6:
+        elif i / 12 == 6:
             self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif self.i % 12 == 7:
+        elif i / 12 == 7:
             self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif self.i % 12 == 8:
+        elif i / 12 == 8:
             self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif self.i % 12 == 9:
+        elif i / 12 == 9:
             self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif self.i % 12 == 10:
+        elif i / 12 == 10:
             self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif self.i % 12 == 11:
+        elif i / 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
-        
+
         #action we take (charge , discharge , stay)
         self.action_space = spaces.Discrete(3)
         #observation space ( Only SOC matters )
@@ -102,12 +104,12 @@ class HemsEnv(Env):
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour)
         sampleTime,load,pv,soc,pricePerHour = self.state
-
+        
         #interaction
-
         # if energy supply is greater than consumption
-        if pv > load and (soc + 0.1) < 1:
-           cost = 0.001
+        if pv > load :
+            cost = 0.001
+
         
         # if energy supply is less than consumption
         else:
@@ -115,13 +117,14 @@ class HemsEnv(Env):
                 #prevent the agent still want to charge while the battery is full of electricity
             if action == 0 and (soc + 0.1) < 1:
                 soc = soc+0.1
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
+                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
                 cost = pricePerHour * 0.25 *( load + 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
 
                 # 1. discharging
                 #prevent the agent still want to discharge while the battery is lack of electricity
             elif action == 1 and (soc-0.1) >= 0:
                 soc = soc-0.1
+
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
                 cost = pricePerHour * 0.25 *( load - 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
 
@@ -130,6 +133,8 @@ class HemsEnv(Env):
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
                 cost = pricePerHour * 0.25 *( load - pv  )
             
+
+
         #change to next state
         sampleTime = int(sampleTime+1)
         #self.state = {'sampleTime':sampleTime,'load': self.Load[self.state['sampleTime']],'pv': self.PV[self.state['sampleTime']],'SOC':soc,'pricePerHour':self.GridPrice[self.state['sampleTime']]}
@@ -144,13 +149,13 @@ class HemsEnv(Env):
         if not done:
             #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
             if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
-                reward.append(-1)
+                reward.append(-2)
             # reward 1
             r1 = -cost/10000
             reward.append(r1)
-            # reward 2
+            #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-6)
+                reward.append(-5)
             else:    
                 reward.append(0.0625)
 
@@ -159,20 +164,23 @@ class HemsEnv(Env):
         # if done
         else : 
             if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
-                reward.append(-1)
+                reward.append(-2)
+                print('im a dumb')
             # reward 1
             r1 = -cost/10000
             reward.append(r1)
             #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-6)
+                reward.append(-5)
             else:    
                 reward.append(0.0625)
-            # reward 2
+
+
+            # reward 3
             if soc >= float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]):
                 r2 = 25
             else:
-                r2 = -25
+                r2 = -25   
             reward.append(r2)
 
 
@@ -181,7 +189,7 @@ class HemsEnv(Env):
 
 
         #set placeholder for infomation
-        info = {'cost':cost,'soc':soc}
+        info = {}
 
         return self.state,reward,done,info
 
@@ -192,42 +200,43 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
+        #pick one day from 360 days
+        i = randint(0,359)
+        self.Load = self.info.experimentData['Load'].iloc[:,i].tolist()
 
-        #each month pick one day for testing
-        self.i += 1
-        self.Load = self.info.experimentData['Load'].iloc[:,self.i]
-
-        if self.i % 12 == 0:
+        if i % 12 == 0:
             self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif self.i % 12 == 1:
+        elif i % 12 == 1:
             self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif self.i % 12 == 2:
+        elif i % 12 == 2:
             self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif self.i % 12 == 3:
+        elif i % 12 == 3:
             self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif self.i % 12 == 4:
+        elif i % 12 == 4:
             self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif self.i % 12 == 5:
+        elif i % 12 == 5:
             self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif self.i % 12 == 6:
+        elif i % 12 == 6:
             self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif self.i % 12 == 7:
+        elif i % 12 == 7:
             self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif self.i % 12 == 8:
+        elif i % 12 == 8:
             self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif self.i % 12 == 9:
+        elif i % 12 == 9:
             self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif self.i % 12 == 10:
+        elif i % 12 == 10:
             self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif self.i % 12 == 11:
+        elif i % 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
+
+
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),self.GridPrice[0]])
         return self.state
 
 
 if __name__ == '__main__':
-    env = make("Hems-v1")
+    env = make("Hems-v0")
 #     # Initialize episode
     states = env.reset()
     done = False
@@ -237,5 +246,5 @@ if __name__ == '__main__':
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
         Totalreward += reward
-    print(states)
+    print(Totalreward)
         
