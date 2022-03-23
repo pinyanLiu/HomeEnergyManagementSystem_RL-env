@@ -1,7 +1,7 @@
 from tensorforce.execution import Runner  
 
 runner = Runner(
-    agent= 'agent/ddqn.json',
+    agent= 'agent/D3qn.json',
     environment=dict(environment='gym', level='Hems-v0'),
     max_episode_timesteps=96,
 )

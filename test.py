@@ -29,10 +29,10 @@ def main():
             pv.append(states[2])
             soc.append(states[3])
             totalReward += reward
-            remain = [load[j]-pv[j] for j in range(len(load))]
             if i == 11:
                 price.append(states[4])
 
+        remain = [load[j]-pv[j] for j in range(len(load))]
         price = [(price[i]-np.min(price))/(np.max(price)-np.min(price)) for i in range(len(price))] #normalize price to [0,1] 
         monthlySoc.insert(i,column=str(i+1),value=soc)
        # monthlyLoad.insert(i,column=str(i+1),value=load)
@@ -136,7 +136,7 @@ def main():
 
     sub1.set_ylabel('Power')
     sub1.plot(range(len(monthlyRemain['1'][:])), monthlyRemain['1'][:],color='green')  
-
+    sub1.plot(range(len(monthlyRemain['1'][:])), np.zeros(95),'--')
 
     sub2.set_ylabel('Power')
     sub2.plot(range(len(monthlyRemain['2'][:])), monthlyRemain['2'][:],color='green')  

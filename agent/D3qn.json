@@ -1,5 +1,5 @@
 {
-    "agent": "double_dqn",
+    "agent": "dueling_dqn",
     "states": {
         "type": "float",
         "shape": [

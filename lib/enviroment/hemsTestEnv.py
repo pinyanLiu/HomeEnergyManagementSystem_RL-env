@@ -23,7 +23,7 @@ class HemsEnv(Env):
         self.db = self.mysqlData['db']
         self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db,mode = 'Testing')
         self.BaseParameter = self.info.experimentData['BaseParameter']
-        self.GridPrice = self.info.experimentData['GridPrice']['price_value'].tolist()
+        self.GridPrice = self.info.experimentData['GridPrice']['summer_price'].tolist()
 
         #each month pick one day for testing
         self.i = 0
@@ -146,7 +146,7 @@ class HemsEnv(Env):
             if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
                 reward.append(-2)
             # reward 1
-            r1 = -cost/10000
+            r1 = -cost/10000*1.05
             reward.append(r1)
             # reward 2
             if cost / (pricePerHour*0.25) >= 20000:
@@ -161,7 +161,7 @@ class HemsEnv(Env):
             if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
                 reward.append(-2)
             # reward 1
-            r1 = -cost/10000
+            r1 = -cost/10000*1.05
             reward.append(r1)
             #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
@@ -169,10 +169,7 @@ class HemsEnv(Env):
             else:    
                 reward.append(0.0625)
             # reward 2
-            if soc >= float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]):
-                r2 = 25
-            else:
-                r2 = -25
+            r2 =  10*(soc - float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
             reward.append(r2)
 
 
