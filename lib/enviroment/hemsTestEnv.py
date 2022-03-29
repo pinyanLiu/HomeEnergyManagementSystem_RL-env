@@ -146,13 +146,14 @@ class HemsEnv(Env):
             if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
                 reward.append(-2)
             # reward 1
-            r1 = -cost/10000*1.05
+            r1 = -cost/10000*1.08
             reward.append(r1)
             # reward 2
             if cost / (pricePerHour*0.25) >= 20000:
                 reward.append(-5)
             else:    
                 reward.append(0.0625)
+            reward.append(soc- float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
 
 
 
@@ -161,7 +162,7 @@ class HemsEnv(Env):
             if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
                 reward.append(-2)
             # reward 1
-            r1 = -cost/10000*1.05
+            r1 = -cost/10000*1.08
             reward.append(r1)
             #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
@@ -169,7 +170,7 @@ class HemsEnv(Env):
             else:    
                 reward.append(0.0625)
             # reward 2
-            r2 =  10*(soc - float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
+            r2 =  20*(soc - float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
             reward.append(r2)
 
 
