@@ -1,0 +1,72 @@
+{
+    "agent": "ddpg",
+    "states": {
+        "type": "float",
+        "shape": [
+            5
+        ],
+        "min_value": [
+            0.0,
+            "-Infinity",
+            "-Infinity",
+            0.0,
+            "-Infinity"
+        ],
+        "max_value": [
+            96.0,
+            "Infinity",
+            "Infinity",
+            1.0,
+            "Infinity"
+        ]
+    },
+    "actions": {
+        "type": "int",
+        "shape": [],
+        "num_values": 3
+    },
+    "max_episode_timesteps": 96,
+    "batch_size": 16,
+    "network": [
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        }
+    ],
+    "memory": 540,
+    "start_updating": 64,
+    "update_frequency": 0.002,
+    "learning_rate": 0.0001,
+    "discount": 0.98,
+    "return_processing": null,
+    "predict_terminal_values": false,
+    "state_preprocessing": "linear_normalization",
+    "exploration": 0.2,
+    "variable_noise": 0.0,
+    "l2_regularization": 0.0,
+    "entropy_regularization": 0.0,
+    "parallel_interactions": 1,
+    "config": null,
+    "saver": {
+        "directory": "saver_dir",
+        "frequency": 100,
+        "unit": "episodes"
+    },
+    "summarizer": {
+        "directory": "summaries",
+        "summaries": "all"
+    },
+    "tracking": null,
+    "recorder": null
+}
