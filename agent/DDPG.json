@@ -22,13 +22,9 @@
     },
     "actions": {
         "type": "float",
-        "shape": [],
-        "min_value": [
-            -0.25
-        ],
-        "max_value": [
-            0.25
-        ]
+        "shape": 1,
+        "min_value": -0.025,
+        "max_value": 0.025
     },
     "max_episode_timesteps": 96,
     "batch_size": 16,
@@ -40,24 +36,7 @@
     "discount": 0.98,
     "return_processing": null,
     "predict_terminal_values": false,
-    "critic": [
-        {
-            "type": "dense",
-            "size": 40,
-            "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 40,
-            "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 40,
-            "activation": "relu"
-        }
-    ],
-    "crtic_optimizer": 1.0,
+    "critic_optimizer": 1.0,
     "state_preprocessing": "linear_normalization",
     "exploration": 0.2,
     "variable_noise": 0.0,
