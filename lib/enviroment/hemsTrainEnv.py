@@ -55,8 +55,8 @@ class HemsEnv(Env):
         elif i / 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
 
-        #action we take (charge , discharge , stay)
-        self.action_space = spaces.Discrete(3)
+        #action we take (degree of charging/discharging power)
+        self.action_space = spaces.Box(low=-0.025,high=0.025,shape=(1,),dtype=np.float32)
         #observation space ( Only SOC matters )
         self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
         upperLimit = np.array(
@@ -104,34 +104,31 @@ class HemsEnv(Env):
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour)
         sampleTime,load,pv,soc,pricePerHour = self.state
-        
+        soc_change = float(action)
+        # action(soc_change) is the degree of charging/discharging power .
+        # if soc_change > 0 means charging , whereas soc_change<0 means discharging.
+
         #interaction
         # if energy supply is greater than consumption
-        if pv > load :
+        if (pv + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])) >= load :
             cost = 0.001
 
         
         # if energy supply is less than consumption
         else:
-                # 0. charging
-                #prevent the agent still want to charge while the battery is full of electricity
-            if action == 0 and (soc + 0.1) < 1:
-                soc = soc+0.1
+            if (soc + soc_change) < 0 :
+                soc = 0
+                cost = 0.001
+            elif (soc + soc_change) > 1:
+                soc = 1
+                cost = 0.001
+            else:
+            #calculate the new soc for next state
+                soc = soc+soc_change
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-                cost = pricePerHour * 0.25 *( load + 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
+                cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
 
-                # 1. discharging
-                #prevent the agent still want to discharge while the battery is lack of electricity
-            elif action == 1 and (soc-0.1) >= 0:
-                soc = soc-0.1
 
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-                cost = pricePerHour * 0.25 *( load - 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
-
-                # 2.stay
-            else :
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
-                cost = pricePerHour * 0.25 *( load - pv  )
             
 
 
@@ -148,7 +145,7 @@ class HemsEnv(Env):
         reward = []
         if not done:
             #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
+            if (soc >= 1 and soc_change > 0) or (soc <= 0 and soc_change < 0) :
                 reward.append(-2)
             # reward 1
             r1 = -cost/10000*1.08
@@ -156,7 +153,7 @@ class HemsEnv(Env):
             #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
                 reward.append(-5)
-                if action == 1:
+                if soc_change < 0:
                     reward.append(2)
             else:    
                 reward.append(0.0625)
@@ -165,7 +162,7 @@ class HemsEnv(Env):
 
         # if done
         else : 
-            if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
+            if (soc >= 1 and soc_change > 0) or (soc <= 0 and soc_change < 1) :
                 reward.append(-2)
             # reward 1
             r1 = -cost/10000*1.08
@@ -173,7 +170,7 @@ class HemsEnv(Env):
             #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
                 reward.append(-5)
-                if action == 1:
+                if soc_change < 1:
                     reward.append(2)
             else:    
                 reward.append(0.0625)
