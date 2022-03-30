@@ -28,7 +28,23 @@
     },
     "max_episode_timesteps": 96,
     "batch_size": 16,
-    "network": "auto",
+    "network": [
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "tanh"
+        }
+    ],
     "memory": 540,
     "start_updating": 64,
     "update_frequency": 0.002,
@@ -36,6 +52,60 @@
     "discount": 0.98,
     "return_processing": null,
     "predict_terminal_values": false,
+    "critic": [
+        {
+            "type": "retrieve",
+            "name": "states_retrieve",
+            "tensor": "states"
+        },
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        },
+        {
+            "type": "linear",
+            "size": 40
+        },
+        {
+            "type": "register",
+            "name": "states_register",
+            "tensor": "states-embedding"
+        },
+        {
+            "type": "retrieve",
+            "name": "actions_retrieve",
+            "tensor": "actions"
+        },
+        {
+            "type": "linear",
+            "size": 40
+        },
+        {
+            "type": "register",
+            "name": "actions_register",
+            "tensor": "actions-embedding"
+        },
+        {
+            "type": "retrieve",
+            "name": "retrieve",
+            "tensor": [
+                "states-embedding",
+                "actions-embedding"
+            ],
+            "aggregation": "concat",
+            "axis": 0
+        },
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        },
+        {
+            "type": "linear",
+            "size": 40
+        }
+    ],
     "critic_optimizer": 1.0,
     "state_preprocessing": "linear_normalization",
     "exploration": 0.2,
