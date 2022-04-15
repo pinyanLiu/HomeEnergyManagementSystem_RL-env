@@ -23,8 +23,8 @@
     "actions": {
         "type": "float",
         "shape": 1,
-        "min_value": -0.25,
-        "max_value": 0.25
+        "min_value": -0.1,
+        "max_value": 0.1
     },
     "max_episode_timesteps": 96,
     "batch_size": 16,
@@ -42,13 +42,13 @@
         {
             "type": "dense",
             "size": 40,
-            "activation": "tanh"
+            "activation": "relu"
         }
     ],
     "memory": 540,
     "start_updating": 64,
     "update_frequency": 0.002,
-    "learning_rate": 0.0001,
+    "learning_rate": 0.001,
     "discount": 0.98,
     "return_processing": null,
     "predict_terminal_values": false,
@@ -67,10 +67,6 @@
                 "activation": "relu"
             },
             {
-                "type": "linear",
-                "size": 40
-            },
-            {
                 "type": "register",
                 "name": "states_register",
                 "tensor": "states-embedding"
@@ -85,8 +81,9 @@
                 ]
             },
             {
-                "type": "linear",
-                "size": 40
+                "type": "dense",
+                "size": 40,
+                "activation": "relu"
             },
             {
                 "type": "register",
@@ -104,22 +101,13 @@
                 ],
                 "aggregation": "concat",
                 "axis": 0
-            },
-            {
-                "type": "dense",
-                "size": 40,
-                "activation": "relu"
-            },
-            {
-                "type": "linear",
-                "size": 40
             }
         ]
     ],
-    "critic_optimizer": 1.0,
+    "critic_optimizer": 0.99,
     "state_preprocessing": "linear_normalization",
-    "exploration": 0.2,
-    "variable_noise": 0.0,
+    "exploration": 0.3,
+    "variable_noise": 0.1,
     "l2_regularization": 0.0,
     "entropy_regularization": 0.0,
     "parallel_interactions": 1,
