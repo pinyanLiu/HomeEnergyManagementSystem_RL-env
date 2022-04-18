@@ -54,7 +54,7 @@ class HemsEnv(Env):
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
         
         #action we take (degree of charging/discharging power)
-        self.action_space = spaces.Box(low=-0.025,high=0.025,shape=(1,),dtype=np.float32)
+        self.action_space = spaces.Box(low=-0.25,high=0.25,shape=(1,),dtype=np.float32)
 
         #observation space ( Only SOC matters )
         self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
@@ -108,6 +108,7 @@ class HemsEnv(Env):
         # if soc_change > 0 means charging , whereas soc_change<0 means discharging.
 
         #interaction
+        reward = []
         # if energy supply is greater than consumption
         if (pv + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])) >= load :
             cost = 0.001
@@ -118,9 +119,14 @@ class HemsEnv(Env):
             if (soc + soc_change) < 0 :
                 soc = 0
                 cost = 0.001
+                reward.append(-2) #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
+
+
             elif (soc + soc_change) > 1:
                 soc = 1
                 cost = 0.001
+                reward.append(-2) #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
+
             else:
             #calculate the new soc for next state
                 soc = soc+soc_change
@@ -141,40 +147,37 @@ class HemsEnv(Env):
         )
 
         #REWARD
-        reward = []
         if not done:
-            #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc >= 1 and soc_change > 0) or (soc <= 0 and soc_change < 0) :
-                reward.append(-2)
             # reward 1
-            r1 = -cost/10000*1.08
+            r1 = -cost/10000*1.2
             reward.append(r1)
             #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
                 reward.append(-5)
                 if soc_change < 0:
                     reward.append(2)
+                elif soc_change > 0 :
+                    reward.append(-2)
             else:    
                 reward.append(0.0625)
-            reward.append(soc- float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
+            #reward3
+            reward.append(soc- float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0])*np.exp(sampleTime/35))
 
 
         # if done
         else : 
-            if (soc >= 1 and soc_change > 0) or (soc <= 0 and soc_change < 1) :
-                reward.append(-2)
             # reward 1
-            r1 = -cost/10000*1.08
+            r1 = -cost/10000*1.2
             reward.append(r1)
             #reward 2
             if cost / (pricePerHour*0.25) >= 20000:
                 reward.append(-5)
-                if soc_change < 1:
+                if soc_change < 0:
                     reward.append(2)
+                elif soc_change > 0 :
+                    reward.append(-2)
             else:    
                 reward.append(0.0625)
-
-
             # reward 3
             r2 =  20*(soc - float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
             reward.append(r2)
