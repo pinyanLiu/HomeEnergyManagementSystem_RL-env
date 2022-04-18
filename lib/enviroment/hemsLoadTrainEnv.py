@@ -1,4 +1,5 @@
 from  gym.envs.Hems.import_data import ImportData 
+from gym.envs.Hems.loads.interrupted import InterruptedLoad
 from  gym import Env
 from  gym import spaces
 from gym import make
@@ -56,9 +57,9 @@ class HemsEnv(Env):
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
 
         #action we take (charge , discharge , stay)
-        self.action_space = spaces.Discrete(3)
+        self.action_space = spaces.Discrete(2)
         #observation space ( Only SOC matters )
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
+        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -67,8 +68,6 @@ class HemsEnv(Env):
                 np.finfo(np.float32).max,
                 #PV
                 np.finfo(np.float32).max,
-                #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmax','value'],
                 #pricePerHour
                 np.finfo(np.float32).max,
             ],
@@ -81,9 +80,7 @@ class HemsEnv(Env):
                 #load
                 np.finfo(np.float32).min,
                 #PV
-                np.finfo(np.float32).min,
-                #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmin','value'],         
+                np.finfo(np.float32).min,   
                 #pricePerHour
                 np.finfo(np.float32).min,
             ],
@@ -103,7 +100,7 @@ class HemsEnv(Env):
         assert self.action_space.contains(action),err_msg
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour)
-        sampleTime,load,pv,soc,pricePerHour = self.state
+        sampleTime,load,pv,pricePerHour = self.state
         
         #interaction
         # if energy supply is greater than consumption
@@ -231,7 +228,7 @@ class HemsEnv(Env):
 
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),self.GridPrice[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0]])
         return self.state
 
 
