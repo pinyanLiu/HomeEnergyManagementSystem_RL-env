@@ -23,31 +23,26 @@
     "actions": {
         "type": "float",
         "shape": 1,
-        "min_value": -0.15,
-        "max_value": 0.15
+        "min_value": -0.25,
+        "max_value": 0.25
     },
     "max_episode_timesteps": 96,
-    "batch_size": 64,
+    "batch_size": 128,
     "network": [
         {
             "type": "dense",
-            "size": 40,
+            "size": 20,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 40,
-            "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 40,
+            "size": 20,
             "activation": "relu"
         }
     ],
     "memory": 540,
-    "start_updating": 128,
-    "update_frequency": 64,
+    "start_updating": 256,
+    "update_frequency": 128,
     "learning_rate": 5e-4,
     "discount": 0.95,
     "return_processing": null,
