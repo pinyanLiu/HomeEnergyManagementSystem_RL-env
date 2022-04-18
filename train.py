@@ -1,10 +1,10 @@
 from tensorforce.execution import Runner  
 
 runner = Runner(
-    agent= 'agent/D3qn.json',
+    agent= 'agent/DDPG.json',
     environment=dict(environment='gym', level='Hems-v0'),
     max_episode_timesteps=96,
 )
 
-runner.run(num_episodes=2000,save_best_agent='bestAgent')
+runner.run(num_episodes=4000,save_best_agent='bestAgent')
 runner.close()

@@ -1,0 +1,126 @@
+{
+    "agent": "ddpg",
+    "states": {
+        "type": "float",
+        "shape": [
+            5
+        ],
+        "min_value": [
+            0.0,
+            "-Infinity",
+            "-Infinity",
+            0.0,
+            "-Infinity"
+        ],
+        "max_value": [
+            96.0,
+            "Infinity",
+            "Infinity",
+            1.0,
+            "Infinity"
+        ]
+    },
+    "actions": {
+        "type": "float",
+        "shape": 1,
+        "min_value": -0.15,
+        "max_value": 0.15
+    },
+    "max_episode_timesteps": 96,
+    "batch_size": 64,
+    "network": [
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 40,
+            "activation": "relu"
+        }
+    ],
+    "memory": 540,
+    "start_updating": 128,
+    "update_frequency": 64,
+    "learning_rate": 5e-4,
+    "discount": 0.95,
+    "return_processing": null,
+    "predict_terminal_values": false,
+    "critic": [
+        [
+            {
+                "type": "retrieve",
+                "name": "states_retrieve",
+                "tensors": [
+                    "states"
+                ]
+            },
+            {
+                "type": "dense",
+                "size": 40,
+                "activation": "relu"
+            },
+            {
+                "type": "register",
+                "name": "states_register",
+                "tensor": "states-embedding"
+            }
+        ],
+        [
+            {
+                "type": "retrieve",
+                "name": "actions_retrieve",
+                "tensors": [
+                    "actions"
+                ]
+            },
+            {
+                "type": "dense",
+                "size": 40,
+                "activation": "relu"
+            },
+            {
+                "type": "register",
+                "name": "actions_register",
+                "tensor": "actions-embedding"
+            }
+        ],
+        [
+            {
+                "type": "retrieve",
+                "name": "retrieve",
+                "tensors": [
+                    "states-embedding",
+                    "actions-embedding"
+                ],
+                "aggregation": "concat",
+                "axis": 0
+            }
+        ]
+    ],
+    "critic_optimizer": 0.99,
+    "state_preprocessing": null,
+    "exploration": 0.1,
+    "variable_noise": 0.1,
+    "l2_regularization": 0.0,
+    "entropy_regularization": 0.0,
+    "parallel_interactions": 1,
+    "config": null,
+    "saver": {
+        "directory": "saver_dir",
+        "frequency": 100,
+        "unit": "episodes"
+    },
+    "summarizer": {
+        "directory": "summaries",
+        "summaries": "all"
+    },
+    "tracking": null,
+    "recorder": null
+}
