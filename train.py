@@ -6,5 +6,5 @@ runner = Runner(
     max_episode_timesteps=96,
 )
 
-runner.run(num_episodes=10000,save_best_agent='bestAgent')
+runner.run(num_episodes=4000,save_best_agent='bestAgent')
 runner.close()
