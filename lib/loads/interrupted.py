@@ -5,7 +5,7 @@ class InterruptedLoad():
         self.demand = demand
         self.alreadyTurnOn = 0
     def step(self,action):
-        #different kind of InterruptedLoad may have different interact with action
+        #different kind of Interrupted Load may have different interact with action
         pass
 
     def getStatus(self):
