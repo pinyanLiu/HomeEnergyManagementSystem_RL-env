@@ -23,11 +23,11 @@
     "actions": {
         "type": "float",
         "shape": 1,
-        "min_value": -0.25,
-        "max_value": 0.25
+        "max_value": 0.5,
+        "min_value": -0.5
     },
     "max_episode_timesteps": 96,
-    "batch_size": 128,
+    "batch_size": 256,
     "network": [
         {
             "type": "dense",
@@ -40,10 +40,10 @@
             "activation": "relu"
         }
     ],
-    "memory": 540,
-    "start_updating": 256,
-    "update_frequency": 128,
-    "learning_rate": 5e-4,
+    "memory": 1024,
+    "start_updating": 512,
+    "update_frequency": 256,
+    "learning_rate": 5e-5,
     "discount": 0.95,
     "return_processing": null,
     "predict_terminal_values": false,
@@ -58,7 +58,7 @@
             },
             {
                 "type": "dense",
-                "size": 40,
+                "size": 30,
                 "activation": "relu"
             },
             {
@@ -77,7 +77,7 @@
             },
             {
                 "type": "dense",
-                "size": 40,
+                "size": 30,
                 "activation": "relu"
             },
             {
@@ -100,7 +100,6 @@
         ]
     ],
     "critic_optimizer": 0.99,
-    "state_preprocessing": null,
     "exploration": 0.1,
     "variable_noise": 0.1,
     "l2_regularization": 0.0,
