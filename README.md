@@ -28,7 +28,7 @@
     which is a Discrete space of three actions "charge" , "discharge" , and "stay".  
 - step(action)
     1. step() is literally for go through one step in the env . Which returns you the next state , the reward you get from this state (through the action you feed in) , whether the whole episode is done or not (96 time step for each episode) .
-    2. the mathematical formula for building reward functions, please regard to https://app.heptabase.com/w/16a6f10f040b1a8ec108a0ce0f1a13556489be7c8a6885489f4f7489e4baf789
+    2. the mathematical formula for building reward functions, please refer to https://app.heptabase.com/w/16a6f10f040b1a8ec108a0ce0f1a13556489be7c8a6885489f4f7489e4baf789
 - reset()
     1. For initializing the Env into $S_0$
     2. Which will randomly pick a training dataset from 360 days 

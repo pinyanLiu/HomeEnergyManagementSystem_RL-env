@@ -12,8 +12,6 @@ def main():
     pv = []
     totalReward = 0
     monthlySoc = pd.DataFrame()
-    monthlyLoad = pd.DataFrame()
-    monthlyPv = pd.DataFrame()
     monthlyRemain = pd.DataFrame()
     price = []
     for i in range(12):
