@@ -311,7 +311,7 @@ class Test():
         self.environment.close()
 
 if __name__ == '__main__':
-    if len(sys.argv < 2):
+    if len(sys.argv) < 2:
         print('please enter the mode: "soc" or "load"')
     test = Test(sys.argv[1])
     test.main()
