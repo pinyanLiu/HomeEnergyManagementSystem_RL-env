@@ -1,5 +1,5 @@
 from  gym.envs.Hems.import_data import ImportData 
-from gym.envs.Hems.loads.interrupted import InterruptedLoad
+from gym.envs.Hems.loads.interrupted import InterruptedLoad,AC
 from  gym import Env
 from  gym import spaces
 from gym import make
@@ -55,11 +55,11 @@ class HemsEnv(Env):
             self.PV = self.info.experimentData['PV']['Nov'].tolist()
         elif i / 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
-
-        #action we take (charge , discharge , stay)
+        ac = AC(demand=8,AvgPowerConsume=3.0)
+        #action AC take (on,off)
         self.action_space = spaces.Discrete(2)
-        #observation space ( Only SOC matters )
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour'])
+        #observation space 
+        self.observation_space_name = np.array(['sampleTime', 'AC','load', 'pv', 'pricePerHour'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -110,32 +110,24 @@ class HemsEnv(Env):
         
         # if energy supply is less than consumption
         else:
-                # 0. charging
+            ac.step(action)
+                # 0. AC off
                 #prevent the agent still want to charge while the battery is full of electricity
-            if action == 0 and (soc + 0.1) < 1:
-                soc = soc+0.1
+            # 1. AC on
+            if action == 0 :
+                ac.turn_on()
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-                cost = pricePerHour * 0.25 *( load + 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
-
-                # 1. discharging
-                #prevent the agent still want to discharge while the battery is lack of electricity
-            elif action == 1 and (soc-0.1) >= 0:
-                soc = soc-0.1
-
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-                cost = pricePerHour * 0.25 *( load - 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
-
-                # 2.stay
-            else :
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
-                cost = pricePerHour * 0.25 *( load - pv  )
+                cost = pricePerHour * 0.25 *( load +ac.AvgPowerConsume - pv  )
             
+            #2. AC off
+            else:
+                ac.turn_off()
+                cost = pricePerHour * 0.25 *(load-pv)
 
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        #self.state = {'sampleTime':sampleTime,'load': self.Load[self.state['sampleTime']],'pv': self.PV[self.state['sampleTime']],'SOC':soc,'pricePerHour':self.GridPrice[self.state['sampleTime']]}
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime]])
         #check if all day is done
         done = bool(
             sampleTime == 95
@@ -144,43 +136,19 @@ class HemsEnv(Env):
         #REWARD
         reward = []
         if not done:
-            #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
-                reward.append(-2)
             # reward 1
-            r1 = -cost/10000*1.08
+            r1 = -cost/10000
+            print(cost)
             reward.append(r1)
-            #reward 2
-            if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-5)
-                if action == 1:
-                    reward.append(2)
-            else:    
-                reward.append(0.0625)
-            reward.append(soc- float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
-
 
         # if done
         else : 
-            if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
-                reward.append(-2)
             # reward 1
-            r1 = -cost/10000*1.08
+            r1 = -cost/10000
+            print(cost)
             reward.append(r1)
             #reward 2
-            if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-5)
-                if action == 1:
-                    reward.append(2)
-            else:    
-                reward.append(0.0625)
-
-
-            # reward 3
-            r2 =  20*(soc - float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
-            reward.append(r2)
-
-
+            r2= - ac.getRemainDemand()
         reward = sum(reward)
 
 

@@ -4,8 +4,10 @@ class InterruptedLoad():
         self.AvgPowerConsume = AvgPowerConsume
         self.demand = demand
         self.alreadyTurnOn = 0
-    def step(self,action):
+    def turn_on(self):
         #different kind of Interrupted Load may have different interact with action
+        pass
+    def turn_off(self):
         pass
 
     def getStatus(self):
@@ -28,15 +30,12 @@ class InterruptedLoad():
 class AC(InterruptedLoad):
     def __init__(self, demand, AvgPowerConsume):
         super().__init__(demand, AvgPowerConsume)
-    def step(self, action):
-        if action == 1:
-            self.switch = True
-            self.alreadyTurnOn += 1
-        elif action == 2:
-            self.switch = True
-            self.alreadyTurnOn += 1
-        else :
-            self.switch = False
+    def turn_on(self):
+        self.switch = True
+        self.alreadyTurnOn += 1
+
+    def turn_off(self):
+        self.switch = False
 
     def getStatus(self):
         return super().getStatus()
