@@ -55,7 +55,7 @@ class HemsEnv(Env):
             self.PV = self.info.experimentData['PV']['Nov'].tolist()
         elif i / 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
-        ac = AC(demand=8,AvgPowerConsume=3.0)
+        self.ac = AC(demand=8,AvgPowerConsume=3000)
         #action AC take (on,off)
         self.action_space = spaces.Discrete(2)
         #observation space 
@@ -110,18 +110,15 @@ class HemsEnv(Env):
         
         # if energy supply is less than consumption
         else:
-            ac.step(action)
-                # 0. AC off
-                #prevent the agent still want to charge while the battery is full of electricity
             # 1. AC on
             if action == 0 :
-                ac.turn_on()
+                self.ac.turn_on()
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-                cost = pricePerHour * 0.25 *( load +ac.AvgPowerConsume - pv  )
+                cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume - pv  )
             
             #2. AC off
             else:
-                ac.turn_off()
+                self.ac.turn_off()
                 cost = pricePerHour * 0.25 *(load-pv)
 
 
@@ -137,18 +134,18 @@ class HemsEnv(Env):
         reward = []
         if not done:
             # reward 1
-            r1 = -cost/10000
-            print(cost)
+            r1 = -cost/1000
             reward.append(r1)
 
         # if done
         else : 
             # reward 1
-            r1 = -cost/10000
-            print(cost)
+            r1 = -cost/1000
             reward.append(r1)
             #reward 2
-            r2= - ac.getRemainDemand()
+            r2= - self.ac.getRemainDemand()
+            reward.append(r2)
+
         reward = sum(reward)
 
 
@@ -168,7 +165,7 @@ class HemsEnv(Env):
         #pick one day from 360 days
         i = randint(0,359)
         self.Load = self.info.experimentData['Load'].iloc[:,i].tolist()
-
+        self.ac.reset()
         if i % 12 == 0:
             self.PV = self.info.experimentData['PV']['Jan'].tolist()
         elif i % 12 == 1:
