@@ -1,3 +1,4 @@
+from inspect import stack
 from tensorforce import Agent,Environment
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -20,7 +21,7 @@ class Test():
 
     def __testInSoc__(self):
         self.environment = dict(environment='gym', level='Hems-v1')
-        self.agent = Agent.load(directory = 'saver_dir',format='checkpoint',environment=environment)
+        self.agent = Agent.load(directory = 'saver_dir',format='checkpoint',environment=self.environment)
         soc = []
         load = []
         pv = []
@@ -57,7 +58,44 @@ class Test():
         print('Agent average episode reward: ', totalReward/12 )
 
     def __testInLoad__(self):
-        pass
+        self.environment = dict(environment='gym', level='Hems-v5')
+        self.agent = Agent.load(directory = 'saver_dir',format='checkpoint',environment=self.environment)
+        load = []
+        pv = []
+        ac = []
+        totalReward = 0
+        self.monthlyRemain = pd.DataFrame()
+        self.acConsume = pd.DataFrame()
+        self.price = []
+        for month in range(12):
+            states = self.environment.reset()
+            internals = self.agent.initial_internals()
+            terminal = False
+            while not terminal:
+                actions, internals = self.agent.act(
+                    states=states, internals=internals, independent=True, deterministic=True
+                )
+                states, terminal, reward = self.environment.execute(actions=actions)
+                #turn on
+                if actions == 0:
+                    ac.append(3000)#power
+                else:
+                    ac.append(0)
+
+                load.append(states[1])
+                pv.append(states[2])
+                totalReward += reward
+                if month == 11:
+                    self.price.append(states[3])
+
+            remain = [load[sampletime]-pv[sampletime] for sampletime in range(96)]
+            #normalize price to [0,1]
+            self.price = [(self.price[month]-np.min(self.price))/(np.max(self.price)-np.min(self.price)) for month in range(len(self.price))]  
+            self.monthlyRemain.insert(month,column=str(month+1),value=remain)
+            self.acConsume.insert(month,column=str(month+1),value=ac)
+            load.clear()
+            pv.clear()
+        print('Agent average episode reward: ', totalReward/12 )
 
     def __plotResult__(self):
         plt.rcParams["figure.figsize"] = (12.8, 9.6)
@@ -88,7 +126,7 @@ class Test():
         sub10=ax10.twinx()
         sub11=ax11.twinx()
         sub12=ax12.twinx()
-        
+
         if self.mode == 'soc':
             ax1.set_ylabel('SOC')
             ax1.plot(range(len(self.monthlySoc['1'][:])), self.monthlySoc['1'][:], label = "Jan",color='red')    
@@ -187,7 +225,77 @@ class Test():
             sub12.plot(range(len(self.monthlyRemain['12'][:])), self.monthlyRemain['12'][:],color='green')  
 
         elif self.mode == 'load':
-            pass
+            ax1.plot(range(len(self.price)), self.price, label = "price")
+            ax1.set_title('Jan')
+
+            ax2.plot(range(len(self.price)), self.price, label = "price")
+            ax2.set_title('Feb')
+
+            ax2.plot(range(len(self.price)), self.price, label = "price")
+            ax3.set_title('Mar')
+
+            ax4.plot(range(len(self.price)), self.price, label = "price")
+            ax4.set_title('Apr')
+
+            ax5.plot(range(len(self.price)), self.price, label = "price")
+            ax5.set_title('May')
+
+            ax6.plot(range(len(self.price)), self.price, label = "price")
+            ax6.set_title('Jun')
+
+            ax7.plot(range(len(self.price)), self.price, label = "price")
+            ax7.set_title('July')
+
+            ax8.plot(range(len(self.price)), self.price, label = "price")
+            ax8.set_title('Aug')
+
+            ax9.plot(range(len(self.price)), self.price, label = "price")
+            ax9.set_title('Sep')
+
+            ax10.plot(range(len(self.price)), self.price, label = "price")
+            ax10.set_title('Oct')
+
+            ax11.plot(range(len(self.price)), self.price, label = "price")
+            ax11.set_title('Nov')
+
+            ax12.plot(range(len(self.price)), self.price, label = "price")
+            ax12.set_title('Dec')
+
+            sub1.set_ylabel('Power')
+            sub1.hist( [self.monthlyRemain['1'][:] , self.acConsume]['1'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub2.set_ylabel('Power')
+            sub2.hist( [self.monthlyRemain['2'][:] , self.acConsume]['2'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub3.set_ylabel('Power')
+            sub3.hist( [self.monthlyRemain['3'][:] , self.acConsume]['3'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub4.set_ylabel('Power')
+            sub4.hist( [self.monthlyRemain['4'][:] , self.acConsume]['4'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub5.set_ylabel('Power')
+            sub5.hist( [self.monthlyRemain['5'][:] , self.acConsume]['5'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub6.set_ylabel('Power')
+            sub6.hist( [self.monthlyRemain['6'][:] , self.acConsume]['6'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub7.set_ylabel('Power')
+            sub7.hist( [self.monthlyRemain['7'][:] , self.acConsume]['7'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub8.set_ylabel('Power')
+            sub8.hist( [self.monthlyRemain['8'][:] , self.acConsume]['8'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub9.set_ylabel('Power')
+            sub9.hist( [self.monthlyRemain['9'][:] , self.acConsume]['9'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub10.set_ylabel('Power')
+            sub10.hist( [self.monthlyRemain['10'][:] , self.acConsume]['10'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub11.set_ylabel('Power')
+            sub11.hist( [self.monthlyRemain['11'][:] , self.acConsume]['11'][:],label = ['fixLoad','AC'],stacked=True)  
+
+            sub12.set_ylabel('Power')
+            sub12.hist( [self.monthlyRemain['12'][:] , self.acConsume]['12'][:],label = ['fixLoad','AC'],stacked=True)  
 
         fig.tight_layout()
         fig.savefig('pic/plot.png')
@@ -203,4 +311,7 @@ class Test():
         self.environment.close()
 
 if __name__ == '__main__':
-    main(sys.argv)
+    if len(sys.argv < 2):
+        print('please enter the mode: "soc" or "load"')
+    test = Test(sys.argv[1])
+    test.main()

@@ -19,7 +19,7 @@ def main(argv):
     if argv[2] == 'True':
         agent = Agent.load(directory = 'Pretrain_dir',format='checkpoint')
     elif argv[2] == 'False':
-        agent = 'agent/DDPG.json'
+        agent = 'loadAgent/D3qn.json'
     else :
         print('undefined agent')
         return
