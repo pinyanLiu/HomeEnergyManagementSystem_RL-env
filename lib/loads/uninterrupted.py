@@ -14,7 +14,7 @@ class UninterruptedLoad():
         pass
 
     def getStatus(self):
-        return(self.switch,self.AvgPowerConsume,self.demand,self.alreadyTurnOn,self)
+        return(self.switch,self.AvgPowerConsume,self.demand,self.alreadyTurnOn,self.alreadyTurnOnInPeriod)
 
     def getRemainDemand(self):
         return(self.demand-self.alreadyTurnOn)
@@ -69,11 +69,16 @@ class WM(UninterruptedLoad):
 if __name__ == '__main__':
     wm = WM(demand=8,AvgPowerConsume=420,executePeriod=4)
     for i in range (10):
-        wm.turn_on()
-        print('reach demand',wm.reachDemand())
-        print('reach Period',wm.reachTimeblockPerUse())
         print('status',wm.getStatus())
+        wm.turn_on()
+        if wm.reachDemand:
+            print('reach demand')
+            
+        if wm.reachTimeblockPerUse:
+            print('reach Period')
         print('remaindemand',wm.getRemainDemand())
         print('powerConsume',wm.getPowerConsume())
     wm.reset()
+    wm.turn_on()
+    wm.turn_off()
     print(wm.getStatus())
