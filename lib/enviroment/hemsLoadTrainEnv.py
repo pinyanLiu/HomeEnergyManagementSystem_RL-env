@@ -1,5 +1,6 @@
 from  gym.envs.Hems.import_data import ImportData 
-from gym.envs.Hems.loads.interrupted import InterruptedLoad,AC
+from gym.envs.Hems.loads.interrupted import AC
+from gym.envs.Hems.loads.uninterrupted import WM
 from  gym import Env
 from  gym import spaces
 from gym import make
@@ -55,11 +56,12 @@ class HemsEnv(Env):
             self.PV = self.info.experimentData['PV']['Nov'].tolist()
         elif i / 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
-        self.ac = AC(demand=8,AvgPowerConsume=3000)
+        self.ac = AC(demand=48,AvgPowerConsume=3000)
+        self.wm = WM(demand=12,AvgPowerConsume=1500,executePeriod=6)
         #action AC take (on,off)
-        self.action_space = spaces.Discrete(2)
+        self.action_space = spaces.Discrete(4)
+        #self.observation_space_name = np.array(['sampleTime', 'AC','WM','load', 'pv', 'pricePerHour'])
         #observation space 
-        self.observation_space_name = np.array(['sampleTime', 'AC','load', 'pv', 'pricePerHour'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -99,6 +101,9 @@ class HemsEnv(Env):
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action),err_msg
 
+        #list for storing reward
+        reward = []
+
         #STATE (sampleTime,Load,PV,SOC,pricePerHour)
         sampleTime,load,pv,pricePerHour = self.state
         
@@ -110,17 +115,44 @@ class HemsEnv(Env):
         
         # if energy supply is less than consumption
         else:
-            # 1. AC on
+            # 1. AC on , WM on
             if action == 0 :
                 self.ac.turn_on()
+                self.wm.turn_on()
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-                cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume - pv  )
+                cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv  )
             
-            #2. AC off
-            else:
-                self.ac.turn_off()
-                cost = pricePerHour * 0.25 *(load-pv)
+            #2. AC on , WM off
+            elif action == 1:
+                self.ac.turn_on()
+                #if uninterrupted load haven't finish , force it open and give penalty to agent
+                if(self.wm.reachExecutePeriod() == False):
+                    self.wm.turn_on()
+                    reward.append(-2)
+                    cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv  )
 
+                else:
+                    self.wm.turn_off()
+                    cost = pricePerHour * 0.25 *(load+self.ac.AvgPowerConsume-pv)
+
+            #3. AC off , WM on
+            elif action == 2:
+                self.ac.turn_off()
+                self.wm.turn_on()
+                cost = pricePerHour * 0.25 * (load + self.wm.AvgPowerConsume-pv)
+
+            #4. AC off , WM off
+            else : 
+                self.ac.turn_off()
+                #if uninterrupted load haven't finish , force it open and give penalty to agent
+                if(self.wm.reachExecutePeriod() == False):
+                    self.wm.turn_on()
+                    reward.append(-2)
+                    cost = pricePerHour * 0.25 *( load +self.wm.AvgPowerConsume - pv  )
+
+                else:
+                    self.wm.turn_off()
+                    cost = pricePerHour * 0.25 *(load-pv)
 
         #change to next state
         sampleTime = int(sampleTime+1)
@@ -131,7 +163,6 @@ class HemsEnv(Env):
         )
 
         #REWARD
-        reward = []
         if not done:
             # reward 1
             r1 = -cost/1000
@@ -148,11 +179,7 @@ class HemsEnv(Env):
 
         reward = sum(reward)
 
-
-
-        #set placeholder for infomation
         info = {}
-
         return self.state,reward,done,info
 
         
