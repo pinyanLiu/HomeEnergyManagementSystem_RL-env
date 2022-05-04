@@ -28,7 +28,7 @@ class InterruptedLoad():
 
 #AC is sub class of InterruptedLoad
 class AC(InterruptedLoad):
-    def __init__(self, demand, AvgPowerConsume):
+    def __init__(self, demand = 8, AvgPowerConsume = 3000):
         super().__init__(demand, AvgPowerConsume)
     def turn_on(self):
         self.switch = True

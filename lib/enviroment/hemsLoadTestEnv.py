@@ -153,37 +153,36 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
-        #pick one day from 360 days
-        i = randint(0,359)
-        self.Load = self.info.experimentData['Load'].iloc[:,i].tolist()
-        self.ac.reset()
-        if i % 12 == 0:
-            self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif i % 12 == 1:
-            self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif i % 12 == 2:
-            self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif i % 12 == 3:
-            self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif i % 12 == 4:
-            self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif i % 12 == 5:
-            self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif i % 12 == 6:
-            self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif i % 12 == 7:
-            self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif i % 12 == 8:
-            self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif i % 12 == 9:
-            self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif i % 12 == 10:
-            self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif i % 12 == 11:
-            self.PV = self.info.experimentData['PV']['Dec'].tolist()
+        #each month pick one day for testing
+        self.i += 1
+        self.Load = self.info.experimentData['Load'].iloc[:,self.i]
 
+        if self.i % 12 == 0:
+            self.PV = self.info.experimentData['PV']['Jan'].tolist()
+        elif self.i % 12 == 1:
+            self.PV = self.info.experimentData['PV']['Feb'].tolist()
+        elif self.i % 12 == 2:
+            self.PV = self.info.experimentData['PV']['Mar'].tolist()
+        elif self.i % 12 == 3:
+            self.PV = self.info.experimentData['PV']['Apr'].tolist()
+        elif self.i % 12 == 4:
+            self.PV = self.info.experimentData['PV']['May'].tolist()
+        elif self.i % 12 == 5:
+            self.PV = self.info.experimentData['PV']['Jun'].tolist()
+        elif self.i % 12 == 6:
+            self.PV = self.info.experimentData['PV']['July'].tolist()
+        elif self.i % 12 == 7:
+            self.PV = self.info.experimentData['PV']['Aug'].tolist()
+        elif self.i % 12 == 8:
+            self.PV = self.info.experimentData['PV']['Sep'].tolist()
+        elif self.i % 12 == 9:
+            self.PV = self.info.experimentData['PV']['Oct'].tolist()
+        elif self.i % 12 == 10:
+            self.PV = self.info.experimentData['PV']['Nov'].tolist()
+        elif self.i % 12 == 11:
+            self.PV = self.info.experimentData['PV']['Dec'].tolist()
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),self.GridPrice[0]])
         return self.state
 
 

@@ -1,4 +1,3 @@
-from inspect import stack
 from tensorforce import Agent,Environment
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -20,7 +19,7 @@ class Test():
         self.__plotResult__()
 
     def __testInSoc__(self):
-        self.environment = dict(environment='gym', level='Hems-v1')
+        self.environment = Environment.create(environment='gym',level='Hems-v1')
         self.agent = Agent.load(directory = 'saver_dir',format='checkpoint',environment=self.environment)
         soc = []
         load = []
@@ -58,7 +57,7 @@ class Test():
         print('Agent average episode reward: ', totalReward/12 )
 
     def __testInLoad__(self):
-        self.environment = dict(environment='gym', level='Hems-v5')
+        self.environment = Environment.create(environment='gym',level='Hems-v5')
         self.agent = Agent.load(directory = 'saver_dir',format='checkpoint',environment=self.environment)
         load = []
         pv = []
@@ -79,6 +78,7 @@ class Test():
                 #turn on
                 if actions == 0:
                     ac.append(3000)#power
+                #turn off
                 else:
                     ac.append(0)
 
@@ -88,11 +88,12 @@ class Test():
                 if month == 11:
                     self.price.append(states[3])
 
-            remain = [load[sampletime]-pv[sampletime] for sampletime in range(96)]
+            remain = [load[sampletime]-pv[sampletime] for sampletime in range(95)]
             #normalize price to [0,1]
             self.price = [(self.price[month]-np.min(self.price))/(np.max(self.price)-np.min(self.price)) for month in range(len(self.price))]  
             self.monthlyRemain.insert(month,column=str(month+1),value=remain)
             self.acConsume.insert(month,column=str(month+1),value=ac)
+            ac.clear()
             load.clear()
             pv.clear()
         print('Agent average episode reward: ', totalReward/12 )
@@ -231,7 +232,7 @@ class Test():
             ax2.plot(range(len(self.price)), self.price, label = "price")
             ax2.set_title('Feb')
 
-            ax2.plot(range(len(self.price)), self.price, label = "price")
+            ax3.plot(range(len(self.price)), self.price, label = "price")
             ax3.set_title('Mar')
 
             ax4.plot(range(len(self.price)), self.price, label = "price")
@@ -262,40 +263,52 @@ class Test():
             ax12.set_title('Dec')
 
             sub1.set_ylabel('Power')
-            sub1.hist( [self.monthlyRemain['1'][:] , self.acConsume]['1'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub1.bar(np.arange(95) ,self.monthlyRemain['1'][:] ,label = 'fixLoad',bottom = self.acConsume['1'][:] , color ='gray')  
+            sub1.bar(np.arange(95) ,self.acConsume['1'][:] ,label = 'AC', color ='green')  
 
             sub2.set_ylabel('Power')
-            sub2.hist( [self.monthlyRemain['2'][:] , self.acConsume]['2'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub2.bar(np.arange(95) ,self.monthlyRemain['2'][:] ,label = 'fixLoad',bottom = self.acConsume['2'][:] , color ='gray')  
+            sub2.bar(np.arange(95) ,self.acConsume['2'][:] ,label = 'AC', color ='green')  
 
             sub3.set_ylabel('Power')
-            sub3.hist( [self.monthlyRemain['3'][:] , self.acConsume]['3'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub3.bar(np.arange(95) ,self.monthlyRemain['3'][:] ,label = 'fixLoad',bottom = self.acConsume['3'][:] , color ='gray')  
+            sub3.bar(np.arange(95) ,self.acConsume['3'][:] ,label = 'AC', color ='green')  
 
             sub4.set_ylabel('Power')
-            sub4.hist( [self.monthlyRemain['4'][:] , self.acConsume]['4'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub4.bar(np.arange(95) ,self.monthlyRemain['4'][:] ,label = 'fixLoad',bottom = self.acConsume['4'][:] , color ='gray')  
+            sub4.bar(np.arange(95) ,self.acConsume['4'][:] ,label = 'AC', color ='green')  
 
             sub5.set_ylabel('Power')
-            sub5.hist( [self.monthlyRemain['5'][:] , self.acConsume]['5'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub5.bar(np.arange(95) ,self.monthlyRemain['5'][:] ,label = 'fixLoad',bottom = self.acConsume['5'][:] , color ='gray')  
+            sub5.bar(np.arange(95) ,self.acConsume['5'][:] ,label = 'AC', color ='green')  
 
             sub6.set_ylabel('Power')
-            sub6.hist( [self.monthlyRemain['6'][:] , self.acConsume]['6'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub6.bar(np.arange(95) ,self.monthlyRemain['6'][:] ,label = 'fixLoad',bottom = self.acConsume['6'][:] , color ='gray')  
+            sub6.bar(np.arange(95) ,self.acConsume['6'][:] ,label = 'AC', color ='green')  
 
             sub7.set_ylabel('Power')
-            sub7.hist( [self.monthlyRemain['7'][:] , self.acConsume]['7'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub7.bar(np.arange(95) ,self.monthlyRemain['7'][:] ,label = 'fixLoad',bottom = self.acConsume['7'][:] , color ='gray')  
+            sub7.bar(np.arange(95) ,self.acConsume['7'][:] ,label = 'AC', color ='green')  
 
             sub8.set_ylabel('Power')
-            sub8.hist( [self.monthlyRemain['8'][:] , self.acConsume]['8'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub8.bar(np.arange(95) ,self.monthlyRemain['8'][:] ,label = 'fixLoad',bottom = self.acConsume['8'][:] , color ='gray')  
+            sub8.bar(np.arange(95) ,self.acConsume['8'][:] ,label = 'AC', color ='green')  
 
             sub9.set_ylabel('Power')
-            sub9.hist( [self.monthlyRemain['9'][:] , self.acConsume]['9'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub9.bar(np.arange(95) ,self.monthlyRemain['9'][:] ,label = 'fixLoad',bottom = self.acConsume['9'][:] , color ='gray')  
+            sub9.bar(np.arange(95) ,self.acConsume['9'][:] ,label = 'AC', color ='green')  
 
             sub10.set_ylabel('Power')
-            sub10.hist( [self.monthlyRemain['10'][:] , self.acConsume]['10'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub10.bar(np.arange(95) ,self.monthlyRemain['10'][:] ,label = 'fixLoad',bottom = self.acConsume['10'][:] , color ='gray')  
+            sub10.bar(np.arange(95) ,self.acConsume['10'][:] ,label = 'AC', color ='green')  
 
             sub11.set_ylabel('Power')
-            sub11.hist( [self.monthlyRemain['11'][:] , self.acConsume]['11'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub11.bar(np.arange(95) ,self.monthlyRemain['11'][:] ,label = 'fixLoad',bottom = self.acConsume['11'][:] , color ='gray')  
+            sub11.bar(np.arange(95) ,self.acConsume['11'][:] ,label = 'AC', color ='green')  
 
             sub12.set_ylabel('Power')
-            sub12.hist( [self.monthlyRemain['12'][:] , self.acConsume]['12'][:],label = ['fixLoad','AC'],stacked=True)  
+            sub12.bar(np.arange(95) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.acConsume['12'][:] , color ='gray')  
+            sub12.bar(np.arange(95) ,self.acConsume['12'][:] ,label = 'AC', color ='green')  
 
         fig.tight_layout()
         fig.savefig('pic/plot.png')
