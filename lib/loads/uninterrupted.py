@@ -22,8 +22,8 @@ class UninterruptedLoad():
     def reachDemand(self):
         return (self.alreadyTurnOn >= self.demand)
 
-    def reachTimeblockPerUse(self):
-        return (self.alreadyTurnOnInPeriod >= self.executePeriod)
+    def reachExecutePeriod(self):
+        return (self.alreadyTurnOnInPeriod == self.executePeriod)
 
     def getPowerConsume(self):
         return (self.alreadyTurnOn * self.AvgPowerConsume)
@@ -38,11 +38,11 @@ class WM(UninterruptedLoad):
     def __init__(self, demand = 12, AvgPowerConsume = 420 ,executePeriod = 6):
         super().__init__(demand, AvgPowerConsume,executePeriod)
     def turn_on(self):
+        if self.alreadyTurnOnInPeriod == self.executePeriod :
+            self.alreadyTurnOnInPeriod = 0
         self.switch = True
         self.alreadyTurnOn += 1
         self.alreadyTurnOnInPeriod +=1
-        if self.alreadyTurnOnInPeriod == self.executePeriod :
-            self.alreadyTurnOnInPeriod = 0
 
     def turn_off(self):
         self.switch = False
@@ -56,8 +56,8 @@ class WM(UninterruptedLoad):
     def reachDemand(self):
         return super().reachDemand()
 
-    def reachTimeblockPerUse(self):
-        return super().reachTimeblockPerUse()
+    def reachExecutePeriod(self):
+        return super().reachExecutePeriod()
 
     def getPowerConsume(self):
         return super().getPowerConsume()
@@ -71,11 +71,11 @@ if __name__ == '__main__':
     for i in range (10):
         print('status',wm.getStatus())
         wm.turn_on()
-        if wm.reachDemand:
-            print('reach demand')
+        if wm.reachDemand():
+            print('---reach demand---')
             
-        if wm.reachTimeblockPerUse:
-            print('reach Period')
+        if wm.reachExecutePeriod():
+            print('---reach Period---')
         print('remaindemand',wm.getRemainDemand())
         print('powerConsume',wm.getPowerConsume())
     wm.reset()
