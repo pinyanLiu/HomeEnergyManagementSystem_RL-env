@@ -30,7 +30,7 @@ def main(argv):
         max_episode_timesteps=96,
     )
 
-    runner.run(num_episodes=int(argv[3]),save_best_agent='bestAgent')
+    runner.run(num_episodes=int(argv[3]),save_best_agent=True)
     runner.close()
 
 

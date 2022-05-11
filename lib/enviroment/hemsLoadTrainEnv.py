@@ -174,7 +174,7 @@ class HemsEnv(Env):
             r1 = -cost/1000
             reward.append(r1)
             #reward 2
-            r2= - self.ac.getRemainDemand()
+            r2= - np.abs( self.ac.getRemainDemand())
             reward.append(r2)
 
         reward = sum(reward)

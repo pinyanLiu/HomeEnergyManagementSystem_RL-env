@@ -15,6 +15,12 @@ class InterruptedLoad():
 
     def getRemainDemand(self):
         return(self.demand-self.alreadyTurnOn)
+    
+    def getProcessPercentage(self):
+        return ((self.alreadyTurnOn)/self.demand)
+
+    def getRemainProcessPercentage(self):
+        return -((self.alreadyTurnOn-self.demand)/self.demand)
 
     def reachDemand(self):
         return (self.alreadyTurnOn >= self.demand)
@@ -43,6 +49,12 @@ class AC(InterruptedLoad):
     def getRemainDemand(self):
         return super().getRemainDemand()
 
+    def getProcessPercentage(self):
+        return super().getProcessPercentage()
+
+    def getRemainProcessPercentage(self):
+        return super().getRemainProcessPercentage()
+
     def reachDemand(self):
         return super().reachDemand()
 
@@ -55,14 +67,18 @@ class AC(InterruptedLoad):
 
 if __name__ == '__main__':
     ac = AC(demand=8,AvgPowerConsume=420)
-    ac.step(action = 1)
-    print(ac.getStatus())
-    ac.step(action= 2)
-    print(ac.getStatus())
-    ac.step(action= 3)
-    print(ac.getStatus())
-    print(ac.getRemainDemand())
-    print(ac.reachDemand())
-    print(ac.getPowerConsume())
+    for i in range (10):
+        print('status',ac.getStatus())
+        ac.turn_on()
+        if ac.reachDemand():
+            reward = ac.getRemainProcessPercentage()
+        else:
+            reward = ac.getProcessPercentage()
+        #print('Percentage',ac.getProcessPercentage())
+        #print('remainPercentage',ac.getRemainProcessPercentage())
+        print("reward",reward)
+        
     ac.reset()
+    ac.turn_on()
+    ac.turn_off()
     print(ac.getStatus())

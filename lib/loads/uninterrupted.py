@@ -19,6 +19,12 @@ class UninterruptedLoad():
     def getRemainDemand(self):
         return(self.demand-self.alreadyTurnOn)
 
+    def getProcessPercentage(self):
+        return ((self.alreadyTurnOn)/self.demand)
+
+    def getRemainProcessPercentage(self):
+        return ((self.demand-self.alreadyTurnOn)/self.demand)
+
     def reachDemand(self):
         return (self.alreadyTurnOn >= self.demand)
 
@@ -53,6 +59,12 @@ class WM(UninterruptedLoad):
     def getRemainDemand(self):
         return super().getRemainDemand()
 
+    def getProcessPercentage(self):
+        return super().getProcessPercentage()
+
+    def getRemainProcessPercentage(self):
+        return super().getRemainProcessPercentage()
+        
     def reachDemand(self):
         return super().reachDemand()
 

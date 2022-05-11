@@ -21,10 +21,10 @@
     "actions": {
         "type": "int",
         "shape": [],
-        "num_values": 2
+        "num_values": 4
     },
     "max_episode_timesteps": 96,
-    "batch_size": 128,
+    "batch_size": 48,
     "network": [
         {
             "type": "dense",
@@ -43,10 +43,10 @@
         }
     ],
     "memory": 540,
-    "start_updating": 512,
-    "update_frequency": 0.002,
+    "start_updating": 256,
+    "update_frequency": 0.1,
     "learning_rate": 0.0001,
-    "discount": 0.98,
+    "discount": 0.97,
     "return_processing": null,
     "predict_terminal_values": false,
     "state_preprocessing": "linear_normalization",
