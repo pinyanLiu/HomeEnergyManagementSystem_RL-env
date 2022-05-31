@@ -5,7 +5,7 @@ import sys
 
 def main(argv):
     if len(argv)<4:
-        print('please give parameters 1.Training mode: "soc"or"load" 2.Pretrain:"True","False" 3. training episode ')
+        print('please give parameters 1.Training mode: "soc"or"load" 2.Agent 3. training episode ')
         return
 
     if argv[1] == 'soc':
@@ -16,13 +16,8 @@ def main(argv):
         print('undefined env')
         return
     
-    if argv[2] == 'True':
-        agent = Agent.load(directory = 'Pretrain_dir',format='checkpoint')
-    elif argv[2] == 'False':
-        agent = 'loadAgent/D3qn.json'
-    else :
-        print('undefined agent')
-        return
+
+    agent = argv[2]
 
     runner = Runner(
         environment=environment,
@@ -30,7 +25,7 @@ def main(argv):
         max_episode_timesteps=96,
     )
 
-    runner.run(num_episodes=int(argv[3]),save_best_agent=True)
+    runner.run(num_episodes=int(argv[3]),save_best_agent='bestAgent')
     runner.close()
 
 

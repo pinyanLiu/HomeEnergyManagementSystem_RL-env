@@ -20,7 +20,7 @@ class Test():
 
     def __testInSoc__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v1')
-        self.agent = Agent.load(directory = 'saver_dir',format='checkpoint',environment=self.environment)
+        self.agent = Agent.load(directory = 'saver_dir',environment=self.environment)
         soc = []
         load = []
         pv = []
@@ -42,11 +42,11 @@ class Test():
                 soc.append(states[3])
                 totalReward += reward
                 if month == 11:
-                    price.append(states[4])
+                    self.price.append(states[4])
 
-            remain = [load[sampletime]-pv[sampletime] for sampletime in range(96)]
+            remain = [load[sampletime]-pv[sampletime] for sampletime in range(95)]
             #normalize price to [0,1]
-            price = [(price[month]-np.min(price))/(np.max(price)-np.min(price)) for month in range(len(price))]  
+            self.price = [(self.price[month]-np.min(self.price))/(np.max(self.price)-np.min(self.price)) for month in range(len(self.price))]  
             self.monthlySoc.insert(month,column=str(month+1),value=soc)
             # monthlyLoad.insert(month,column=str(month+1),value=load)
             # monthlyPv.insert(month,column=str(month+1),value=pv)
@@ -58,7 +58,7 @@ class Test():
 
     def __testInLoad__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v5')
-        self.agent = Agent.load(directory = 'saver_dir',format='checkpoint',environment=self.environment)
+        self.agent = Agent.load(directory = 'saver_dir',filename = 'agent-1001.index',format='checkpoint',environment=self.environment)
         load = []
         pv = []
         ac = []
