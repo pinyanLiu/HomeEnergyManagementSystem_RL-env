@@ -3,16 +3,20 @@
     "states": {
         "type": "float",
         "shape": [
-            4
+            6
         ],
         "min_value": [
             0.0,
+            "-Infinity",
+            "-Infinity",
             "-Infinity",
             "-Infinity",
             "-Infinity"
         ],
         "max_value": [
             96.0,
+            "Infinity",
+            "Infinity",
             "Infinity",
             "Infinity",
             "Infinity"
@@ -24,7 +28,7 @@
         "num_values": 4
     },
     "max_episode_timesteps": 96,
-    "batch_size": 48,
+    "batch_size": 256,
     "network": [
         {
             "type": "dense",
@@ -44,8 +48,8 @@
     ],
     "memory": 540,
     "start_updating": 256,
-    "update_frequency": 0.1,
-    "learning_rate": 0.0001,
+    "update_frequency": 0.5,
+    "learning_rate": 0.001,
     "discount": 0.97,
     "return_processing": null,
     "predict_terminal_values": false,
@@ -58,7 +62,7 @@
     "config": null,
     "saver": {
         "directory": "saver_dir",
-        "frequency": 100,
+        "frequency": 250,
         "unit": "episodes"
     },
     "summarizer": {

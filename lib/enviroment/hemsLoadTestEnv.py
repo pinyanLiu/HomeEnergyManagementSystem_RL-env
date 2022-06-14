@@ -1,4 +1,6 @@
 from  gym.envs.Hems.import_data import ImportData 
+from gym.envs.Hems.loads.interrupted import AC
+from gym.envs.Hems.loads.uninterrupted import WM
 from  gym import Env
 from  gym import spaces
 from gym import make
@@ -52,11 +54,13 @@ class HemsEnv(Env):
             self.PV = self.info.experimentData['PV']['Nov'].tolist()
         elif self.i % 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
-        
-        #action we take (charge , discharge , stay)
-        self.action_space = spaces.Discrete(2)
-        #observation space ( Only SOC matters )
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour'])
+        self.ac = AC(demand=5,AvgPowerConsume=3000)
+        self.wm = WM(demand=6,AvgPowerConsume=3000,executePeriod=6)
+
+         #action AC take (on,off)
+        self.action_space = spaces.Discrete(4)
+        #observation space 
+        self.observation_space_name = np.array(['sampleTime', 'AC','load', 'pv', 'pricePerHour'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -67,6 +71,10 @@ class HemsEnv(Env):
                 np.finfo(np.float32).max,
                 #pricePerHour
                 np.finfo(np.float32).max,
+                #AC Remain
+                np.finfo(np.float32).max,
+                #WM Remain
+                np.finfo(np.float32).max
             ],
             dtype=np.float32,
         )
@@ -77,9 +85,13 @@ class HemsEnv(Env):
                 #load
                 np.finfo(np.float32).min,
                 #PV
-                np.finfo(np.float32).min,
+                np.finfo(np.float32).min,   
                 #pricePerHour
                 np.finfo(np.float32).min,
+                #AC Remain
+                np.finfo(np.float32).min,
+                #WM Remain
+                np.finfo(np.float32).min
             ],
             dtype=np.float32,
         )
@@ -96,54 +108,74 @@ class HemsEnv(Env):
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action),err_msg
 
-        #STATE (sampleTime,Load,PV,SOC,pricePerHour)
-        sampleTime,load,pv,pricePerHour = self.state
-        
-        #interaction
-        # if energy supply is greater than consumption
-        if pv > load :
-            cost = 0.001
+        #list for storing reward
+        reward = []
 
+        #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
+        sampleTime,load,pv,pricePerHour,ACRemain,WMRemain = self.state
+        fail = False
         
-        # if energy supply is less than consumption
-        else:
-            # 1. AC on
-            if action == 0 :
-                self.ac.turn_on()
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-                cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume - pv  )
-            
-            #2. AC off
+
+        # 1. AC on , WM on
+        if action == 0 :
+            self.ac.turn_on()
+            self.wm.turn_on()
+            reward.append(0.5)
+            #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
+            cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv  )
+        
+        #2. AC on , WM off
+        elif action == 1:
+            self.ac.turn_on()
+            if(self.wm.reachExecutePeriod() == False):
+                reward.append(-0.5)
             else:
-                self.ac.turn_off()
-                cost = pricePerHour * 0.25 *(load-pv)
+                reward.append(0.5)
+            self.wm.turn_off()
+            cost = pricePerHour * 0.25 *(load+self.ac.AvgPowerConsume-pv)
+
+        #3. AC off , WM on
+        elif action == 2:
+            self.ac.turn_off()
+            self.wm.turn_on()
+            fail=False
+            reward.append(0.5)
+            cost = pricePerHour * 0.25 * (load + self.wm.AvgPowerConsume-pv)
+
+        #4. AC off , WM off
+        else : 
+            self.ac.turn_off()
+            if(self.wm.reachExecutePeriod() == False):
+                #fail = True
+                reward.append(-0.5)
+
+            else:
+                reward.append(0.5)
+            self.wm.turn_off()
+            cost = pricePerHour * 0.25 *(load-pv)
+
+        if WMRemain<0:
+            reward.append(-np.abs(WMRemain))
+        if ACRemain<0:
+            reward.append(-np.abs(ACRemain))
 
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.ac.getRemainDemand(),self.wm.getRemainDemand()])
+
         #check if all day is done
-        done = bool(
-            sampleTime == 95
-        )
-
+        done =  bool(sampleTime == 95)
         #REWARD
-        reward = []
-        if not done:
-            # reward 1
-            r1 = -cost/1000
-            reward.append(r1)
-
-        # if done
-        else : 
-            # reward 1
-            r1 = -cost/1000
-            reward.append(r1)
-            #reward 2
-            r2= - self.ac.getRemainDemand()
-            reward.append(r2)
+        if done == True:
+            if self.ac.getRemainDemand()==0:
+                reward.append(20)
+            if self.wm.getRemainDemand()==0:
+                reward.append(20)
 
         reward = sum(reward)
+
+        info = {ACRemain,WMRemain}
         return self.state,reward,done,info
 
         
@@ -154,6 +186,8 @@ class HemsEnv(Env):
         Starting State
         '''
         #each month pick one day for testing
+        self.ac.reset()
+        self.wm.reset()
         self.i += 1
         self.Load = self.info.experimentData['Load'].iloc[:,self.i]
 
@@ -182,7 +216,7 @@ class HemsEnv(Env):
         elif self.i % 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),self.GridPrice[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.ac.demand,self.wm.demand])
         return self.state
 
 
