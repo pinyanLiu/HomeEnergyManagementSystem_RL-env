@@ -28,33 +28,40 @@
         "num_values": 4
     },
     "max_episode_timesteps": 96,
-    "batch_size": 256,
+    "batch_size": 48,
     "network": [
         {
             "type": "dense",
-            "size": 100,
+            "size": 75,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 100,
+            "size": 75,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 100,
+            "size": 75,
             "activation": "relu"
         }
     ],
-    "memory": 540,
-    "start_updating": 256,
-    "update_frequency": 0.5,
+    "memory": 96,
+    "start_updating": 96,
+    "update_frequency": 0.1,
     "learning_rate": 0.001,
     "discount": 0.97,
     "return_processing": null,
     "predict_terminal_values": false,
     "state_preprocessing": "linear_normalization",
-    "exploration": 0.1,
+    "exploration": {
+        "type":"decaying",
+        "decay":"linear",
+        "unit":"episodes",
+        "num_steps":2000,
+        "initial_value" : 0.9999,
+        "final_value":0.0001
+    },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
     "entropy_regularization": 0.0,
