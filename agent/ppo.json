@@ -48,7 +48,7 @@
     "use_beta_distribution": true,
     "memory": "minimum",
     "update_frequency": 0.5,
-    "learning_rate": 1e-7,
+    "learning_rate": 1e-4,
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.2,
@@ -67,7 +67,14 @@
         "multi_step": 10
     },
     "state_preprocessing": "linear_normalization",
-    "exploration": 0.2,
+    "exploration": {
+        "type":"decaying",
+        "decay":"linear",
+        "unit":"episodes",
+        "num_steps":2000,
+        "initial_value" : 0.9999,
+        "final_value":0.0001
+    },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
     "entropy_regularization": 0.0,
