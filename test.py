@@ -1,4 +1,6 @@
 from tensorforce import Agent,Environment
+from lib.loads.interrupted import AC
+from lib.loads.uninterrupted import WM
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -58,7 +60,9 @@ class Test():
 
     def __testInLoad__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v5')
-        self.agent = Agent.load(directory = 'saver_dir',filename = 'agent-1001.index',format='checkpoint',environment=self.environment)
+        self.agent = Agent.load(directory = 'saver_dir',environment=self.environment)
+        ac_object = AC(demand=5,AvgPowerConsume=3000)
+        wm_object = WM(demand=6,AvgPowerConsume=3000,executePeriod=6)
         load = []
         pv = []
         ac = []
@@ -79,20 +83,36 @@ class Test():
                 states, terminal, reward = self.environment.execute(actions=actions)
                 #1. AC on , WM on
                 if actions == 0:
+                    ac_object.turn_on()
+                    wm_object.turn_on()
                     ac.append(3000)#power
-                    wm.append(1500)
+                    wm.append(3000)
                 #2. AC on , WM off
                 elif actions == 1:
+                    ac_object.turn_on()
                     ac.append(3000)
-                    wm.append(0)
+                    if(wm_object.reachExecutePeriod() == False):
+                        wm_object.turn_on()
+                        wm.append(3000)
+                    else:
+                        wm_object.turn_off
+                        wm.append(0)
                 # AC off , WM on
                 elif actions == 2 :
+                    ac_object.turn_off()
+                    wm_object.turn_on()
                     ac.append(0)
-                    wm.append(1500)
+                    wm.append(3000)
                 # AC off , WM off
                 else:
+                    ac_object.turn_off()
                     ac.append(0)
-                    wm.append(0)
+                    if(wm_object.reachExecutePeriod() == False):
+                        wm_object.turn_on()
+                        wm.append(3000)
+                    else:
+                        wm_object.turn_off
+                        wm.append(0)
                 load.append(states[1])
                 pv.append(states[2])
                 totalReward += reward

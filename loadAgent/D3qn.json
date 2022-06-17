@@ -3,16 +3,20 @@
     "states": {
         "type": "float",
         "shape": [
-            4
+            6
         ],
         "min_value": [
             0.0,
+            "-Infinity",
+            "-Infinity",
             "-Infinity",
             "-Infinity",
             "-Infinity"
         ],
         "max_value": [
             96.0,
+            "Infinity",
+            "Infinity",
             "Infinity",
             "Infinity",
             "Infinity"
@@ -28,29 +32,36 @@
     "network": [
         {
             "type": "dense",
-            "size": 100,
+            "size": 75,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 100,
+            "size": 75,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 100,
+            "size": 75,
             "activation": "relu"
         }
     ],
-    "memory": 540,
-    "start_updating": 256,
+    "memory": 96,
+    "start_updating": 96,
     "update_frequency": 0.1,
-    "learning_rate": 0.0001,
+    "learning_rate": 0.001,
     "discount": 0.97,
     "return_processing": null,
     "predict_terminal_values": false,
     "state_preprocessing": "linear_normalization",
-    "exploration": 0.1,
+    "exploration": {
+        "type":"decaying",
+        "decay":"linear",
+        "unit":"episodes",
+        "num_steps":2000,
+        "initial_value" : 0.9999,
+        "final_value":0.0001
+    },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
     "entropy_regularization": 0.0,
@@ -58,7 +69,7 @@
     "config": null,
     "saver": {
         "directory": "saver_dir",
-        "frequency": 100,
+        "frequency": 250,
         "unit": "episodes"
     },
     "summarizer": {
