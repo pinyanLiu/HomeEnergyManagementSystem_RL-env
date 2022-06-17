@@ -4,7 +4,9 @@ from  gym import spaces
 from gym import make
 import numpy as np
 from  yaml import load , SafeLoader
+import math
 from random import randint
+import pandas as pd
 
 class HemsEnv(Env):
     def __init__(self) :
@@ -91,6 +93,7 @@ class HemsEnv(Env):
         )
         self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
         self.state = None
+        self.totalCost = 0
         
     def step(self,action):
         '''
@@ -106,88 +109,64 @@ class HemsEnv(Env):
         sampleTime,load,pv,soc,pricePerHour = self.state
         soc_change = float(action)
         # action(soc_change) is the degree of charging/discharging power .
-        # if soc_change > 0 means charging , whereas soc_change<0 means discharging.
+        # if soc_change > 0 means charging , whereas soc_change < 0 means discharging.
+
 
     #interaction
+        fail = False # use for check whether the agent do wrong action 
         reward = []
-        # if energy supply is greater than consumption
+        # if energy supply is greater than consumption means we don't have to buy grid , so cost = 0(0 makes error easily , so make it close to 0)
         if (pv + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])) >= load :
             cost = 0.001
+            fail = False
 
         
         # if energy supply is less than consumption
         else:
             #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
             if (soc + soc_change) < 0 :
-                soc = 0
+                reward.append(-1)
                 cost = 0.001
-                reward.append(-2)
+                fail = True # force the training stop
+
             elif (soc + soc_change) > 1:
-                soc = 1
+                reward.append(-1)
                 cost = 0.001
-                reward.append(-2)
+                fail = True # force the training stop
+
             else:
             #calculate the new soc for next state
                 soc = soc+soc_change
+                reward.append(0.1)
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
                 cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
 
-
-            
-
-
-        #change to next state
-        sampleTime = int(sampleTime+1)
-        #self.state = {'sampleTime':sampleTime,'load': self.Load[self.state['sampleTime']],'pv': self.PV[self.state['sampleTime']],'SOC':soc,'pricePerHour':self.GridPrice[self.state['sampleTime']]}
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
-        #check if all day is done
-        done = bool(
-            sampleTime == 95
-        )
+        self.totalCost += cost
 
     #REWARD
-        if not done:
-            # reward 1
-            r1 = -cost/10000*1.2
-            reward.append(r1)
-            #reward 2
-            if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-5)
-                if soc_change < 0:
-                    reward.append(2)
-                elif soc_change > 0 :
-                    reward.append(-2)
-            else:    
-                reward.append(0.0625)
-            #reward3
-            reward.append(soc- float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0])*np.exp(sampleTime/35))
-
-
+        if sampleTime!=95:
+            if soc_change != 0 :
+                reward.append(0.1)
         # if done
         else : 
             # reward 1
-            r1 = -cost/10000*1.2
+            r1 = 400*sigmoid(self.totalCost)
             reward.append(r1)
-            #reward 2
-            if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-5)
-                if soc_change < 0:
-                    reward.append(2)
-                elif soc_change > 0 :
-                    reward.append(-2)
-            else:    
-                reward.append(0.0625)
-            # reward 3
-            r2 =  20*(soc - float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
-            reward.append(r2)
 
 
+        #check if agent fail or all day is done
+        done = fail or bool(
+            sampleTime == 95
+        )
         reward = sum(reward)
+        #change to next state
+        sampleTime = int(sampleTime+1)
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
 
 
 
         #set placeholder for infomation
-        info = {}
+        info = {'totalcost':self.totalCost}
 
         return self.state,reward,done,info
 
@@ -198,6 +177,7 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
+        self.totalCost = 0
         #pick one day from 360 days
         i = randint(0,359)
         self.Load = self.info.experimentData['Load'].iloc[:,i].tolist()
@@ -232,17 +212,26 @@ class HemsEnv(Env):
         self.state=np.array([0,self.Load[0],self.PV[0],float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),self.GridPrice[0]])
         return self.state
 
+def sigmoid(x):
+    # set cost reward between 0 to -2
+    return -1/(1+math.exp(-x/100000+3))+0.5
+
 
 if __name__ == '__main__':
     env = make("Hems-v0")
 #     # Initialize episode
     states = env.reset()
     done = False
-    step = 0
-    Totalreward = 0
-    while not done: # Episode timestep
-        actions = env.action_space.sample()
-        states, reward, done , info = env.step(action=actions)
-        Totalreward += reward
-    print(Totalreward)
-        
+    totalcost=[]
+    #step = 0
+    #Totalreward = 0
+    for i in range(1000):
+        while not done: # Episode timestep
+            actions = env.action_space.sample()
+            states, reward, done , info = env.step(action=actions)
+        totalcost.append(info['totalcost'])
+        env.reset()
+        done = False
+    print(np.mean(totalcost))
+    print(np.std(totalcost))
+    print(np.var(totalcost))

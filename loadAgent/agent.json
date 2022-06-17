@@ -1,0 +1,6 @@
+{
+    "agent": "dqn",
+    "memory": "1000",
+    "network": "auto",
+    "batch_size": "10"
+}

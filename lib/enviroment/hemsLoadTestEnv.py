@@ -54,9 +54,9 @@ class HemsEnv(Env):
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
         
         #action we take (charge , discharge , stay)
-        self.action_space = spaces.Discrete(3)
+        self.action_space = spaces.Discrete(2)
         #observation space ( Only SOC matters )
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
+        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -65,8 +65,6 @@ class HemsEnv(Env):
                 np.finfo(np.float32).max,
                 #PV
                 np.finfo(np.float32).max,
-                #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmax','value'],
                 #pricePerHour
                 np.finfo(np.float32).max,
             ],
@@ -80,8 +78,6 @@ class HemsEnv(Env):
                 np.finfo(np.float32).min,
                 #PV
                 np.finfo(np.float32).min,
-                #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmin','value'],         
                 #pricePerHour
                 np.finfo(np.float32).min,
             ],
@@ -101,39 +97,31 @@ class HemsEnv(Env):
         assert self.action_space.contains(action),err_msg
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour)
-        sampleTime,load,pv,soc,pricePerHour = self.state
-
+        sampleTime,load,pv,pricePerHour = self.state
+        
         #interaction
-
         # if energy supply is greater than consumption
-        if pv > load and (soc + 0.1) < 1:
-           cost = 0.001
+        if pv > load :
+            cost = 0.001
+
         
         # if energy supply is less than consumption
         else:
-                # 0. charging
-                #prevent the agent still want to charge while the battery is full of electricity
-            if action == 0 and (soc + 0.1) < 1:
-                soc = soc+0.1
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
-                cost = pricePerHour * 0.25 *( load + 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
-
-                # 1. discharging
-                #prevent the agent still want to discharge while the battery is lack of electricity
-            elif action == 1 and (soc-0.1) >= 0:
-                soc = soc-0.1
+            # 1. AC on
+            if action == 0 :
+                self.ac.turn_on()
                 #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-                cost = pricePerHour * 0.25 *( load - 0.1*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  )
-
-                # 2.stay
-            else :
-                #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per min)
-                cost = pricePerHour * 0.25 *( load - pv  )
+                cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume - pv  )
             
+            #2. AC off
+            else:
+                self.ac.turn_off()
+                cost = pricePerHour * 0.25 *(load-pv)
+
+
         #change to next state
         sampleTime = int(sampleTime+1)
-        #self.state = {'sampleTime':sampleTime,'load': self.Load[self.state['sampleTime']],'pv': self.PV[self.state['sampleTime']],'SOC':soc,'pricePerHour':self.GridPrice[self.state['sampleTime']]}
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime]])
         #check if all day is done
         done = bool(
             sampleTime == 95
@@ -142,45 +130,20 @@ class HemsEnv(Env):
         #REWARD
         reward = []
         if not done:
-            #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
-                reward.append(-2)
             # reward 1
-            r1 = -cost/10000*1.08
+            r1 = -cost/1000
             reward.append(r1)
-            # reward 2
-            if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-5)
-            else:    
-                reward.append(0.0625)
-            reward.append(soc- float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
-
-
 
         # if done
         else : 
-            if (soc >= 1 and action == 0) or (soc <= 0 and action == 1) :
-                reward.append(-2)
             # reward 1
-            r1 = -cost/10000*1.08
+            r1 = -cost/1000
             reward.append(r1)
             #reward 2
-            if cost / (pricePerHour*0.25) >= 20000:
-                reward.append(-5)
-            else:    
-                reward.append(0.0625)
-            # reward 2
-            r2 =  20*(soc - float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0]))
+            r2= - self.ac.getRemainDemand()
             reward.append(r2)
 
-
         reward = sum(reward)
-
-
-
-        #set placeholder for infomation
-        info = {'cost':cost,'soc':soc}
-
         return self.state,reward,done,info
 
         
@@ -190,7 +153,6 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
-
         #each month pick one day for testing
         self.i += 1
         self.Load = self.info.experimentData['Load'].iloc[:,self.i]
