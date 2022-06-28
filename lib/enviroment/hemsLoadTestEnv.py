@@ -115,12 +115,25 @@ class HemsEnv(Env):
         sampleTime,load,pv,pricePerHour,ACRemain,WMRemain = self.state
         
 
+        '''
+        There are 3 kind of penalty
+            1. Cost . The higher the cost , the higher the penalty
+            2. Wrong act in WM . If agent ask WM to stop while WM still haven't reach the Execute period .
+            3. Turn on too much . IF agent ask AC or WM to turn on while they have already reach the daily goal
+
+        There is one mix reward (can be reward or penalty , depends on the state and action )
+            1. Remain . Get reward if the agent ask AC or WM to turn on while there's still remain time steps need to be turned on . Get penalty if the agent ask AC or WM to turn on while they have already reach the Executed period . 
+        '''
+
+
         # 1. AC on , WM on
         if action == 0 :
             self.ac.turn_on()
             self.wm.turn_on()
-            reward.append(ACRemain)
-            reward.append(WMRemain)
+            if ACRemain <= 0 or WMRemain <= 0 :
+                reward.append(-1)
+            reward.append(ACRemain*0.1)
+            reward.append(WMRemain*0.1)
             #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
             cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv  )
             reward.append(-cost/10000)
@@ -128,22 +141,26 @@ class HemsEnv(Env):
         #2. AC on , WM off
         elif action == 1:
             self.ac.turn_on()
+            if ACRemain <= 0:
+                reward.append(-1)
             reward.append(ACRemain*0.1)
             if(self.wm.reachExecutePeriod() == False):
                 self.wm.turn_on()
                 reward.append(WMRemain*0.1)
                 reward.append(-1)
                 cost = pricePerHour * 0.25 *(load+self.ac.AvgPowerConsume+self.wm.AvgPowerConsume-pv)
-                reward.append(-cost/10000)
             else:
                 self.wm.turn_off()
                 cost = pricePerHour * 0.25 *(load+self.ac.AvgPowerConsume-pv)
-                reward.append(-cost/10000)
+            reward.append(-cost/10000)
 
         #3. AC off , WM on
         elif action == 2:
             self.ac.turn_off()
             self.wm.turn_on()
+            if WMRemain <= 0:
+                reward.append(-1)
+
             reward.append(WMRemain*0.1)
             cost = pricePerHour * 0.25 * (load + self.wm.AvgPowerConsume-pv)
             reward.append(-cost/10000)
@@ -156,16 +173,15 @@ class HemsEnv(Env):
                 reward.append(WMRemain*0.1)
                 reward.append(-1)
                 cost = pricePerHour * 0.25 * (load + self.wm.AvgPowerConsume-pv)
-                reward.append(-cost/10000)
             else:
                 cost = pricePerHour * 0.25 *(load-pv)
                 self.wm.turn_off()
-                reward.append(-cost/10000)
+            reward.append(-cost/10000)
 
-        if WMRemain<0:
-            reward.append(-np.abs(WMRemain*0.05))
-        if ACRemain<0:
-            reward.append(-np.abs(ACRemain*0.05))
+        # if WMRemain < 0:
+        #     reward.append(-np.abs(WMRemain*0.05))
+        # if ACRemain < 0:
+        #     reward.append(-np.abs(ACRemain*0.05)) 
 
 
         #change to next state
@@ -176,12 +192,12 @@ class HemsEnv(Env):
         done =  bool(sampleTime == 95)
         #REWARD
         if done == True:
-            if self.ac.getRemainDemand()==0:
-                reward.append(20)
-            if self.wm.getRemainDemand()==0:
-                reward.append(20)
+            if self.ac.getRemainDemand() == 0:
+                reward.append(40)
+            if self.wm.getRemainDemand() == 0:
+                reward.append(40)
 
-        info = {'reward':reward}
+        info = {'reward':reward,'percentage':reward/sum(reward)}
         reward = sum(reward)
 
         return self.state,reward,done,info
