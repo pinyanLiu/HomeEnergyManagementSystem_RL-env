@@ -55,7 +55,7 @@ class HemsEnv(Env):
         elif self.i % 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
         self.ac = AC(demand=10,AvgPowerConsume=3000)
-        self.wm = WM(demand=6,AvgPowerConsume=3000,executePeriod=6)
+        self.wm = WM(demand=10,AvgPowerConsume=3000,executePeriod=10)
 
          #action AC take (on,off)
         self.action_space = spaces.Discrete(4)
@@ -130,10 +130,15 @@ class HemsEnv(Env):
         if action == 0 :
             self.ac.turn_on()
             self.wm.turn_on()
-            if ACRemain <= 0 or WMRemain <= 0 :
-                reward.append(-1)
-            reward.append(ACRemain*0.1)
-            reward.append(WMRemain*0.1)
+            if ACRemain <= 0 :
+                reward.append(-2)
+            if WMRemain <= 0:
+                reward.append(-0.5*self.wm.executePeriod)
+            #avoid WM can't complete execute period if it starts in nearly end of the day
+            if (95-sampleTime) < self.wm.executePeriod:
+                reward.append(-2)
+            reward.append(ACRemain*0.2)
+            reward.append(WMRemain*0.2)
             #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
             cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv  )
             reward.append(-cost/10000)
@@ -142,12 +147,12 @@ class HemsEnv(Env):
         elif action == 1:
             self.ac.turn_on()
             if ACRemain <= 0:
-                reward.append(-1)
+                reward.append(-2)
             reward.append(ACRemain*0.1)
             if(self.wm.reachExecutePeriod() == False):
                 self.wm.turn_on()
-                reward.append(WMRemain*0.1)
-                reward.append(-1)
+                reward.append(WMRemain*0.2)
+                reward.append(-2)
                 cost = pricePerHour * 0.25 *(load+self.ac.AvgPowerConsume+self.wm.AvgPowerConsume-pv)
             else:
                 self.wm.turn_off()
@@ -159,9 +164,12 @@ class HemsEnv(Env):
             self.ac.turn_off()
             self.wm.turn_on()
             if WMRemain <= 0:
-                reward.append(-1)
+                reward.append(-0.5*self.wm.executePeriod)
+            #avoid WM can't complete execute period if it starts in nearly end of the day
+            if (95-sampleTime) < self.wm.executePeriod:
+                reward.append(-2)
 
-            reward.append(WMRemain*0.1)
+            reward.append(WMRemain*0.2)
             cost = pricePerHour * 0.25 * (load + self.wm.AvgPowerConsume-pv)
             reward.append(-cost/10000)
 
@@ -170,13 +178,14 @@ class HemsEnv(Env):
             self.ac.turn_off()
             if(self.wm.reachExecutePeriod() == False):
                 self.wm.turn_on()
-                reward.append(WMRemain*0.1)
-                reward.append(-1)
+                reward.append(WMRemain*0.2)
+                reward.append(-2)
                 cost = pricePerHour * 0.25 * (load + self.wm.AvgPowerConsume-pv)
+                # put cost reward here , for the reason that if WM didn't take wrong action , then the cost reward is nothing to do with the action we choose .
+                reward.append(-cost/10000)
             else:
                 cost = pricePerHour * 0.25 *(load-pv)
                 self.wm.turn_off()
-            reward.append(-cost/10000)
 
         # if WMRemain < 0:
         #     reward.append(-np.abs(WMRemain*0.05))
@@ -197,11 +206,10 @@ class HemsEnv(Env):
             if self.wm.getRemainDemand() == 0:
                 reward.append(40)
 
-        info = {'reward':reward,'percentage':reward/sum(reward)}
+        info = {'reward':reward}
         reward = sum(reward)
 
         return self.state,reward,done,info
-
 
         
     def render(self):
