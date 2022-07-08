@@ -111,18 +111,18 @@ class HemsEnv(Env):
 
     #interaction
         reward = []
-        # if energy supply is greater than consumption means we don't have to buy grid , so cost = 0(0 makes error easily , so make it close to 0)
+        # if energy supply is greater than consumption means we don't have to buy grid , this should be encourage .
         if (pv - soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])) >= load :
             if (soc + soc_change) < 0 :
-                reward.append(-2)
+                reward.append(-0.2)
                 cost = 0.0001
             elif (soc + soc_change) > 1:
-                reward.append(-2)
+                reward.append(-0.2)
                 cost = 0.0001
 
             else:
             #calculate the new soc for next state
-                reward.append(1)
+                reward.append(0.1)
                 soc = soc+soc_change
                 cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  ) ## negative , because load < pv - soc_change
         
@@ -130,22 +130,22 @@ class HemsEnv(Env):
         else:
             #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
             if (soc + soc_change) < 0 :
-                reward.append(-2)
+                reward.append(-0.2)
                 cost = 0.0001
 
             elif (soc + soc_change) > 1:
-                reward.append(-2)
+                reward.append(-0.2)
                 cost = 0.0001
 
             else:
             #calculate the new soc for next state
-                reward.append(1)
+                reward.append(0.1)
                 soc = soc+soc_change
                 cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  ) ## positive , because load > pv - soc_change
 
         #REWARD
-        if sampleTime!=95:
-            reward.append(cost)
+      #  if sampleTime!=95:
+        reward.append(-cost/10000)
 
 
         #change to next state
@@ -162,7 +162,7 @@ class HemsEnv(Env):
 
 
         #set placeholder for infomation
-        info = {reward}
+        info = {'reward':reward}
         reward = sum(reward)
 
         return self.state,reward,done,info
