@@ -25,7 +25,7 @@ class HemsEnv(Env):
         self.db = self.mysqlData['db']
         self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db,mode = 'Testing')
         self.BaseParameter = self.info.experimentData['BaseParameter']
-        self.GridPrice = self.info.experimentData['GridPrice']['summer_price'].tolist()
+        self.GridPrice = self.info.experimentData['GridPrice']['price_value'].tolist()
 
         #each month pick one day for testing
         self.i = 0
@@ -54,8 +54,8 @@ class HemsEnv(Env):
             self.PV = self.info.experimentData['PV']['Nov'].tolist()
         elif self.i % 12 == 11:
             self.PV = self.info.experimentData['PV']['Dec'].tolist()
-        self.ac = AC(demand=10,AvgPowerConsume=3000)
-        self.wm = WM(demand=10,AvgPowerConsume=3000,executePeriod=10)
+        self.ac = AC(demand=40,AvgPowerConsume=3000)
+        self.wm = WM(demand=40,AvgPowerConsume=3000,executePeriod=40)
 
          #action AC take (on,off)
         self.action_space = spaces.Discrete(4)
@@ -133,14 +133,17 @@ class HemsEnv(Env):
             if ACRemain <= 0 :
                 reward.append(-2)
             if WMRemain <= 0:
-                reward.append(-0.5*self.wm.executePeriod)
+                reward.append(-0.8*self.wm.executePeriod)
             #avoid WM can't complete execute period if it starts in nearly end of the day
             if (95-sampleTime) < self.wm.executePeriod:
                 reward.append(-2)
             reward.append(ACRemain*0.2)
             reward.append(WMRemain*0.2)
             #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-            cost = pricePerHour * 0.25 *( load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv  )
+            if (load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv) < 0:
+                cost = -15000 #encourage agent turn on loads when pv is high
+            else:
+                cost = (pricePerHour-self.avgPrice) * 0.25 *( load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv  )
             reward.append(-cost/10000)
         
         #2. AC on , WM off
@@ -153,10 +156,16 @@ class HemsEnv(Env):
                 self.wm.turn_on()
                 reward.append(WMRemain*0.2)
                 reward.append(-2)
-                cost = pricePerHour * 0.25 *(load+self.ac.AvgPowerConsume+self.wm.AvgPowerConsume-pv)
+                if(load+self.ac.AvgPowerConsume+self.wm.AvgPowerConsume-pv) < 0:
+                    cost = -15000 #encourage agent turn on loads when pv is high
+                else:
+                    cost = (pricePerHour-self.avgPrice) * 0.25 *(load+self.ac.AvgPowerConsume+self.wm.AvgPowerConsume-pv)
             else:
                 self.wm.turn_off()
-                cost = pricePerHour * 0.25 *(load+self.ac.AvgPowerConsume-pv)
+                if (load+self.ac.AvgPowerConsume-pv) < 0:
+                    cost = -15000 #encourage agent turn on loads when pv is high
+                else:
+                    cost = (pricePerHour-self.avgPrice) * 0.25 *(load+self.ac.AvgPowerConsume-pv)
             reward.append(-cost/10000)
 
         #3. AC off , WM on
@@ -164,13 +173,16 @@ class HemsEnv(Env):
             self.ac.turn_off()
             self.wm.turn_on()
             if WMRemain <= 0:
-                reward.append(-0.5*self.wm.executePeriod)
+                reward.append(-0.8*self.wm.executePeriod)
             #avoid WM can't complete execute period if it starts in nearly end of the day
             if (95-sampleTime) < self.wm.executePeriod:
                 reward.append(-2)
 
             reward.append(WMRemain*0.2)
-            cost = pricePerHour * 0.25 * (load + self.wm.AvgPowerConsume-pv)
+            if (load + self.wm.AvgPowerConsume-pv) < 0 :
+                cost = -15000 #encourage agent turn on loads when pv is high
+            else :
+                cost = (pricePerHour-self.avgPrice) * 0.25 * (load + self.wm.AvgPowerConsume-pv)
             reward.append(-cost/10000)
 
         #4. AC off , WM off
@@ -180,17 +192,17 @@ class HemsEnv(Env):
                 self.wm.turn_on()
                 reward.append(WMRemain*0.2)
                 reward.append(-2)
-                cost = pricePerHour * 0.25 * (load + self.wm.AvgPowerConsume-pv)
-                # put cost reward here , for the reason that if WM didn't take wrong action , then the cost reward is nothing to do with the action we choose .
-                reward.append(-cost/10000)
+                if (load + self.wm.AvgPowerConsume-pv) < 0:
+                    cost = -15000 #encourage agent turn on loads when pv is high
+                else :
+                    cost = (pricePerHour-self.avgPrice) * 0.25 * (load + self.wm.AvgPowerConsume-pv)
             else:
-                cost = pricePerHour * 0.25 *(load-pv)
+                if (load-pv)<0:
+                    cost = -15000 #encourage agent turn on loads when pv is high
+                else:
+                    cost = (pricePerHour-self.avgPrice) * 0.25 *(load-pv)
                 self.wm.turn_off()
-
-        # if WMRemain < 0:
-        #     reward.append(-np.abs(WMRemain*0.05))
-        # if ACRemain < 0:
-        #     reward.append(-np.abs(ACRemain*0.05)) 
+            reward.append(-cost/10000)
 
 
         #change to next state
@@ -206,8 +218,8 @@ class HemsEnv(Env):
             if self.wm.getRemainDemand() == 0:
                 reward.append(40)
 
-        info = {'reward':reward}
         reward = sum(reward)
+        info = {'reward':reward}
 
         return self.state,reward,done,info
 

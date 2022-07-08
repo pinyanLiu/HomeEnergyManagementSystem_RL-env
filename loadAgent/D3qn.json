@@ -28,7 +28,7 @@
         "num_values": 4
     },
     "max_episode_timesteps": 96,
-    "batch_size": 250,
+    "batch_size": 500,
     "network": [
         {
             "type": "dense",
@@ -36,9 +36,17 @@
             "activation": "relu"
         },
         {
+            "type": "dropout",
+            "rate": 0.4
+        },
+        {
             "type": "dense",
             "size": 75,
             "activation": "relu"
+        },
+        {
+            "type": "dropout",
+            "rate": 0.4
         },
         {
             "type": "dense",
@@ -46,8 +54,8 @@
             "activation": "relu"
         }
     ],
-    "memory": 500,
-    "start_updating": 96,
+    "memory": 600,
+    "start_updating": 1000,
     "update_frequency": 0.1,
     "learning_rate": 0.001,
     "discount": 0.97,
@@ -58,11 +66,13 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 4000,
+        "num_steps": 10000,
         "initial_value": 0.5,
         "final_value": 0.00001
     },
     "variable_noise": 0.0,
+    "target_update_weight": 0.5,
+    "target_sync_frequency": 1,
     "l2_regularization": 0.0,
     "entropy_regularization": 0.0,
     "parallel_interactions": 1,

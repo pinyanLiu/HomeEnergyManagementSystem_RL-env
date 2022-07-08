@@ -61,8 +61,8 @@ class Test():
     def __testInLoad__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v5')
         self.agent = Agent.load(directory = 'saver_dir',environment=self.environment)
-        ac_object = AC(demand=10,AvgPowerConsume=3000)
-        wm_object = WM(demand=10,AvgPowerConsume=3000,executePeriod=10)
+        ac_object = AC(demand=40,AvgPowerConsume=3000)
+        wm_object = WM(demand=40,AvgPowerConsume=3000,executePeriod=40)
         load = []
         pv = []
         ac = []
