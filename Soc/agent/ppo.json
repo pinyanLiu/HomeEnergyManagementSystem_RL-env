@@ -35,9 +35,17 @@
             "activation": "relu"
         },
         {
+            "type": "dropout",
+            "rate": 0.4
+        },
+        {
             "type": "dense",
             "size": 100,
             "activation": "relu"
+        },
+        {
+            "type": "dropout",
+            "rate": 0.4
         },
         {
             "type": "dense",
@@ -45,35 +53,54 @@
             "activation": "relu"
         }
     ],
-    "use_beta_distribution": true,
+    "use_beta_distribution": false,
     "memory": "minimum",
     "update_frequency": 0.5,
     "learning_rate": 1e-4,
     "multi_step": 10,
     "subsampling_fraction": 0.33,
-    "likelihood_ratio_clipping": 0.2,
+    "likelihood_ratio_clipping": 0.25,
     "discount": 0.95,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
-    "baseline": {
-        "type": "auto",
-        "size": 32,
-        "depth": 1
-    },
+    "baseline": [
+        {
+            "type": "dense",
+            "size": 75,
+            "activation": "relu"
+        },
+        {
+            "type": "dropout",
+            "rate": 0.4
+        },
+        {
+            "type": "dense",
+            "size": 75,
+            "activation": "relu"
+        },
+        {
+            "type": "dropout",
+            "rate": 0.4
+        },
+        {
+            "type": "dense",
+            "size": 75,
+            "activation": "relu"
+        }
+    ],
     "baseline_optimizer": {
         "optimizer": "adam",
-        "learning_rate": 1e-4,
-        "multi_step": 10
+        "learning_rate": 1e-4
     },
     "state_preprocessing": "linear_normalization",
     "exploration": {
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 4000,
+        "num_steps": 1000,
         "initial_value": 0.6,
-        "final_value": 0.0001
+        "final_value": 0.00001
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
@@ -81,12 +108,12 @@
     "parallel_interactions": 1,
     "config": null,
     "saver": {
-        "directory": "saver_dir",
+        "directory": "Soc/saver_dir",
         "frequency": 100,
         "unit": "episodes"
     },
     "summarizer": {
-        "directory": "summaries",
+        "directory": "Soc/summaries",
         "summaries": "all"
     },
     "tracking": null,

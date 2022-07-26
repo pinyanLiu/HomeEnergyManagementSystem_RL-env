@@ -63,3 +63,8 @@ class ImportData:
         TestingData.columns = [column[0] for column in self.cursor.description]
         return TestingData
 
+    def __importTemperature__(self):
+        self.cursor.execute("SELECT * FROM Temperature")
+        Temperature = pd.DataFrame(self.cursor.fetchall())
+        Temperature.columns = [column[0]for column in self.cursor.description]
+        return Temperature

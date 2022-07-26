@@ -22,7 +22,7 @@ class Test():
 
     def __testInSoc__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v1')
-        self.agent = Agent.load(directory = 'saver_dir',environment=self.environment)
+        self.agent = Agent.load(directory = 'Soc/saver_dir',environment=self.environment)
         soc = []
         load = []
         pv = []
@@ -60,7 +60,7 @@ class Test():
 
     def __testInLoad__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v5')
-        self.agent = Agent.load(directory = 'saver_dir',environment=self.environment)
+        self.agent = Agent.load(directory = 'Load/saver_dir',environment=self.environment)
         ac_object = AC(demand=40,AvgPowerConsume=3000)
         wm_object = WM(demand=40,AvgPowerConsume=3000,executePeriod=40)
         load = []
