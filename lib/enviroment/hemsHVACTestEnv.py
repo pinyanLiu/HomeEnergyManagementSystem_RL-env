@@ -18,42 +18,67 @@ class HemsEnv(Env):
         with open("yaml/mysqlData.yaml","r") as f:
             self.mysqlData = load(f,SafeLoader)
 
-        self.host = self.mysqlData['host']
-        self.user = self.mysqlData['user']
-        self.passwd = self.mysqlData['passwd']
-        self.db = self.mysqlData['db']
-        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db,mode = 'Testing')
-        self.BaseParameter = self.info.experimentData['BaseParameter']
-        self.GridPrice = self.info.experimentData['GridPrice']['price_value'].tolist()
-
-        #each month pick one day for testing
-        self.i = 0
-        self.Load = self.info.experimentData['Load'].iloc[:,self.i].tolist()
-        if self.i % 12 == 0:
-            self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif self.i % 12 == 1:
-            self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif self.i % 12 == 2:
-            self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif self.i % 12 == 3:
-            self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif self.i % 12 == 4:
-            self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif self.i % 12 == 5:
-            self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif self.i % 12 == 6:
-            self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif self.i % 12 == 7:
-            self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif self.i % 12 == 8:
-            self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif self.i % 12 == 9:
-            self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif self.i % 12 == 10:
-            self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif self.i % 12 == 11:
-            self.PV = self.info.experimentData['PV']['Dec'].tolist()
+        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db)
         
+        self.BaseParameter = self.info.importBaseParameter()
+        self.GridPrice = self.info.importGridPrice()
+        self.GridPrice = self.GridPrice['price_value'].tolist()
+        #pick one day from 360 days
+        i = randint(0,359)
+        self.Load = self.info.importTrainingLoad()
+        self.Load = self.Load['Load'].iloc[:,i].tolist()
+        self.PV = self.info.importPhotoVoltaic()
+
+        if i / 12 == 0:
+            self.PV = self.PV['Jan'].tolist()
+        elif i / 12 == 1:
+            self.PV = self.PV['Feb'].tolist()
+        elif i / 12 == 2:
+            self.PV = self.PV['Mar'].tolist()
+        elif i / 12 == 3:
+            self.PV = self.PV['Apr'].tolist()
+        elif i / 12 == 4:
+            self.PV = self.PV['May'].tolist()
+        elif i / 12 == 5:
+            self.PV = self.PV['Jun'].tolist()
+        elif i / 12 == 6:
+            self.PV = self.PV['July'].tolist()
+        elif i / 12 == 7:
+            self.PV = self.PV['Aug'].tolist()
+        elif i / 12 == 8:
+            self.PV = self.PV['Sep'].tolist()
+        elif i / 12 == 9:
+            self.PV = self.PV['Oct'].tolist()
+        elif i / 12 == 10:
+            self.PV = self.PV['Nov'].tolist()
+        elif i / 12 == 11:
+            self.PV = self.PV['Dec'].tolist()
+        
+        self.Temperature = self.info.importTemperature()
+        if i / 12 == 0:
+            self.Temperature = self.Temperature['Jan'].tolist()
+        elif i / 12 == 1:
+            self.Temperature = self.Temperature['Feb'].tolist()
+        elif i / 12 == 2:
+            self.Temperature = self.Temperature['Mar'].tolist()
+        elif i / 12 == 3:
+            self.Temperature = self.Temperature['Apr'].tolist()
+        elif i / 12 == 4:
+            self.Temperature = self.Temperature['May'].tolist()
+        elif i / 12 == 5:
+            self.Temperature = self.Temperature['Jun'].tolist()
+        elif i / 12 == 6:
+            self.Temperature = self.Temperature['July'].tolist()
+        elif i / 12 == 7:
+            self.Temperature = self.Temperature['Aug'].tolist()
+        elif i / 12 == 8:
+            self.Temperature = self.Temperature['Sep'].tolist()
+        elif i / 12 == 9:
+            self.Temperature = self.Temperature['Oct'].tolist()
+        elif i / 12 == 10:
+            self.Temperature = self.Temperature['Nov'].tolist()
+        elif i / 12 == 11:
+            self.Temperature = self.Temperature['Dcb'].tolist()
         #action we take (degree of charging/discharging power)
         self.action_space = spaces.Box(low=-0.1,high=0.1,shape=(1,),dtype=np.float32)
 
