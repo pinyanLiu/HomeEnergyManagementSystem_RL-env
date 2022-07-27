@@ -32,65 +32,72 @@ class HemsEnv(Env):
         i = randint(0,359)
         #import Load 
         self.Load = self.info.importTrainingLoad()
-        self.Load = self.Load['Load'].iloc[:,i].tolist()
+        self.Load = self.Load.iloc[:,i].tolist()
         self.PV = self.info.importPhotoVoltaic()
         #import PV
-        if i / 12 == 0:
+        if int(i / 30) == 0:
             self.PV = self.PV['Jan'].tolist()
-        elif i / 12 == 1:
+        elif int(i / 30) == 1:
             self.PV = self.PV['Feb'].tolist()
-        elif i / 12 == 2:
+        elif int(i / 30) == 2:
             self.PV = self.PV['Mar'].tolist()
-        elif i / 12 == 3:
+        elif int(i / 30) == 3:
             self.PV = self.PV['Apr'].tolist()
-        elif i / 12 == 4:
+        elif int(i / 30) == 4:
             self.PV = self.PV['May'].tolist()
-        elif i / 12 == 5:
+        elif int(i / 30) == 5:
             self.PV = self.PV['Jun'].tolist()
-        elif i / 12 == 6:
+        elif int(i / 30) == 6:
             self.PV = self.PV['July'].tolist()
-        elif i / 12 == 7:
+        elif int(i / 30) == 7:
             self.PV = self.PV['Aug'].tolist()
-        elif i / 12 == 8:
+        elif int(i / 30) == 8:
             self.PV = self.PV['Sep'].tolist()
-        elif i / 12 == 9:
+        elif int(i / 30) == 9:
             self.PV = self.PV['Oct'].tolist()
-        elif i / 12 == 10:
+        elif int(i / 30) == 10:
             self.PV = self.PV['Nov'].tolist()
-        elif i / 12 == 11:
+        elif int(i / 30) == 11:
             self.PV = self.PV['Dec'].tolist()
+        else:
+            print('haha')
         
         #import Temperature
-        self.Temperature = self.info.importTemperature()
-        if i / 12 == 0:
+        self.Temperature = self.info.importTemperatureF()
+        if int(i / 30) == 0:
             self.Temperature = self.Temperature['Jan'].tolist()
-        elif i / 12 == 1:
+        elif int(i / 30) == 1:
             self.Temperature = self.Temperature['Feb'].tolist()
-        elif i / 12 == 2:
+        elif int(i / 30) == 2:
             self.Temperature = self.Temperature['Mar'].tolist()
-        elif i / 12 == 3:
+        elif int(i / 30) == 3:
             self.Temperature = self.Temperature['Apr'].tolist()
-        elif i / 12 == 4:
+        elif int(i / 30) == 4:
             self.Temperature = self.Temperature['May'].tolist()
-        elif i / 12 == 5:
+        elif int(i / 30) == 5:
             self.Temperature = self.Temperature['Jun'].tolist()
-        elif i / 12 == 6:
+        elif int(i / 30) == 6:
             self.Temperature = self.Temperature['July'].tolist()
-        elif i / 12 == 7:
+        elif int(i / 30) == 7:
             self.Temperature = self.Temperature['Aug'].tolist()
-        elif i / 12 == 8:
+        elif int(i / 30) == 8:
             self.Temperature = self.Temperature['Sep'].tolist()
-        elif i / 12 == 9:
+        elif int(i / 30) == 9:
             self.Temperature = self.Temperature['Oct'].tolist()
-        elif i / 12 == 10:
+        elif int(i / 30) == 10:
             self.Temperature = self.Temperature['Nov'].tolist()
-        elif i / 12 == 11:
+        elif int(i / 30) == 11:
             self.Temperature = self.Temperature['Dcb'].tolist()
-        print("???")
+        else:
+            print('haha')
+
         #action we take (degree of charging/discharging power)
         self.action_space = spaces.Box(low=-0.1,high=0.1,shape=(1,),dtype=np.float32)
         #observation space ( Only SOC matters )
         self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
+        print(self.Load)
+        print(self.PV)
+        print(self.Temperature)
         upperLimit = np.array(
             [
                 #timeblock
@@ -208,32 +215,66 @@ class HemsEnv(Env):
         '''
         #pick one day from 360 days
         i = randint(0,359)
-        self.Load = self.info.experimentData['Load'].iloc[:,i].tolist()
-
-        if i % 12 == 0:
-            self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif i % 12 == 1:
-            self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif i % 12 == 2:
-            self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif i % 12 == 3:
-            self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif i % 12 == 4:
-            self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif i % 12 == 5:
-            self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif i % 12 == 6:
-            self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif i % 12 == 7:
-            self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif i % 12 == 8:
-            self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif i % 12 == 9:
-            self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif i % 12 == 10:
-            self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif i % 12 == 11:
-            self.PV = self.info.experimentData['PV']['Dec'].tolist()
+        self.Load = self.info.importTrainingLoad()
+        self.Load = self.Load.iloc[:,i].tolist()
+        self.PV = self.info.importPhotoVoltaic()
+        #import PV
+        if int(i / 30) == 0:
+            self.PV = self.PV['Jan'].tolist()
+        elif int(i / 30) == 1:
+            self.PV = self.PV['Feb'].tolist()
+        elif int(i / 30) == 2:
+            self.PV = self.PV['Mar'].tolist()
+        elif int(i / 30) == 3:
+            self.PV = self.PV['Apr'].tolist()
+        elif int(i / 30) == 4:
+            self.PV = self.PV['May'].tolist()
+        elif int(i / 30) == 5:
+            self.PV = self.PV['Jun'].tolist()
+        elif int(i / 30) == 6:
+            self.PV = self.PV['July'].tolist()
+        elif int(i / 30) == 7:
+            self.PV = self.PV['Aug'].tolist()
+        elif int(i / 30) == 8:
+            self.PV = self.PV['Sep'].tolist()
+        elif int(i / 30) == 9:
+            self.PV = self.PV['Oct'].tolist()
+        elif int(i / 30) == 10:
+            self.PV = self.PV['Nov'].tolist()
+        elif int(i / 30) == 11:
+            self.PV = self.PV['Dec'].tolist()
+        else:
+            print('haha')
+    
+        
+        #import Temperature
+        self.Temperature = self.info.importTemperatureF()
+        if int(i / 30) == 0:
+            self.Temperature = self.Temperature['Jan'].tolist()
+        elif int(i / 30) == 1:
+            self.Temperature = self.Temperature['Feb'].tolist()
+        elif int(i / 30) == 2:
+            self.Temperature = self.Temperature['Mar'].tolist()
+        elif int(i / 30) == 3:
+            self.Temperature = self.Temperature['Apr'].tolist()
+        elif int(i / 30) == 4:
+            self.Temperature = self.Temperature['May'].tolist()
+        elif int(i / 30) == 5:
+            self.Temperature = self.Temperature['Jun'].tolist()
+        elif int(i / 30) == 6:
+            self.Temperature = self.Temperature['July'].tolist()
+        elif int(i / 30) == 7:
+            self.Temperature = self.Temperature['Aug'].tolist()
+        elif int(i / 30) == 8:
+            self.Temperature = self.Temperature['Sep'].tolist()
+        elif int(i / 30) == 9:
+            self.Temperature = self.Temperature['Oct'].tolist()
+        elif int(i / 30) == 10:
+            self.Temperature = self.Temperature['Nov'].tolist()
+        elif int(i / 30) == 11:
+            self.Temperature = self.Temperature['Dcb'].tolist()
+        else:
+            print('haha')
 
 
         #reset state
