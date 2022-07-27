@@ -23,13 +23,21 @@ class HemsEnv(Env):
         self.passwd = self.mysqlData['passwd']
         self.db = self.mysqlData['db']
         self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db)
+
         #import Base Parameter
         self.BaseParameter = self.info.importBaseParameter()
+        self.epsilon = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='epsilon']['value'])[0])
+        self.eta = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='eta_HVAC']['value'])[0])
+        self.A = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='A(KW/F)']['value'])[0])
+        self.max_temperature = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='max_temperature(F)']['value'])[0])
+        self.min_temperature = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='min_temperature(F)']['value'])[0])
+        self.initIndoorTemperature= float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='init_indoor_temperature(F)']['value'])[0])
+
         #import Grid price
         self.GridPrice = self.info.importGridPrice()
         self.GridPrice = self.GridPrice['price_value'].tolist()
         #pick one day from 360 days
-        i = randint(0,359)
+        i = randint(1,360)
         #import Load 
         self.Load = self.info.importTrainingLoad()
         self.Load = self.Load.iloc[:,i].tolist()
@@ -59,45 +67,40 @@ class HemsEnv(Env):
             self.PV = self.PV['Nov'].tolist()
         elif int(i / 30) == 11:
             self.PV = self.PV['Dec'].tolist()
-        else:
-            print('haha')
+
         
         #import Temperature
-        self.Temperature = self.info.importTemperatureF()
+        self.outdoorTemperature = self.info.importTemperatureF()
         if int(i / 30) == 0:
-            self.Temperature = self.Temperature['Jan'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Jan'].tolist()
         elif int(i / 30) == 1:
-            self.Temperature = self.Temperature['Feb'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Feb'].tolist()
         elif int(i / 30) == 2:
-            self.Temperature = self.Temperature['Mar'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Mar'].tolist()
         elif int(i / 30) == 3:
-            self.Temperature = self.Temperature['Apr'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Apr'].tolist()
         elif int(i / 30) == 4:
-            self.Temperature = self.Temperature['May'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['May'].tolist()
         elif int(i / 30) == 5:
-            self.Temperature = self.Temperature['Jun'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Jun'].tolist()
         elif int(i / 30) == 6:
-            self.Temperature = self.Temperature['July'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['July'].tolist()
         elif int(i / 30) == 7:
-            self.Temperature = self.Temperature['Aug'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Aug'].tolist()
         elif int(i / 30) == 8:
-            self.Temperature = self.Temperature['Sep'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Sep'].tolist()
         elif int(i / 30) == 9:
-            self.Temperature = self.Temperature['Oct'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Oct'].tolist()
         elif int(i / 30) == 10:
-            self.Temperature = self.Temperature['Nov'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Nov'].tolist()
         elif int(i / 30) == 11:
-            self.Temperature = self.Temperature['Dcb'].tolist()
-        else:
-            print('haha')
+            self.outdoorTemperature = self.outdoorTemperature['Dcb'].tolist()
 
-        #action we take (degree of charging/discharging power)
-        self.action_space = spaces.Box(low=-0.1,high=0.1,shape=(1,),dtype=np.float32)
-        #observation space ( Only SOC matters )
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
-        print(self.Load)
-        print(self.PV)
-        print(self.Temperature)
+
+        #action we take (degree of HVAC power)
+        self.action_space = spaces.Box(low=0,high=2,shape=(1,),dtype=np.float32)
+        #observation space 
+        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -106,10 +109,12 @@ class HemsEnv(Env):
                 np.finfo(np.float32).max,
                 #PV
                 np.finfo(np.float32).max,
-                #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmax','value'],
                 #pricePerHour
                 np.finfo(np.float32).max,
+                #indoor temperature
+                self.max_temperature,
+                #outdoor temperature
+                np.finfo(np.float32).max
             ],
             dtype=np.float32,
         )
@@ -121,10 +126,12 @@ class HemsEnv(Env):
                 np.finfo(np.float32).min,
                 #PV
                 np.finfo(np.float32).min,
-                #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmin','value'],         
                 #pricePerHour
                 np.finfo(np.float32).min,
+                #indoor temperature
+                self.min_temperature,
+                #outdoor temperature
+                np.finfo(np.float32).min
             ],
             dtype=np.float32,
         )
@@ -141,51 +148,37 @@ class HemsEnv(Env):
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action),err_msg
 
-    #STATE (sampleTime,Load,PV,SOC,pricePerHour)
-        sampleTime,load,pv,soc,pricePerHour = self.state
-        soc_change = float(action)
-        # action(soc_change) is the degree of charging/discharging power .
-        # if soc_change > 0 means charging , whereas soc_change < 0 means discharging.
+    #STATE (sampleTime,Load,PV,pricePerHour,indoor temperature ,outdoor temperature )
+        sampleTime,load,pv,pricePerHour,indoorTemperature,outdoorTemperature = self.state
+        Power_HVAC = float(action)
 
 
     #interaction
-        reward = []
-        # if energy supply is greater than consumption means we don't have to buy grid , this should be encourage .
-        if (pv + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])) >= load :
-            if (soc + soc_change) < 0 :
-                reward.append(-0.2)
-                cost = 0.0001
-            elif (soc + soc_change) > 1:
-                reward.append(-0.2)
-                cost = 0.0001
 
-            else:
-            #calculate the new soc for next state
-                reward.append(0.1)
-                soc = soc+soc_change
-                cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  ) ## negative , because load < pv + soc_change
-        
-        # if energy supply is less than consumption
+        #calculate the new indoor temperature for next state
+        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
+
+        #calculate cost
+        if pv >= load + Power_HVAC :
+            cost = 0.0001
         else:
-            #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc + soc_change) < 0 :
-                reward.append(-0.2)
-                cost = 0.0001
-
-            elif (soc + soc_change) > 1:
-                reward.append(-0.2)
-                cost = 0.0001
-
-            else:
-            #calculate the new soc for next state
-                reward.append(0.1)
-                soc = soc+soc_change
-                cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  ) ## positive , because load > pv + soc_change
+            cost = (load+Power_HVAC-pv)*pricePerHour
 
         #REWARD
-      #  if sampleTime!=95:
-        reward.append(-cost/10000)
+        reward = []
+        #temperature reward
+        if nextIndoorTemperature < (self.max_temperature+self.min_temperature)/2:
+            r1 = 2*(nextIndoorTemperature-self.min_temperature)/(self.max_temperature-self.min_temperature)
+        elif nextIndoorTemperature >= (self.max_temperature+self.min_temperature)/2:    
+            r1 = -2*(nextIndoorTemperature-self.max_temperature)/(self.max_temperature-self.min_temperature)
+        else:
+            print("wtf are you doing?")
 
+        #cost reward
+        r2 = -cost
+
+        reward.append(r1)
+        reward.append(r2)
 
         #change to next state
         sampleTime = int(sampleTime+1)
@@ -196,7 +189,7 @@ class HemsEnv(Env):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,outdoorTemperature])
 
 
 
@@ -214,7 +207,7 @@ class HemsEnv(Env):
         Starting State
         '''
         #pick one day from 360 days
-        i = randint(0,359)
+        i = randint(1,360)
         self.Load = self.info.importTrainingLoad()
         self.Load = self.Load.iloc[:,i].tolist()
         self.PV = self.info.importPhotoVoltaic()
@@ -243,42 +236,40 @@ class HemsEnv(Env):
             self.PV = self.PV['Nov'].tolist()
         elif int(i / 30) == 11:
             self.PV = self.PV['Dec'].tolist()
-        else:
-            print('haha')
+
     
         
         #import Temperature
-        self.Temperature = self.info.importTemperatureF()
+        self.outdoorTemperature = self.info.importTemperatureF()
         if int(i / 30) == 0:
-            self.Temperature = self.Temperature['Jan'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Jan'].tolist()
         elif int(i / 30) == 1:
-            self.Temperature = self.Temperature['Feb'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Feb'].tolist()
         elif int(i / 30) == 2:
-            self.Temperature = self.Temperature['Mar'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Mar'].tolist()
         elif int(i / 30) == 3:
-            self.Temperature = self.Temperature['Apr'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Apr'].tolist()
         elif int(i / 30) == 4:
-            self.Temperature = self.Temperature['May'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['May'].tolist()
         elif int(i / 30) == 5:
-            self.Temperature = self.Temperature['Jun'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Jun'].tolist()
         elif int(i / 30) == 6:
-            self.Temperature = self.Temperature['July'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['July'].tolist()
         elif int(i / 30) == 7:
-            self.Temperature = self.Temperature['Aug'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Aug'].tolist()
         elif int(i / 30) == 8:
-            self.Temperature = self.Temperature['Sep'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Sep'].tolist()
         elif int(i / 30) == 9:
-            self.Temperature = self.Temperature['Oct'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Oct'].tolist()
         elif int(i / 30) == 10:
-            self.Temperature = self.Temperature['Nov'].tolist()
+            self.outdoorTemperature = self.outdoorTemperature['Nov'].tolist()
         elif int(i / 30) == 11:
-            self.Temperature = self.Temperature['Dcb'].tolist()
-        else:
-            print('haha')
+            self.outdoorTemperature = self.outdoorTemperature['Dcb'].tolist()
+
 
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),self.GridPrice[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.initIndoorTemperature,self.outdoorTemperature[0]])
         return self.state
 
 
