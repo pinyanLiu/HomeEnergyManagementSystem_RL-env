@@ -37,17 +37,9 @@
             "activation": "relu"
         },
         {
-            "type": "dropout",
-            "rate": 0.4
-        },
-        {
             "type": "dense",
             "size": 100,
             "activation": "relu"
-        },
-        {
-            "type": "dropout",
-            "rate": 0.4
         },
         {
             "type": "dense",
@@ -73,17 +65,9 @@
             "activation": "relu"
         },
         {
-            "type": "dropout",
-            "rate": 0.4
-        },
-        {
             "type": "dense",
             "size": 75,
             "activation": "relu"
-        },
-        {
-            "type": "dropout",
-            "rate": 0.4
         },
         {
             "type": "dense",
@@ -100,7 +84,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 500,
+        "num_steps": 3000,
         "initial_value": 0.6,
         "final_value": 0.00001
     },

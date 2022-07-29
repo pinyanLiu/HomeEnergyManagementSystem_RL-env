@@ -39,62 +39,62 @@ class HemsEnv(Env):
         #pick one day from 360 days
         i = randint(1,359)
         #import Load 
-        self.Load = self.info.importTrainingLoad()
-        self.Load = self.Load.iloc[:,i].tolist()
-        self.PV = self.info.importPhotoVoltaic()
+        self.allLoad = self.info.importTrainingLoad()
+        self.Load = self.allLoad.iloc[:,i].tolist()
+        self.allPV = self.info.importPhotoVoltaic()
         #import PV
         if int(i / 30) == 0:
-            self.PV = self.PV['Jan'].tolist()
+            self.PV = self.allPV['Jan'].tolist()
         elif int(i / 30) == 1:
-            self.PV = self.PV['Feb'].tolist()
+            self.PV = self.allPV['Feb'].tolist()
         elif int(i / 30) == 2:
-            self.PV = self.PV['Mar'].tolist()
+            self.PV = self.allPV['Mar'].tolist()
         elif int(i / 30) == 3:
-            self.PV = self.PV['Apr'].tolist()
+            self.PV = self.allPV['Apr'].tolist()
         elif int(i / 30) == 4:
-            self.PV = self.PV['May'].tolist()
+            self.PV = self.allPV['May'].tolist()
         elif int(i / 30) == 5:
-            self.PV = self.PV['Jun'].tolist()
+            self.PV = self.allPV['Jun'].tolist()
         elif int(i / 30) == 6:
-            self.PV = self.PV['July'].tolist()
+            self.PV = self.allPV['July'].tolist()
         elif int(i / 30) == 7:
-            self.PV = self.PV['Aug'].tolist()
+            self.PV = self.allPV['Aug'].tolist()
         elif int(i / 30) == 8:
-            self.PV = self.PV['Sep'].tolist()
+            self.PV = self.allPV['Sep'].tolist()
         elif int(i / 30) == 9:
-            self.PV = self.PV['Oct'].tolist()
+            self.PV = self.allPV['Oct'].tolist()
         elif int(i / 30) == 10:
-            self.PV = self.PV['Nov'].tolist()
+            self.PV = self.allPV['Nov'].tolist()
         elif int(i / 30) == 11:
-            self.PV = self.PV['Dec'].tolist()
+            self.PV = self.allPV['Dec'].tolist()
 
         
         #import Temperature
-        self.outdoorTemperature = self.info.importTemperatureF()
+        self.allOutdoorTemperature = self.info.importTemperatureF()
         if int(i / 30) == 0:
-            self.outdoorTemperature = self.outdoorTemperature['Jan'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
         elif int(i / 30) == 1:
-            self.outdoorTemperature = self.outdoorTemperature['Feb'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
         elif int(i / 30) == 2:
-            self.outdoorTemperature = self.outdoorTemperature['Mar'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
         elif int(i / 30) == 3:
-            self.outdoorTemperature = self.outdoorTemperature['Apr'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
         elif int(i / 30) == 4:
-            self.outdoorTemperature = self.outdoorTemperature['May'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
         elif int(i / 30) == 5:
-            self.outdoorTemperature = self.outdoorTemperature['Jun'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
         elif int(i / 30) == 6:
-            self.outdoorTemperature = self.outdoorTemperature['July'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
         elif int(i / 30) == 7:
-            self.outdoorTemperature = self.outdoorTemperature['Aug'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
         elif int(i / 30) == 8:
-            self.outdoorTemperature = self.outdoorTemperature['Sep'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
         elif int(i / 30) == 9:
-            self.outdoorTemperature = self.outdoorTemperature['Oct'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Oct'].tolist()
         elif int(i / 30) == 10:
-            self.outdoorTemperature = self.outdoorTemperature['Nov'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
         elif int(i / 30) == 11:
-            self.outdoorTemperature = self.outdoorTemperature['Dcb'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
 
 
         #action we take (degree of HVAC power)
@@ -172,9 +172,10 @@ class HemsEnv(Env):
             r1 = -2*(nextIndoorTemperature-self.max_temperature)/(self.max_temperature-self.min_temperature)
         else:
             print("wtf are you doing?")
-
+        if r1<-1:
+            r1 = -1
         #cost reward
-        r2 = -cost/10
+        r2 = -cost/5
 
         reward.append(r1)
         reward.append(r2)
@@ -207,63 +208,60 @@ class HemsEnv(Env):
         '''
         #pick one day from 360 days
         i = randint(1,359)
-        self.Load = self.info.importTrainingLoad()
-        self.Load = self.Load.iloc[:,i].tolist()
-        self.PV = self.info.importPhotoVoltaic()
+        self.Load = self.allLoad.iloc[:,i].tolist()
         #import PV
         if int(i / 30) == 0:
-            self.PV = self.PV['Jan'].tolist()
+            self.PV = self.allPV['Jan'].tolist()
         elif int(i / 30) == 1:
-            self.PV = self.PV['Feb'].tolist()
+            self.PV = self.allPV['Feb'].tolist()
         elif int(i / 30) == 2:
-            self.PV = self.PV['Mar'].tolist()
+            self.PV = self.allPV['Mar'].tolist()
         elif int(i / 30) == 3:
-            self.PV = self.PV['Apr'].tolist()
+            self.PV = self.allPV['Apr'].tolist()
         elif int(i / 30) == 4:
-            self.PV = self.PV['May'].tolist()
+            self.PV = self.allPV['May'].tolist()
         elif int(i / 30) == 5:
-            self.PV = self.PV['Jun'].tolist()
+            self.PV = self.allPV['Jun'].tolist()
         elif int(i / 30) == 6:
-            self.PV = self.PV['July'].tolist()
+            self.PV = self.allPV['July'].tolist()
         elif int(i / 30) == 7:
-            self.PV = self.PV['Aug'].tolist()
+            self.PV = self.allPV['Aug'].tolist()
         elif int(i / 30) == 8:
-            self.PV = self.PV['Sep'].tolist()
+            self.PV = self.allPV['Sep'].tolist()
         elif int(i / 30) == 9:
-            self.PV = self.PV['Oct'].tolist()
+            self.PV = self.allPV['Oct'].tolist()
         elif int(i / 30) == 10:
-            self.PV = self.PV['Nov'].tolist()
+            self.PV = self.allPV['Nov'].tolist()
         elif int(i / 30) == 11:
-            self.PV = self.PV['Dec'].tolist()
+            self.PV = self.allPV['Dec'].tolist()
 
     
         
         #import Temperature
-        self.outdoorTemperature = self.info.importTemperatureF()
         if int(i / 30) == 0:
-            self.outdoorTemperature = self.outdoorTemperature['Jan'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
         elif int(i / 30) == 1:
-            self.outdoorTemperature = self.outdoorTemperature['Feb'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
         elif int(i / 30) == 2:
-            self.outdoorTemperature = self.outdoorTemperature['Mar'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
         elif int(i / 30) == 3:
-            self.outdoorTemperature = self.outdoorTemperature['Apr'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
         elif int(i / 30) == 4:
-            self.outdoorTemperature = self.outdoorTemperature['May'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
         elif int(i / 30) == 5:
-            self.outdoorTemperature = self.outdoorTemperature['Jun'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
         elif int(i / 30) == 6:
-            self.outdoorTemperature = self.outdoorTemperature['July'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
         elif int(i / 30) == 7:
-            self.outdoorTemperature = self.outdoorTemperature['Aug'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
         elif int(i / 30) == 8:
-            self.outdoorTemperature = self.outdoorTemperature['Sep'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
         elif int(i / 30) == 9:
-            self.outdoorTemperature = self.outdoorTemperature['Oct'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Oct'].tolist()
         elif int(i / 30) == 10:
-            self.outdoorTemperature = self.outdoorTemperature['Nov'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
         elif int(i / 30) == 11:
-            self.outdoorTemperature = self.outdoorTemperature['Dcb'].tolist()
+            self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
 
 
 
