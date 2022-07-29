@@ -37,7 +37,7 @@ class HemsEnv(Env):
         self.GridPrice = self.info.importGridPrice()
         self.GridPrice = self.GridPrice['price_value'].tolist()
         #pick one day from 360 days
-        i = randint(1,360)
+        i = randint(1,359)
         #import Load 
         self.Load = self.info.importTrainingLoad()
         self.Load = self.Load.iloc[:,i].tolist()
@@ -98,7 +98,7 @@ class HemsEnv(Env):
 
 
         #action we take (degree of HVAC power)
-        self.action_space = spaces.Box(low=0,high=2,shape=(1,),dtype=np.float32)
+        self.action_space = spaces.Box(low=0,high=1,shape=(1,),dtype=np.float32)
         #observation space 
         self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature'])
         upperLimit = np.array(
@@ -158,11 +158,10 @@ class HemsEnv(Env):
         #calculate the new indoor temperature for next state
         nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
 
-        #calculate cost
-        if pv >= load + Power_HVAC :
-            cost = 0.0001
-        else:
-            cost = (load+Power_HVAC-pv)*pricePerHour
+        #calculate proportion
+        cost = (load+Power_HVAC-pv)*pricePerHour
+        proportion = Power_HVAC/(load+Power_HVAC-pv)
+        cost= cost * proportion
 
         #REWARD
         reward = []
@@ -175,7 +174,7 @@ class HemsEnv(Env):
             print("wtf are you doing?")
 
         #cost reward
-        r2 = -cost
+        r2 = -cost/10
 
         reward.append(r1)
         reward.append(r2)
@@ -207,7 +206,7 @@ class HemsEnv(Env):
         Starting State
         '''
         #pick one day from 360 days
-        i = randint(1,360)
+        i = randint(1,359)
         self.Load = self.info.importTrainingLoad()
         self.Load = self.Load.iloc[:,i].tolist()
         self.PV = self.info.importPhotoVoltaic()
