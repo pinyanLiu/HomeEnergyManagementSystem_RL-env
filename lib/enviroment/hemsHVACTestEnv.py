@@ -18,72 +18,90 @@ class HemsEnv(Env):
         with open("yaml/mysqlData.yaml","r") as f:
             self.mysqlData = load(f,SafeLoader)
 
+        self.host = self.mysqlData['host']
+        self.user = self.mysqlData['user']
+        self.passwd = self.mysqlData['passwd']
+        self.db = self.mysqlData['db']
         self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db)
-        
+
+    #import Base Parameter
         self.BaseParameter = self.info.importBaseParameter()
+        self.epsilon = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='epsilon']['value'])[0])
+        self.eta = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='eta_HVAC']['value'])[0])
+        self.A = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='A(KW/F)']['value'])[0])
+        self.max_temperature = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='max_temperature(F)']['value'])[0])
+        self.min_temperature = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='min_temperature(F)']['value'])[0])
+        self.initIndoorTemperature= float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='init_indoor_temperature(F)']['value'])[0])
+
+    #import Grid price
         self.GridPrice = self.info.importGridPrice()
         self.GridPrice = self.GridPrice['price_value'].tolist()
-        #pick one day from 360 days
-        i = randint(0,359)
-        self.Load = self.info.importTrainingLoad()
-        self.Load = self.Load['Load'].iloc[:,i].tolist()
-        self.PV = self.info.importPhotoVoltaic()
+        self.GridPrice = self.info.experimentData['GridPrice']['price_value'].tolist()
 
-        if i / 12 == 0:
-            self.PV = self.PV['Jan'].tolist()
-        elif i / 12 == 1:
-            self.PV = self.PV['Feb'].tolist()
-        elif i / 12 == 2:
-            self.PV = self.PV['Mar'].tolist()
-        elif i / 12 == 3:
-            self.PV = self.PV['Apr'].tolist()
-        elif i / 12 == 4:
-            self.PV = self.PV['May'].tolist()
-        elif i / 12 == 5:
-            self.PV = self.PV['Jun'].tolist()
-        elif i / 12 == 6:
-            self.PV = self.PV['July'].tolist()
-        elif i / 12 == 7:
-            self.PV = self.PV['Aug'].tolist()
-        elif i / 12 == 8:
-            self.PV = self.PV['Sep'].tolist()
-        elif i / 12 == 9:
-            self.PV = self.PV['Oct'].tolist()
-        elif i / 12 == 10:
-            self.PV = self.PV['Nov'].tolist()
-        elif i / 12 == 11:
-            self.PV = self.PV['Dec'].tolist()
+        #each month pick one day for testing
+        self.i = 0
+    #import Load 
+        self.allLoad = self.info.importTestingLoad()
+        self.Load = self.allLoad.iloc[:,self.i].tolist()
+
+    #import PV
+        self.allPV = self.info.importPhotoVoltaic()
+        if self.i == 0:
+            self.PV = self.allPV['Jan'].tolist()
+        elif self.i == 1:
+            self.PV = self.allPV['Feb'].tolist()
+        elif self.i == 2:
+            self.PV = self.allPV['Mar'].tolist()
+        elif self.i == 3:
+            self.PV = self.allPV['Apr'].tolist()
+        elif self.i == 4:
+            self.PV = self.allPV['May'].tolist()
+        elif self.i == 5:
+            self.PV = self.allPV['Jun'].tolist()
+        elif self.i == 6:
+            self.PV = self.allPV['July'].tolist()
+        elif self.i == 7:
+            self.PV = self.allPV['Aug'].tolist()
+        elif self.i == 8:
+            self.PV = self.allPV['Sep'].tolist()
+        elif self.i == 9:
+            self.PV = self.allPV['Oct'].tolist()
+        elif self.i == 10:
+            self.PV = self.allPV['Nov'].tolist()
+        elif self.i == 11:
+            self.PV = self.allPV['Dec'].tolist()
+
+    #import Temperature
+        self.allOutdoorTemperature = self.info.importTemperatureF()
+        if self.i == 0:
+            self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
+        elif self.i == 1:
+            self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
+        elif self.i == 2:
+            self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
+        elif self.i == 3:
+            self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
+        elif self.i == 4:
+            self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
+        elif self.i == 5:
+            self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
+        elif self.i == 6:
+            self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
+        elif self.i == 7:
+            self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
+        elif self.i == 8:
+            self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
+        elif self.i == 9:
+            self.outdoorTemperature = self.allOutdoorTemperature['Oct'].tolist()
+        elif self.i == 10:
+            self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
+        elif self.i == 11:
+            self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()    
         
-        self.Temperature = self.info.importTemperature()
-        if i / 12 == 0:
-            self.Temperature = self.Temperature['Jan'].tolist()
-        elif i / 12 == 1:
-            self.Temperature = self.Temperature['Feb'].tolist()
-        elif i / 12 == 2:
-            self.Temperature = self.Temperature['Mar'].tolist()
-        elif i / 12 == 3:
-            self.Temperature = self.Temperature['Apr'].tolist()
-        elif i / 12 == 4:
-            self.Temperature = self.Temperature['May'].tolist()
-        elif i / 12 == 5:
-            self.Temperature = self.Temperature['Jun'].tolist()
-        elif i / 12 == 6:
-            self.Temperature = self.Temperature['July'].tolist()
-        elif i / 12 == 7:
-            self.Temperature = self.Temperature['Aug'].tolist()
-        elif i / 12 == 8:
-            self.Temperature = self.Temperature['Sep'].tolist()
-        elif i / 12 == 9:
-            self.Temperature = self.Temperature['Oct'].tolist()
-        elif i / 12 == 10:
-            self.Temperature = self.Temperature['Nov'].tolist()
-        elif i / 12 == 11:
-            self.Temperature = self.Temperature['Dcb'].tolist()
         #action we take (degree of charging/discharging power)
-        self.action_space = spaces.Box(low=-0.1,high=0.1,shape=(1,),dtype=np.float32)
+        self.action_space = spaces.Box(low=0,high=2,shape=(1,),dtype=np.float32)
 
-        #observation space ( Only SOC matters )
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
+        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -92,10 +110,12 @@ class HemsEnv(Env):
                 np.finfo(np.float32).max,
                 #PV
                 np.finfo(np.float32).max,
-                #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmax','value'],
                 #pricePerHour
                 np.finfo(np.float32).max,
+                #indoor temperature
+                self.max_temperature,
+                #outdoor temperature
+                np.finfo(np.float32).max
             ],
             dtype=np.float32,
         )
@@ -107,17 +127,18 @@ class HemsEnv(Env):
                 np.finfo(np.float32).min,
                 #PV
                 np.finfo(np.float32).min,
-                #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmin','value'],         
                 #pricePerHour
                 np.finfo(np.float32).min,
+                #indoor temperature
+                self.min_temperature,
+                #outdoor temperature
+                np.finfo(np.float32).min
             ],
             dtype=np.float32,
         )
         self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
         self.state = None
-        self.cost = 0
-        
+
     def step(self,action):
         '''
         interaction of each state(changes while taking action)
@@ -128,51 +149,37 @@ class HemsEnv(Env):
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action),err_msg
 
-    #STATE (sampleTime,Load,PV,SOC,pricePerHour)
-        sampleTime,load,pv,soc,pricePerHour = self.state
-        soc_change = float(action)
-        # action(soc_change) is the degree of charging/discharging power .
-        # if soc_change > 0 means charging , whereas soc_change < 0 means discharging.
+    #STATE (sampleTime,Load,PV,pricePerHour,indoor temperature ,outdoor temperature )
+        sampleTime,load,pv,pricePerHour,indoorTemperature,outdoorTemperature = self.state
+        Power_HVAC = float(action)
 
 
     #interaction
-        reward = []
-        # if energy supply is greater than consumption means we don't have to buy grid , this should be encourage .
-        if (pv - soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])) >= load :
-            if (soc + soc_change) < 0 :
-                reward.append(-0.2)
-                cost = 0.0001
-            elif (soc + soc_change) > 1:
-                reward.append(-0.2)
-                cost = 0.0001
 
-            else:
-            #calculate the new soc for next state
-                reward.append(0.1)
-                soc = soc+soc_change
-                cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  ) ## negative , because load < pv - soc_change
-        
-        # if energy supply is less than consumption
-        else:
-            #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc + soc_change) < 0 :
-                reward.append(-0.2)
-                cost = 0.0001
+        #calculate the new indoor temperature for next state
+        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
 
-            elif (soc + soc_change) > 1:
-                reward.append(-0.2)
-                cost = 0.0001
-
-            else:
-            #calculate the new soc for next state
-                reward.append(0.1)
-                soc = soc+soc_change
-                cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  ) ## positive , because load > pv - soc_change
+        #calculate proportion
+        cost = (load+Power_HVAC-pv)*pricePerHour
+        proportion = Power_HVAC/(load+Power_HVAC-pv)
+        cost= cost * proportion
 
         #REWARD
-      #  if sampleTime!=95:
-        reward.append(-cost/10000)
+        reward = []
+        #temperature reward
+        if nextIndoorTemperature < (self.max_temperature+self.min_temperature)/2:
+            r1 = 2*(nextIndoorTemperature-self.min_temperature)/(self.max_temperature-self.min_temperature)
+        elif nextIndoorTemperature >= (self.max_temperature+self.min_temperature)/2:    
+            r1 = -2*(nextIndoorTemperature-self.max_temperature)/(self.max_temperature-self.min_temperature)
+        else:
+            print("wtf are you doing?")
+        if r1<-1:
+            r1 = -0.8
+        #cost reward
+        r2 = -cost/5
 
+        reward.append(r1)
+        reward.append(r2)
 
         #change to next state
         sampleTime = int(sampleTime+1)
@@ -183,7 +190,7 @@ class HemsEnv(Env):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime]])
 
 
 
@@ -200,42 +207,69 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
-        self.cost = 0
         #each month pick one day for testing
         self.i += 1
-        self.Load = self.info.experimentData['Load'].iloc[:,self.i]
+        self.Load = self.allLoad.iloc[:,self.i].to_list()
 
-        if self.i % 12 == 0:
-            self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif self.i % 12 == 1:
-            self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif self.i % 12 == 2:
-            self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif self.i % 12 == 3:
-            self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif self.i % 12 == 4:
-            self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif self.i % 12 == 5:
-            self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif self.i % 12 == 6:
-            self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif self.i % 12 == 7:
-            self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif self.i % 12 == 8:
-            self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif self.i % 12 == 9:
-            self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif self.i % 12 == 10:
-            self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif self.i % 12 == 11:
-            self.PV = self.info.experimentData['PV']['Dec'].tolist()
+    #setting PV
+        if self.i == 0:
+            self.PV = self.allPV['Jan'].tolist()
+        elif self.i == 1:
+            self.PV = self.allPV['Feb'].tolist()
+        elif self.i == 2:
+            self.PV = self.allPV['Mar'].tolist()
+        elif self.i == 3:
+            self.PV = self.allPV['Apr'].tolist()
+        elif self.i == 4:
+            self.PV = self.allPV['May'].tolist()
+        elif self.i == 5:
+            self.PV = self.allPV['Jun'].tolist()
+        elif self.i == 6:
+            self.PV = self.allPV['July'].tolist()
+        elif self.i == 7:
+            self.PV = self.allPV['Aug'].tolist()
+        elif self.i == 8:
+            self.PV = self.allPV['Sep'].tolist()
+        elif self.i == 9:
+            self.PV = self.allPV['Oct'].tolist()
+        elif self.i == 10:
+            self.PV = self.allPV['Nov'].tolist()
+        elif self.i == 11:
+            self.PV = self.allPV['Dec'].tolist()
+
+    #setting Temperature
+        if self.i == 0:
+            self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
+        elif self.i == 1:
+            self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
+        elif self.i == 2:
+            self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
+        elif self.i == 3:
+            self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
+        elif self.i == 4:
+            self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
+        elif self.i == 5:
+            self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
+        elif self.i == 6:
+            self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
+        elif self.i == 7:
+            self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
+        elif self.i == 8:
+            self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
+        elif self.i == 9:
+            self.outdoorTemperature = self.allOutdoorTemperature['Oct'].tolist()
+        elif self.i == 10:
+            self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
+        elif self.i == 11:
+            self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
+
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),self.GridPrice[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.initIndoorTemperature,self.outdoorTemperature[0]])
         return self.state
 
 
 if __name__ == '__main__':
-    env = make("Hems-v1")
+    env = make("Hems-v7")
 #     # Initialize episode
     states = env.reset()
     done = False
@@ -245,5 +279,4 @@ if __name__ == '__main__':
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
         Totalreward += reward
-    print(states)
         

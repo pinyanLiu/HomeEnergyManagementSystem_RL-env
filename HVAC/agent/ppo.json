@@ -25,53 +25,50 @@
     "actions": {
         "type": "float",
         "shape": 1,
-        "max_value": 1,
+        "max_value": 2,
         "min_value": 0
     },
     "max_episode_timesteps": 96,
-    "batch_size": 96,
+    "batch_size": 48,
     "network": [
         {
             "type": "dense",
-            "size": 100,
+            "size": 300,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 100,
-            "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 100,
+            "size": 600,
             "activation": "relu"
         }
     ],
-    "use_beta_distribution": false,
+    "use_beta_distribution": true,
     "memory": "minimum",
     "update_frequency": 0.5,
     "learning_rate": 1e-4,
-    "multi_step": 10,
-    "subsampling_fraction": 0.33,
-    "likelihood_ratio_clipping": 0.25,
-    "discount": 0.95,
+    "discount": 0.995,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
     "baseline": [
         {
             "type": "dense",
-            "size": 75,
+            "size": 300,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 75,
+            "size": 600,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 75,
+            "size": 600,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
             "activation": "relu"
         }
     ],
@@ -84,8 +81,8 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 3000,
-        "initial_value": 0.6,
+        "num_steps": 2000,
+        "initial_value": 0.99,
         "final_value": 0.00001
     },
     "variable_noise": 0.0,
