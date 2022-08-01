@@ -36,6 +36,7 @@ class HemsEnv(Env):
         #import Grid price
         self.GridPrice = self.info.importGridPrice()
         self.GridPrice = self.GridPrice['price_value'].tolist()
+
         #pick one day from 360 days
         i = randint(1,359)
         #import Load 
@@ -98,7 +99,7 @@ class HemsEnv(Env):
 
 
         #action we take (degree of HVAC power)
-        self.action_space = spaces.Box(low=0,high=1,shape=(1,),dtype=np.float32)
+        self.action_space = spaces.Box(low=0,high=2,shape=(1,),dtype=np.float32)
         #observation space 
         self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature'])
         upperLimit = np.array(
@@ -173,7 +174,7 @@ class HemsEnv(Env):
         else:
             print("wtf are you doing?")
         if r1<-1:
-            r1 = -1
+            r1 = -0.8
         #cost reward
         r2 = -cost/5
 
@@ -189,7 +190,7 @@ class HemsEnv(Env):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,outdoorTemperature])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime]])
 
 
 
@@ -235,8 +236,6 @@ class HemsEnv(Env):
         elif int(i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
 
-    
-        
         #import Temperature
         if int(i / 30) == 0:
             self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
