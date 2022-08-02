@@ -178,7 +178,7 @@ class HemsEnv(Env):
         elif nextIndoorTemperature < self.min_temperature:
             r1 = self.min_temperature - nextIndoorTemperature
         else :
-            r1 = -1
+            r1 = -10
         #cost reward
         r2 = -cost/10
 
