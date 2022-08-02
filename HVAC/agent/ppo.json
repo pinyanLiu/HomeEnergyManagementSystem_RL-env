@@ -25,7 +25,7 @@
     "actions": {
         "type": "float",
         "shape": 1,
-        "max_value": 2,
+        "max_value": 1,
         "min_value": 0
     },
     "max_episode_timesteps": 96,
@@ -82,7 +82,7 @@
         "decay": "linear",
         "unit": "episodes",
         "num_steps": 2000,
-        "initial_value": 0.99,
+        "initial_value": 0.2,
         "final_value": 0.00001
     },
     "variable_noise": 0.0,

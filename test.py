@@ -17,8 +17,50 @@ class Test():
         
         elif self.mode == 'load':
             self.__testInLoad__()
+        elif self.mode == 'HVAC':
+            self.__testInHVAC__()
+
     #plot result
         self.__plotResult__()
+
+
+    def __testInHVAC__(self):
+        self.environment = Environment.create(environment='gym',level='Hems-v7')
+        self.agent = Agent.load(directory = 'HVAC/saver_dir',environment=self.environment)
+        load = []
+        pv = []
+        temperature = []
+        totalReward = 0
+        self.monthlyTPT = pd.DataFrame()
+        self.monthlyRemain = pd.DataFrame()
+        self.price = []
+        for month in range(12):
+            states = self.environment.reset()
+            internals = self.agent.initial_internals()
+            terminal = False
+            while not terminal:
+                actions, internals = self.agent.act(
+                    states=states, internals=internals, independent=True, deterministic=True
+                )
+                states, terminal, reward = self.environment.execute(actions=actions)
+                load.append(states[1])
+                pv.append(states[2])
+                temperature.append(states[4])
+                totalReward += reward
+                if month == 11:
+                    self.price.append(states[3])
+
+            remain = [load[sampletime]-pv[sampletime] for sampletime in range(95)]
+            #normalize price to [0,1]
+            self.price = [(self.price[month]-np.min(self.price))/(np.max(self.price)-np.min(self.price)) for month in range(len(self.price))]  
+            #store testing result in each dictionary
+            self.monthlyTPT.insert(month,column=str(month+1),value=temperature)
+            self.monthlyRemain.insert(month,column=str(month+1),value=remain)
+            load.clear()
+            pv.clear()
+            temperature.clear()
+        print('Agent average episode reward: ', totalReward/12 )    
+
 
     def __testInSoc__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v1')
@@ -135,7 +177,6 @@ class Test():
         plt.rcParams["figure.figsize"] = (12.8, 9.6)
         fig,axes = plt.subplots(6,2)
         plt.title("SOC and Price for each month")
-        #plt.xlabel("sampleTime")
         ax1=axes[0,0]
         ax2=axes[0,1]
         ax3=axes[1,0]
@@ -357,6 +398,107 @@ class Test():
             sub12.bar(np.arange(95) ,self.wmConsume['12'][:] ,label = 'WM',bottom = self.acConsume['12'][:], color ='orange')  
             sub12.bar(np.arange(95) ,self.acConsume['12'][:] ,label = 'AC', color ='green')  
 
+        elif self.mode == 'HVAC':
+            #transfer temperature unit
+            self.monthlyTPT = (self.monthlyTPT-32) *5/9
+            
+            ax1.set_ylabel('Temperature')
+            ax1.plot(range(len(self.monthlyTPT['1'][:])), self.monthlyTPT['1'][:], label = "Jan",color='red')    
+            ax1.plot(range(len(self.price)), self.price, label = "price")
+            ax1.set_title('Jan')
+
+            ax2.set_ylabel('Temperature')
+            ax2.plot(range(len(self.monthlyTPT['2'][:])), self.monthlyTPT['2'][:], label = "Feb",color='red')
+            ax2.plot(range(len(self.price)), self.price, label = "price")
+            ax2.set_title('Feb')
+
+            ax3.set_ylabel('Temperature')
+            ax3.plot(range(len(self.price)), self.price, label = "price")
+            ax3.plot(range(len(self.monthlyTPT['3'][:])), self.monthlyTPT['3'][:], label = "Mar",color='red')
+            ax3.set_title('Mar')
+
+            ax4.set_ylabel('Temperature')
+            ax4.plot(range(len(self.monthlyTPT['4'][:])), self.monthlyTPT['4'][:], label = "Apr",color='red')
+            ax4.plot(range(len(self.price)), self.price, label = "price")
+            ax4.set_title('Apr')
+
+            ax5.set_ylabel('Temperature')
+            ax5.plot(range(len(self.monthlyTPT['5'][:])), self.monthlyTPT['5'][:], label = "May",color='red')
+            ax5.plot(range(len(self.price)), self.price, label = "price")
+            ax5.set_title('May')
+
+            ax6.set_ylabel('Temperature')
+            ax6.plot(range(len(self.monthlyTPT['6'][:])), self.monthlyTPT['6'][:], label = "Jun",color='red')
+            ax6.plot(range(len(self.price)), self.price, label = "price")
+            ax6.set_title('Jun')
+
+            ax7.set_ylabel('Temperature')
+            ax7.plot(range(len(self.monthlyTPT['7'][:])), self.monthlyTPT['7'][:], label = "July",color='red')
+            ax7.plot(range(len(self.price)), self.price, label = "price")
+            ax7.set_title('July')
+
+            ax8.set_ylabel('Temperature')
+            ax8.plot(range(len(self.monthlyTPT['8'][:])), self.monthlyTPT['8'][:], label = "Aug",color='red')
+            ax8.plot(range(len(self.price)), self.price, label = "price")
+            ax8.set_title('Aug')
+
+            ax9.set_ylabel('Temperature')
+            ax9.plot(range(len(self.monthlyTPT['9'][:])), self.monthlyTPT['9'][:], label = "Sep",color='red')
+            ax9.plot(range(len(self.price)), self.price, label = "price")
+            ax9.set_title('Sep')
+
+            ax10.set_ylabel('Temperature')
+            ax10.plot(range(len(self.monthlyTPT['10'][:])), self.monthlyTPT['10'][:], label = "Oct",color='red')
+            ax10.plot(range(len(self.price)), self.price, label = "price")
+            ax10.set_title('Oct')
+
+            ax11.set_ylabel('Temperature')
+            ax11.plot(range(len(self.monthlyTPT['11'][:])), self.monthlyTPT['11'][:], label = "Nov",color='red')
+            ax11.plot(range(len(self.price)), self.price, label = "price")
+            ax11.set_title('Nov')
+
+            ax12.set_ylabel('Temperature')
+            ax12.plot(range(len(self.monthlyTPT['12'][:])), self.monthlyTPT['12'][:], label = "Dec",color='red')
+            ax12.plot(range(len(self.price)), self.price, label = "price")
+            ax12.set_title('Dec')
+            
+
+            sub1.set_ylabel('Power')
+            sub1.plot(range(len(self.monthlyRemain['1'][:])), self.monthlyRemain['1'][:],color='green')  
+
+            sub2.set_ylabel('Power')
+            sub2.plot(range(len(self.monthlyRemain['2'][:])), self.monthlyRemain['2'][:],color='green')  
+
+            sub3.set_ylabel('Power')
+            sub3.plot(range(len(self.monthlyRemain['3'][:])), self.monthlyRemain['3'][:],color='green')  
+
+            sub4.set_ylabel('Power')
+            sub4.plot(range(len(self.monthlyRemain['4'][:])), self.monthlyRemain['4'][:],color='green')  
+
+            sub5.set_ylabel('Power')
+            sub5.plot(range(len(self.monthlyRemain['5'][:])), self.monthlyRemain['5'][:],color='green')  
+
+            sub6.set_ylabel('Power')
+            sub6.plot(range(len(self.monthlyRemain['6'][:])), self.monthlyRemain['6'][:],color='green')  
+
+            sub7.set_ylabel('Power')
+            sub7.plot(range(len(self.monthlyRemain['7'][:])), self.monthlyRemain['7'][:],color='green')  
+
+            sub8.set_ylabel('Power')
+            sub8.plot(range(len(self.monthlyRemain['8'][:])), self.monthlyRemain['8'][:],color='green')  
+
+            sub9.set_ylabel('Power')
+            sub9.plot(range(len(self.monthlyRemain['9'][:])), self.monthlyRemain['9'][:],color='green')  
+
+            sub10.set_ylabel('Power')
+            sub10.plot(range(len(self.monthlyRemain['10'][:])), self.monthlyRemain['10'][:],color='green')  
+
+            sub11.set_ylabel('Power')
+            sub11.plot(range(len(self.monthlyRemain['11'][:])), self.monthlyRemain['11'][:],color='green')  
+
+            sub12.set_ylabel('Power')
+            sub12.plot(range(len(self.monthlyRemain['12'][:])), self.monthlyRemain['12'][:],color='green')
+
         fig.tight_layout()
         fig.savefig('pic/plot.png')
 
@@ -372,6 +514,6 @@ class Test():
 
 if __name__ == '__main__':
     if len(sys.argv) < 2:
-        print('please enter the mode: "soc" or "load"')
+        print('please enter the mode: "soc" or "load" or "HVAC" ')
     test = Test(sys.argv[1])
     test.main()

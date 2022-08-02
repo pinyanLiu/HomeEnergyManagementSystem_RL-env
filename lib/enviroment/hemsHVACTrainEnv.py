@@ -99,7 +99,7 @@ class HemsEnv(Env):
 
 
         #action we take (degree of HVAC power)
-        self.action_space = spaces.Box(low=0,high=2,shape=(1,),dtype=np.float32)
+        self.action_space = spaces.Box(low=0,high=1,shape=(1,),dtype=np.float32)
         #observation space 
         self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature'])
         upperLimit = np.array(

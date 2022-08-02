@@ -36,7 +36,6 @@ class HemsEnv(Env):
     #import Grid price
         self.GridPrice = self.info.importGridPrice()
         self.GridPrice = self.GridPrice['price_value'].tolist()
-        self.GridPrice = self.info.experimentData['GridPrice']['price_value'].tolist()
 
         #each month pick one day for testing
         self.i = 0
@@ -279,4 +278,5 @@ if __name__ == '__main__':
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
         Totalreward += reward
+        print(states)
         
