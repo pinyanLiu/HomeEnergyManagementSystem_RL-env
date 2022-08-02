@@ -36,7 +36,7 @@ class HemsEnv(Env):
         #import Grid price
         self.GridPrice = self.info.importGridPrice()
         self.GridPrice = self.GridPrice['price_value'].tolist()
-
+        
         #pick one day from 360 days
         i = randint(1,359)
         #import Load 
@@ -44,7 +44,7 @@ class HemsEnv(Env):
         self.Load = self.allLoad.iloc[:,i].tolist()
         self.allPV = self.info.importPhotoVoltaic()
         #import PV
-        if int(i / 30) == 0:
+        if int( i / 30) == 0:
             self.PV = self.allPV['Jan'].tolist()
         elif int(i / 30) == 1:
             self.PV = self.allPV['Feb'].tolist()
@@ -167,16 +167,20 @@ class HemsEnv(Env):
         #REWARD
         reward = []
         #temperature reward
-        if nextIndoorTemperature < (self.max_temperature+self.min_temperature)/2:
-            r1 = 2*(nextIndoorTemperature-self.min_temperature)/(self.max_temperature-self.min_temperature)
-        elif nextIndoorTemperature >= (self.max_temperature+self.min_temperature)/2:    
-            r1 = -2*(nextIndoorTemperature-self.max_temperature)/(self.max_temperature-self.min_temperature)
-        else:
-            print("wtf are you doing?")
-        if r1<-1:
-            r1 = -0.8
+        # if nextIndoorTemperature < (self.max_temperature+self.min_temperature)/2:
+        #     r1 = 2*(nextIndoorTemperature-self.min_temperature)/(self.max_temperature-self.min_temperature)
+        # elif nextIndoorTemperature >= (self.max_temperature+self.min_temperature)/2:    
+        #     r1 = -2*(nextIndoorTemperature-self.max_temperature)/(self.max_temperature-self.min_temperature)
+        # if r1<-1:
+        #     r1 = -0.8
+        if nextIndoorTemperature > self.max_temperature:
+            r1 = nextIndoorTemperature-self.max_temperature
+        elif nextIndoorTemperature < self.min_temperature:
+            r1 = self.min_temperature - nextIndoorTemperature
+        else :
+            r1 = 0 
         #cost reward
-        r2 = -cost/5
+        r2 = -cost/10
 
         reward.append(r1)
         reward.append(r2)
@@ -236,6 +240,8 @@ class HemsEnv(Env):
         elif int(i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
 
+    
+        
         #import Temperature
         if int(i / 30) == 0:
             self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
