@@ -43,7 +43,7 @@
         }
     ],
     "use_beta_distribution": true,
-    "memory": "minimum",
+    "memory": 24000,
     "update_frequency": 0.5,
     "learning_rate": 1e-4,
     "discount": 0.995,
@@ -74,14 +74,14 @@
     ],
     "baseline_optimizer": {
         "optimizer": "adam",
-        "learning_rate": 1e-4
+        "learning_rate": 1e-3
     },
     "state_preprocessing": "linear_normalization",
     "exploration": {
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 1000,
+        "num_steps": 3000,
         "initial_value": 0.2,
         "final_value": 0.00001
     },
