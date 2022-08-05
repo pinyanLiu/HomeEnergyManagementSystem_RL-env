@@ -106,15 +106,15 @@ class HemsEnv(Env):
                 #timeblock
                 96,
                 #load
-                np.finfo(np.float32).max,
+                80,
                 #PV
-                np.finfo(np.float32).max,
+                20,
                 #pricePerHour
-                np.finfo(np.float32).max,
+                6,
                 #indoor temperature
-                self.max_temperature,
+                104,
                 #outdoor temperature
-                np.finfo(np.float32).max
+                104
             ],
             dtype=np.float32,
         )
@@ -123,15 +123,15 @@ class HemsEnv(Env):
                 #timeblock
                 0,
                 #load
-                np.finfo(np.float32).min,
+                0,
                 #PV
-                np.finfo(np.float32).min,
+                0,
                 #pricePerHour
-                np.finfo(np.float32).min,
+                1,
                 #indoor temperature
-                self.min_temperature,
+                35,
                 #outdoor temperature
-                np.finfo(np.float32).min
+                50
             ],
             dtype=np.float32,
         )
@@ -175,9 +175,9 @@ class HemsEnv(Env):
         if nextIndoorTemperature > self.max_temperature:
             r1 = nextIndoorTemperature-self.max_temperature
         elif nextIndoorTemperature < self.min_temperature:
-            r1 = self.min_temperature - nextIndoorTemperature
+            r1 = 0
         else :
-            r1 = -1
+            r1 = -2
         #cost reward
         r2 = -cost/10
 

@@ -520,51 +520,51 @@ class Test():
 
             sub1.set_ylabel('Power')
             sub1.bar(np.arange(95) ,self.monthlyRemain['1'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['1'][:] , color ='gray')  
-            sub1.bar(np.arange(95) ,self.monthlyHVAC['1'][:] ,label = 'HVAC',color ='yellow')  
+            sub1.bar(np.arange(95) ,self.monthlyHVAC['1'][:] ,label = 'HVAC',color ='red')  
 
             sub2.set_ylabel('Power')
             sub2.bar(np.arange(95) ,self.monthlyRemain['2'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['2'][:] , color ='gray')  
-            sub2.bar(np.arange(95) ,self.monthlyHVAC['2'][:] ,label = 'HVAC',color ='yellow')  
+            sub2.bar(np.arange(95) ,self.monthlyHVAC['2'][:] ,label = 'HVAC',color ='red')  
 
             sub3.set_ylabel('Power')
             sub3.bar(np.arange(95) ,self.monthlyRemain['3'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['3'][:] , color ='gray')  
-            sub3.bar(np.arange(95) ,self.monthlyHVAC['3'][:] ,label = 'HVAC',color ='yellow')  
+            sub3.bar(np.arange(95) ,self.monthlyHVAC['3'][:] ,label = 'HVAC',color ='red')  
 
             sub4.set_ylabel('Power')
             sub4.bar(np.arange(95) ,self.monthlyRemain['4'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['4'][:] , color ='gray')  
-            sub4.bar(np.arange(95) ,self.monthlyHVAC['4'][:] ,label = 'HVAC',color ='yellow')  
+            sub4.bar(np.arange(95) ,self.monthlyHVAC['4'][:] ,label = 'HVAC',color ='red')  
 
             sub5.set_ylabel('Power')
             sub5.bar(np.arange(95) ,self.monthlyRemain['5'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['5'][:] , color ='gray')  
-            sub5.bar(np.arange(95) ,self.monthlyHVAC['5'][:] ,label = 'HVAC',color ='yellow')  
+            sub5.bar(np.arange(95) ,self.monthlyHVAC['5'][:] ,label = 'HVAC',color ='red')  
 
             sub6.set_ylabel('Power')
             sub6.bar(np.arange(95) ,self.monthlyRemain['6'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['6'][:] , color ='gray')  
-            sub6.bar(np.arange(95) ,self.monthlyHVAC['6'][:] ,label = 'HVAC',color ='yellow')  
+            sub6.bar(np.arange(95) ,self.monthlyHVAC['6'][:] ,label = 'HVAC',color ='red')  
 
             sub7.set_ylabel('Power')
             sub7.bar(np.arange(95) ,self.monthlyRemain['7'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['7'][:] , color ='gray')  
-            sub7.bar(np.arange(95) ,self.monthlyHVAC['7'][:] ,label = 'HVAC',color ='yellow')  
+            sub7.bar(np.arange(95) ,self.monthlyHVAC['7'][:] ,label = 'HVAC',color ='red')  
 
             sub8.set_ylabel('Power')
             sub8.bar(np.arange(95) ,self.monthlyRemain['8'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['8'][:] , color ='gray')  
-            sub8.bar(np.arange(95) ,self.monthlyHVAC['8'][:] ,label = 'HVAC',color ='yellow')  
+            sub8.bar(np.arange(95) ,self.monthlyHVAC['8'][:] ,label = 'HVAC',color ='red')  
 
             sub9.set_ylabel('Power')
             sub9.bar(np.arange(95) ,self.monthlyRemain['9'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['9'][:] , color ='gray')  
-            sub9.bar(np.arange(95) ,self.monthlyHVAC['9'][:] ,label = 'HVAC',color ='yellow')  
+            sub9.bar(np.arange(95) ,self.monthlyHVAC['9'][:] ,label = 'HVAC',color ='red')  
 
             sub10.set_ylabel('Power')
             sub10.bar(np.arange(95) ,self.monthlyRemain['10'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['10'][:] , color ='gray')  
-            sub10.bar(np.arange(95) ,self.monthlyHVAC['10'][:] ,label = 'HVAC', color ='yellow')  
+            sub10.bar(np.arange(95) ,self.monthlyHVAC['10'][:] ,label = 'HVAC', color ='red')  
 
             sub11.set_ylabel('Power')
             sub11.bar(np.arange(95) ,self.monthlyRemain['11'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['11'][:] , color ='gray')  
-            sub11.bar(np.arange(95) ,self.monthlyHVAC['11'][:] ,label = 'HVAC', color ='yellow')  
+            sub11.bar(np.arange(95) ,self.monthlyHVAC['11'][:] ,label = 'HVAC', color ='red')  
 
             sub12.set_ylabel('Power')
             sub12.bar(np.arange(95) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['12'][:] , color ='gray')  
-            sub12.bar(np.arange(95) ,self.monthlyHVAC['12'][:] ,label = 'HVAC', color ='yellow')  
+            sub12.bar(np.arange(95) ,self.monthlyHVAC['12'][:] ,label = 'HVAC', color ='red')  
 
             sub1a = ax1.twinx()
             sub1a.spines['right'].set_position(("axes",1.1))
