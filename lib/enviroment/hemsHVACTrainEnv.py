@@ -173,16 +173,22 @@ class HemsEnv(Env):
         #     r1 = -2*(nextIndoorTemperature-self.max_temperature)/(self.max_temperature-self.min_temperature)
         # if r1<-1:
         #     r1 = -0.8
-        if nextIndoorTemperature > self.max_temperature:
-            r1 = nextIndoorTemperature-self.max_temperature
-        elif nextIndoorTemperature < self.min_temperature:
-            r1 = 0
-        else :
-            r1 = -3
+
+        ##success one
+        # if nextIndoorTemperature > self.max_temperature:
+        #     r1 = nextIndoorTemperature-self.max_temperature
+        # elif nextIndoorTemperature < self.min_temperature:
+        #     r1 = 0
+        # else :
+        #     r1 = -3
+
+        #new one
+        r1 = -abs(nextIndoorTemperature-80.6)
+
         #cost reward
         r2 = -cost/4
 
-        reward.append(-r1)
+        reward.append(r1)
         reward.append(r2)
 
         #change to next state
