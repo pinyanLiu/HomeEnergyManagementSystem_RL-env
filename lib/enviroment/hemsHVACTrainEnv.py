@@ -214,8 +214,10 @@ class HemsEnv(Env):
         #     r1 = -3
 
         #new one
-        r1 = -abs(nextIndoorTemperature-userSetTemperature)/15
-
+        if nextIndoorTemperature > userSetTemperature:
+            r1 = -abs(nextIndoorTemperature-userSetTemperature)/15
+        else :
+            r1 = 0
         #cost reward
         r2 = -cost/4
 
