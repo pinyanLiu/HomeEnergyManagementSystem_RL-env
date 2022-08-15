@@ -70,7 +70,7 @@ class HemsEnv(Env):
             self.PV = self.allPV['Dec'].tolist()
 
         
-        #import Temperature
+        #import Outdoor Temperature
         self.allOutdoorTemperature = self.info.importTemperatureF()
         if int(i / 30) == 0:
             self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
@@ -97,11 +97,38 @@ class HemsEnv(Env):
         elif int(i / 30) == 11:
             self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
 
+        #import User set Temperature
+        self.allUserSetTemperature = self.info.importUserSetTemperatureF()
+        if int(i / 30) == 0:
+            self.userSetTemperature = self.allUserSetTemperature['Jan'].tolist()
+        elif int(i / 30) == 1:
+            self.userSetTemperature = self.allUserSetTemperature['Feb'].tolist()
+        elif int(i / 30) == 2:
+            self.userSetTemperature = self.allUserSetTemperature['Mar'].tolist()
+        elif int(i / 30) == 3:
+            self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
+        elif int(i / 30) == 4:
+            self.userSetTemperature = self.allUserSetTemperature['May'].tolist()
+        elif int(i / 30) == 5:
+            self.userSetTemperature = self.allUserSetTemperature['Jun'].tolist()
+        elif int(i / 30) == 6:
+            self.userSetTemperature = self.allUserSetTemperature['July'].tolist()
+        elif int(i / 30) == 7:
+            self.userSetTemperature = self.allUserSetTemperature['Aug'].tolist()
+        elif int(i / 30) == 8:
+            self.userSetTemperature = self.allUserSetTemperature['Sep'].tolist()
+        elif int(i / 30) == 9:
+            self.userSetTemperature = self.allUserSetTemperature['Oct'].tolist()
+        elif int(i / 30) == 10:
+            self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
+        elif int(i / 30) == 11:
+            self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
+
 
         #action we take (degree of HVAC power)
         self.action_space = spaces.Box(low=0,high=1,shape=(1,),dtype=np.float32)
         #observation space 
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature'])
+        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature','userSetTemperature'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -115,6 +142,8 @@ class HemsEnv(Env):
                 #indoor temperature
                 104,
                 #outdoor temperature
+                104,
+                #user set temperature
                 104
             ],
             dtype=np.float32,
@@ -132,7 +161,9 @@ class HemsEnv(Env):
                 #indoor temperature
                 35,
                 #outdoor temperature
-                50
+                50,
+                #user set temperature
+                35
             ],
             dtype=np.float32,
         )
@@ -150,7 +181,7 @@ class HemsEnv(Env):
         assert self.action_space.contains(action),err_msg
 
     #STATE (sampleTime,Load,PV,pricePerHour,indoor temperature ,outdoor temperature )
-        sampleTime,load,pv,pricePerHour,indoorTemperature,outdoorTemperature = self.state
+        sampleTime,load,pv,pricePerHour,indoorTemperature,outdoorTemperature,userSetTemperature = self.state
         Power_HVAC = float(action)
 
 
@@ -183,7 +214,7 @@ class HemsEnv(Env):
         #     r1 = -3
 
         #new one
-        r1 = -abs(nextIndoorTemperature-80.6)/10
+        r1 = -abs(nextIndoorTemperature-userSetTemperature)/15
 
         #cost reward
         r2 = -cost/4
@@ -200,7 +231,7 @@ class HemsEnv(Env):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
 
 
 
@@ -274,10 +305,35 @@ class HemsEnv(Env):
         elif int(i / 30) == 11:
             self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
 
-
+        #import User set Temperature
+        self.allUserSetTemperature = self.info.importUserSetTemperatureF()
+        if int(i / 30) == 0:
+            self.userSetTemperature = self.allUserSetTemperature['Jan'].tolist()
+        elif int(i / 30) == 1:
+            self.userSetTemperature = self.allUserSetTemperature['Feb'].tolist()
+        elif int(i / 30) == 2:
+            self.userSetTemperature = self.allUserSetTemperature['Mar'].tolist()
+        elif int(i / 30) == 3:
+            self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
+        elif int(i / 30) == 4:
+            self.userSetTemperature = self.allUserSetTemperature['May'].tolist()
+        elif int(i / 30) == 5:
+            self.userSetTemperature = self.allUserSetTemperature['Jun'].tolist()
+        elif int(i / 30) == 6:
+            self.userSetTemperature = self.allUserSetTemperature['July'].tolist()
+        elif int(i / 30) == 7:
+            self.userSetTemperature = self.allUserSetTemperature['Aug'].tolist()
+        elif int(i / 30) == 8:
+            self.userSetTemperature = self.allUserSetTemperature['Sep'].tolist()
+        elif int(i / 30) == 9:
+            self.userSetTemperature = self.allUserSetTemperature['Oct'].tolist()
+        elif int(i / 30) == 10:
+            self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
+        elif int(i / 30) == 11:
+            self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.initIndoorTemperature,self.outdoorTemperature[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0]])
         return self.state
 
 
