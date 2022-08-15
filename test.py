@@ -423,15 +423,13 @@ class Test():
             ax1.set_ylim(10,45)
             ax1.plot(range(len(self.monthlyIndoorTemperature['1'][:])), self.monthlyIndoorTemperature['1'][:], label = "Jan",color='red')    
             ax1.plot(range(len(self.monthlyOutdoorTemperature['1'][:])), self.monthlyOutdoorTemperature['1'][:], label = "Jan",color='orange')    
-            ax1.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
-            ax1.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax1.hlines(27,0,95,color="black",linestyles='dotted',label='Tmax')
             ax1.set_title('Jan')
 
             ax2.set_ylabel('Temperature')
             ax2.set_ylim(10,45)
             ax2.plot(range(len(self.monthlyIndoorTemperature['2'][:])), self.monthlyIndoorTemperature['2'][:], label = "Feb",color='red')
             ax2.plot(range(len(self.monthlyOutdoorTemperature['2'][:])), self.monthlyOutdoorTemperature['2'][:], label = "Feb",color='orange')
-            ax2.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax2.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax2.set_title('Feb')
 
@@ -439,7 +437,6 @@ class Test():
             ax3.set_ylim(10,45)
             ax3.plot(range(len(self.monthlyIndoorTemperature['3'][:])), self.monthlyIndoorTemperature['3'][:], label = "Mar",color='red')
             ax3.plot(range(len(self.monthlyOutdoorTemperature['3'][:])), self.monthlyOutdoorTemperature['3'][:], label = "Mar",color='orange')
-            ax3.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax3.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax3.set_title('Mar')
 
@@ -447,7 +444,6 @@ class Test():
             ax4.set_ylim(10,45)
             ax4.plot(range(len(self.monthlyIndoorTemperature['4'][:])), self.monthlyIndoorTemperature['4'][:], label = "Apr",color='red')
             ax4.plot(range(len(self.monthlyOutdoorTemperature['4'][:])), self.monthlyOutdoorTemperature['4'][:], label = "Apr",color='orange')
-            ax4.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax4.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax4.set_title('Apr')
 
@@ -455,7 +451,6 @@ class Test():
             ax5.set_ylim(10,45)
             ax5.plot(range(len(self.monthlyIndoorTemperature['5'][:])), self.monthlyIndoorTemperature['5'][:], label = "May",color='red')
             ax5.plot(range(len(self.monthlyOutdoorTemperature['5'][:])), self.monthlyOutdoorTemperature['5'][:], label = "May",color='orange')
-            ax5.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax5.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax5.set_title('May')
 
@@ -463,7 +458,6 @@ class Test():
             ax6.set_ylim(10,45)
             ax6.plot(range(len(self.monthlyIndoorTemperature['6'][:])), self.monthlyIndoorTemperature['6'][:], label = "Jun",color='red')
             ax6.plot(range(len(self.monthlyOutdoorTemperature['6'][:])), self.monthlyOutdoorTemperature['6'][:], label = "Jun",color='orange')
-            ax6.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax6.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax6.set_title('Jun')
 
@@ -471,7 +465,6 @@ class Test():
             ax7.set_ylim(10,45)
             ax7.plot(range(len(self.monthlyIndoorTemperature['7'][:])), self.monthlyIndoorTemperature['7'][:], label = "July",color='red')
             ax7.plot(range(len(self.monthlyOutdoorTemperature['7'][:])), self.monthlyOutdoorTemperature['7'][:], label = "July",color='orange')
-            ax7.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax7.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax7.set_title('July')
 
@@ -479,7 +472,6 @@ class Test():
             ax8.set_ylim(10,45)
             ax8.plot(range(len(self.monthlyIndoorTemperature['8'][:])), self.monthlyIndoorTemperature['8'][:], label = "Aug",color='red')
             ax8.plot(range(len(self.monthlyOutdoorTemperature['8'][:])), self.monthlyOutdoorTemperature['8'][:], label = "Aug",color='orange')
-            ax8.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax8.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax8.set_title('Aug')
 
@@ -487,7 +479,6 @@ class Test():
             ax9.set_ylim(10,45)
             ax9.plot(range(len(self.monthlyIndoorTemperature['9'][:])), self.monthlyIndoorTemperature['9'][:], label = "Sep",color='red')
             ax9.plot(range(len(self.monthlyOutdoorTemperature['9'][:])), self.monthlyOutdoorTemperature['9'][:], label = "Sep",color='orange')
-            ax9.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax9.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax9.set_title('Sep')
 
@@ -495,7 +486,6 @@ class Test():
             ax10.set_ylim(10,45)
             ax10.plot(range(len(self.monthlyIndoorTemperature['10'][:])), self.monthlyIndoorTemperature['10'][:], label = "Oct",color='red')
             ax10.plot(range(len(self.monthlyOutdoorTemperature['10'][:])), self.monthlyOutdoorTemperature['10'][:], label = "Oct",color='orange')
-            ax10.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax10.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax10.set_title('Oct')
 
@@ -503,7 +493,6 @@ class Test():
             ax11.set_ylim(10,45)
             ax11.plot(range(len(self.monthlyIndoorTemperature['11'][:])), self.monthlyIndoorTemperature['11'][:], label = "Nov",color='red')
             ax11.plot(range(len(self.monthlyOutdoorTemperature['11'][:])), self.monthlyOutdoorTemperature['11'][:], label = "Nov",color='orange')
-            ax11.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax11.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax11.set_title('Nov')
 
@@ -511,7 +500,6 @@ class Test():
             ax12.set_ylim(10,45)
             ax12.plot(range(len(self.monthlyIndoorTemperature['12'][:])), self.monthlyIndoorTemperature['12'][:], label = "Dec",color='red')
             ax12.plot(range(len(self.monthlyOutdoorTemperature['12'][:])), self.monthlyOutdoorTemperature['12'][:], label = "Dec",color='orange')
-            ax12.hlines(20,0,95,color="black",linestyles='dotted',label='Tmin')
             ax12.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
             ax12.set_title('Dec')
             

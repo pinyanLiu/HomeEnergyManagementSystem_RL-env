@@ -66,3 +66,15 @@ class ImportData:
         TemperatureF = pd.DataFrame(self.cursor.fetchall())
         TemperatureF.columns = [column[0]for column in self.cursor.description]
         return TemperatureF
+
+    def importUserSetTemperatureF(self):
+        self.cursor.execute("SELECT * FROM UserSetTemperatureF")
+        UserSetTemperatureF = pd.DataFrame(self.cursor.fetchall())
+        UserSetTemperatureF.columns = [column[0]for column in self.cursor.description]
+        return UserSetTemperatureF
+
+    def importUserSetTemperatureC(self):
+        self.cursor.execute("SELECT * FROM UserSetTemperatureC")
+        UserSetTemperatureC = pd.DataFrame(self.cursor.fetchall())
+        UserSetTemperatureC.columns = [column[0]for column in self.cursor.description]
+        return UserSetTemperatureC

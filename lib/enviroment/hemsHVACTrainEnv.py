@@ -183,7 +183,7 @@ class HemsEnv(Env):
         #     r1 = -3
 
         #new one
-        r1 = -abs(nextIndoorTemperature-80.6)
+        r1 = -abs(nextIndoorTemperature-80.6)/10
 
         #cost reward
         r2 = -cost/4
