@@ -97,10 +97,38 @@ class HemsEnv(Env):
         elif self.i == 11:
             self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()    
         
+        #import User set Temperature
+        self.allUserSetTemperature = self.info.importUserSetTemperatureF()
+        if int(self.i / 30) == 0:
+            self.userSetTemperature = self.allUserSetTemperature['Jan'].tolist()
+        elif int(self.i / 30) == 1:
+            self.userSetTemperature = self.allUserSetTemperature['Feb'].tolist()
+        elif int(self.i / 30) == 2:
+            self.userSetTemperature = self.allUserSetTemperature['Mar'].tolist()
+        elif int(self.i / 30) == 3:
+            self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
+        elif int(self.i / 30) == 4:
+            self.userSetTemperature = self.allUserSetTemperature['May'].tolist()
+        elif int(self.i / 30) == 5:
+            self.userSetTemperature = self.allUserSetTemperature['Jun'].tolist()
+        elif int(self.i / 30) == 6:
+            self.userSetTemperature = self.allUserSetTemperature['July'].tolist()
+        elif int(self.i / 30) == 7:
+            self.userSetTemperature = self.allUserSetTemperature['Aug'].tolist()
+        elif int(self.i / 30) == 8:
+            self.userSetTemperature = self.allUserSetTemperature['Sep'].tolist()
+        elif int(self.i / 30) == 9:
+            self.userSetTemperature = self.allUserSetTemperature['Oct'].tolist()
+        elif int(self.i / 30) == 10:
+            self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
+        elif int(self.i / 30) == 11:
+            self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
+
+
         #action we take (degree of charging/discharging power)
         self.action_space = spaces.Box(low=0,high=2,shape=(1,),dtype=np.float32)
 
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature'])
+        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature','userSetTemperature'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -114,6 +142,8 @@ class HemsEnv(Env):
                 #indoor temperature
                 104,
                 #outdoor temperature
+                104,
+                #user set temperature
                 104
             ],
             dtype=np.float32,
@@ -131,7 +161,9 @@ class HemsEnv(Env):
                 #indoor temperature
                 35,
                 #outdoor temperature
-                50
+                50,
+                #user set temperature
+                35
             ],
             dtype=np.float32,
         )
@@ -149,7 +181,7 @@ class HemsEnv(Env):
         assert self.action_space.contains(action),err_msg
 
     #STATE (sampleTime,Load,PV,pricePerHour,indoor temperature ,outdoor temperature )
-        sampleTime,load,pv,pricePerHour,indoorTemperature,outdoorTemperature = self.state
+        sampleTime,load,pv,pricePerHour,indoorTemperature,outdoorTemperature,userSetTemperature = self.state
         Power_HVAC = float(action)
 
 
@@ -172,16 +204,24 @@ class HemsEnv(Env):
         #     r1 = -2*(nextIndoorTemperature-self.max_temperature)/(self.max_temperature-self.min_temperature)
         # if r1<-1:
         #     r1 = -0.8
-        if nextIndoorTemperature > self.max_temperature:
-            r1 = nextIndoorTemperature-self.max_temperature
-        elif nextIndoorTemperature < self.min_temperature:
-            r1 = 0
-        else :
-            r1 = -2
-        #cost reward
-        r2 = -cost/10
 
-        reward.append(-r1/10)
+        ##success one
+        # if nextIndoorTemperature > self.max_temperature:
+        #     r1 = nextIndoorTemperature-self.max_temperature
+        # elif nextIndoorTemperature < self.min_temperature:
+        #     r1 = 0
+        # else :
+        #     r1 = -3
+
+        #new one
+        if nextIndoorTemperature > userSetTemperature:
+            r1 = -abs(nextIndoorTemperature-userSetTemperature)/15
+        else :
+            r1 = 0
+        #cost reward
+        r2 = -cost/4
+
+        reward.append(r1)
         reward.append(r2)
 
         #change to next state
@@ -193,7 +233,7 @@ class HemsEnv(Env):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
 
 
 
@@ -266,8 +306,34 @@ class HemsEnv(Env):
         elif self.i == 11:
             self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
 
+        self.allUserSetTemperature = self.info.importUserSetTemperatureF()
+        if int(self.i / 30) == 0:
+            self.userSetTemperature = self.allUserSetTemperature['Jan'].tolist()
+        elif int(self.i / 30) == 1:
+            self.userSetTemperature = self.allUserSetTemperature['Feb'].tolist()
+        elif int(self.i / 30) == 2:
+            self.userSetTemperature = self.allUserSetTemperature['Mar'].tolist()
+        elif int(self.i / 30) == 3:
+            self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
+        elif int(self.i / 30) == 4:
+            self.userSetTemperature = self.allUserSetTemperature['May'].tolist()
+        elif int(self.i / 30) == 5:
+            self.userSetTemperature = self.allUserSetTemperature['Jun'].tolist()
+        elif int(self.i / 30) == 6:
+            self.userSetTemperature = self.allUserSetTemperature['July'].tolist()
+        elif int(self.i / 30) == 7:
+            self.userSetTemperature = self.allUserSetTemperature['Aug'].tolist()
+        elif int(self.i / 30) == 8:
+            self.userSetTemperature = self.allUserSetTemperature['Sep'].tolist()
+        elif int(self.i / 30) == 9:
+            self.userSetTemperature = self.allUserSetTemperature['Oct'].tolist()
+        elif int(self.i / 30) == 10:
+            self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
+        elif int(self.i / 30) == 11:
+            self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
+
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.initIndoorTemperature,self.outdoorTemperature[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0]])
         return self.state
 
 

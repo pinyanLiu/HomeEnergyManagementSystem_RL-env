@@ -32,18 +32,16 @@ class Test():
         pv = []
         indoorTemperature = []
         outdoorTemperature = []
+        userSetTemperature = []
         totalReward = 0
         self.monthlyIndoorTemperature = pd.DataFrame()
         self.monthlyOutdoorTemperature = pd.DataFrame()
         self.monthlyRemain = pd.DataFrame()
         self.monthlyHVAC = pd.DataFrame()
+        self.monthlyUserSetTemperature = pd.DataFrame()
         self.price = []
         for month in range(12):
             states = self.environment.reset()
-            # load.append(states[1])
-            # pv.append(states[2])
-            # indoorTemperature.append(states[4])
-            # outdoorTemperature.append(states[5])
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -57,20 +55,22 @@ class Test():
                     self.price.append(states[3])
                 indoorTemperature.append(states[4])
                 outdoorTemperature.append(states[5])
+                userSetTemperature.append(states[6])
                 hvac.append(actions[0])
                 totalReward += reward
 
             remain = [load[sampletime]-pv[sampletime] for sampletime in range(95)]
-            #normalize price to [0,1]
             #store testing result in each dictionary
             self.monthlyIndoorTemperature.insert(month,column=str(month+1),value=indoorTemperature)
             self.monthlyOutdoorTemperature.insert(month,column=str(month+1),value=outdoorTemperature)
             self.monthlyRemain.insert(month,column=str(month+1),value=remain)
             self.monthlyHVAC.insert(month,column=str(month+1),value=hvac)
+            self.monthlyUserSetTemperature.insert(month,column=str(month+1),value=userSetTemperature)
             load.clear()
             pv.clear()
             indoorTemperature.clear()
             outdoorTemperature.clear()
+            userSetTemperature.clear()
             hvac.clear()
         print('Agent average episode reward: ', totalReward/12 )    
 
@@ -412,10 +412,16 @@ class Test():
             sub12.bar(np.arange(95) ,self.acConsume['12'][:] ,label = 'AC', color ='green')  
 
         elif self.mode == 'HVAC':
+            #import User set data
+
+            
             #transfer indoorTemperature unit
             #transfer outdoorTemperature unit
             self.monthlyIndoorTemperature = (self.monthlyIndoorTemperature-32) *5/9
             self.monthlyOutdoorTemperature = (self.monthlyOutdoorTemperature-32) *5/9
+            self.monthlyUserSetTemperature = (self.monthlyUserSetTemperature-32) *5/9
+            
+
             #more twinx
 
             
@@ -423,84 +429,96 @@ class Test():
             ax1.set_ylim(10,45)
             ax1.plot(range(len(self.monthlyIndoorTemperature['1'][:])), self.monthlyIndoorTemperature['1'][:], label = "Jan",color='red')    
             ax1.plot(range(len(self.monthlyOutdoorTemperature['1'][:])), self.monthlyOutdoorTemperature['1'][:], label = "Jan",color='orange')    
-            ax1.hlines(27,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax1.plot(range(len(self.monthlyUserSetTemperature['1'][:])), self.monthlyUserSetTemperature['1'][:], label = "Jan",color='orange')    
+            ax1.hlines(27,0,95,color="black",linestyles='dotted',label='Tset')
             ax1.set_title('Jan')
 
             ax2.set_ylabel('Temperature')
             ax2.set_ylim(10,45)
             ax2.plot(range(len(self.monthlyIndoorTemperature['2'][:])), self.monthlyIndoorTemperature['2'][:], label = "Feb",color='red')
             ax2.plot(range(len(self.monthlyOutdoorTemperature['2'][:])), self.monthlyOutdoorTemperature['2'][:], label = "Feb",color='orange')
-            ax2.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax2.plot(range(len(self.monthlyUserSetTemperature['2'][:])), self.monthlyUserSetTemperature['2'][:], label = "Feb",color='orange')
+            ax2.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax2.set_title('Feb')
 
             ax3.set_ylabel('Temperature')
             ax3.set_ylim(10,45)
             ax3.plot(range(len(self.monthlyIndoorTemperature['3'][:])), self.monthlyIndoorTemperature['3'][:], label = "Mar",color='red')
             ax3.plot(range(len(self.monthlyOutdoorTemperature['3'][:])), self.monthlyOutdoorTemperature['3'][:], label = "Mar",color='orange')
-            ax3.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax3.plot(range(len(self.monthlyUserSetTemperature['3'][:])), self.monthlyUserSetTemperature['3'][:], label = "Mar",color='orange')
+            ax3.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax3.set_title('Mar')
 
             ax4.set_ylabel('Temperature')
             ax4.set_ylim(10,45)
             ax4.plot(range(len(self.monthlyIndoorTemperature['4'][:])), self.monthlyIndoorTemperature['4'][:], label = "Apr",color='red')
             ax4.plot(range(len(self.monthlyOutdoorTemperature['4'][:])), self.monthlyOutdoorTemperature['4'][:], label = "Apr",color='orange')
-            ax4.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax4.plot(range(len(self.monthlyUserSetTemperature['4'][:])), self.monthlyUserSetTemperature['4'][:], label = "Apr",color='orange')
+            ax4.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax4.set_title('Apr')
 
             ax5.set_ylabel('Temperature')
             ax5.set_ylim(10,45)
             ax5.plot(range(len(self.monthlyIndoorTemperature['5'][:])), self.monthlyIndoorTemperature['5'][:], label = "May",color='red')
             ax5.plot(range(len(self.monthlyOutdoorTemperature['5'][:])), self.monthlyOutdoorTemperature['5'][:], label = "May",color='orange')
-            ax5.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax5.plot(range(len(self.monthlyUserSetTemperature['5'][:])), self.monthlyUserSetTemperature['5'][:], label = "May",color='orange')
+            ax5.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax5.set_title('May')
 
             ax6.set_ylabel('Temperature')
             ax6.set_ylim(10,45)
             ax6.plot(range(len(self.monthlyIndoorTemperature['6'][:])), self.monthlyIndoorTemperature['6'][:], label = "Jun",color='red')
             ax6.plot(range(len(self.monthlyOutdoorTemperature['6'][:])), self.monthlyOutdoorTemperature['6'][:], label = "Jun",color='orange')
-            ax6.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax6.plot(range(len(self.monthlyUserSetTemperature['6'][:])), self.monthlyUserSetTemperature['6'][:], label = "Jun",color='orange')
+            ax6.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax6.set_title('Jun')
 
             ax7.set_ylabel('Temperature')
             ax7.set_ylim(10,45)
             ax7.plot(range(len(self.monthlyIndoorTemperature['7'][:])), self.monthlyIndoorTemperature['7'][:], label = "July",color='red')
             ax7.plot(range(len(self.monthlyOutdoorTemperature['7'][:])), self.monthlyOutdoorTemperature['7'][:], label = "July",color='orange')
-            ax7.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax7.plot(range(len(self.monthlyUserSetTemperature['7'][:])), self.monthlyUserSetTemperature['7'][:], label = "July",color='orange')
+            ax7.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax7.set_title('July')
 
             ax8.set_ylabel('Temperature')
             ax8.set_ylim(10,45)
             ax8.plot(range(len(self.monthlyIndoorTemperature['8'][:])), self.monthlyIndoorTemperature['8'][:], label = "Aug",color='red')
             ax8.plot(range(len(self.monthlyOutdoorTemperature['8'][:])), self.monthlyOutdoorTemperature['8'][:], label = "Aug",color='orange')
-            ax8.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax8.plot(range(len(self.monthlyUserSetTemperature['8'][:])), self.monthlyUserSetTemperature['8'][:], label = "Aug",color='orange')
+            ax8.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax8.set_title('Aug')
 
             ax9.set_ylabel('Temperature')
             ax9.set_ylim(10,45)
             ax9.plot(range(len(self.monthlyIndoorTemperature['9'][:])), self.monthlyIndoorTemperature['9'][:], label = "Sep",color='red')
             ax9.plot(range(len(self.monthlyOutdoorTemperature['9'][:])), self.monthlyOutdoorTemperature['9'][:], label = "Sep",color='orange')
-            ax9.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax9.plot(range(len(self.monthlyUserSetTemperature['9'][:])), self.monthlyUserSetTemperature['9'][:], label = "Sep",color='orange')
+            ax9.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax9.set_title('Sep')
 
             ax10.set_ylabel('Temperature')
             ax10.set_ylim(10,45)
             ax10.plot(range(len(self.monthlyIndoorTemperature['10'][:])), self.monthlyIndoorTemperature['10'][:], label = "Oct",color='red')
             ax10.plot(range(len(self.monthlyOutdoorTemperature['10'][:])), self.monthlyOutdoorTemperature['10'][:], label = "Oct",color='orange')
-            ax10.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax10.plot(range(len(self.monthlyUserSetTemperature['10'][:])), self.monthlyUserSetTemperature['10'][:], label = "Oct",color='orange')
+            ax10.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax10.set_title('Oct')
 
             ax11.set_ylabel('Temperature')
             ax11.set_ylim(10,45)
             ax11.plot(range(len(self.monthlyIndoorTemperature['11'][:])), self.monthlyIndoorTemperature['11'][:], label = "Nov",color='red')
             ax11.plot(range(len(self.monthlyOutdoorTemperature['11'][:])), self.monthlyOutdoorTemperature['11'][:], label = "Nov",color='orange')
-            ax11.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax11.plot(range(len(self.monthlyUserSetTemperature['11'][:])), self.monthlyUserSetTemperature['11'][:], label = "Nov",color='orange')
+            ax11.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax11.set_title('Nov')
 
             ax12.set_ylabel('Temperature')
             ax12.set_ylim(10,45)
             ax12.plot(range(len(self.monthlyIndoorTemperature['12'][:])), self.monthlyIndoorTemperature['12'][:], label = "Dec",color='red')
             ax12.plot(range(len(self.monthlyOutdoorTemperature['12'][:])), self.monthlyOutdoorTemperature['12'][:], label = "Dec",color='orange')
-            ax12.hlines(24,0,95,color="black",linestyles='dotted',label='Tmax')
+            ax12.plot(range(len(self.monthlyUserSetTemperature['12'][:])), self.monthlyUserSetTemperature['12'][:], label = "Dec",color='orange')
+            ax12.hlines(24,0,95,color="black",linestyles='dotted',label='Tset')
             ax12.set_title('Dec')
             
             #plot power
