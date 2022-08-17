@@ -23,8 +23,8 @@
     "actions": {
         "type": "float",
         "shape": 1,
-        "max_value": 0.1,
-        "min_value": -0.1
+        "max_value": 0.2,
+        "min_value": -0.2
     },
     "max_episode_timesteps": 96,
     "batch_size": 96,
