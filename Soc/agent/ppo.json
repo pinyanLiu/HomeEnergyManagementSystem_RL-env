@@ -6,18 +6,18 @@
             5
         ],
         "min_value": [
-            0.0,
-            "-Infinity",
-            "-Infinity",
-            0.0,
-            "-Infinity"
+            0,
+            0,
+            0,
+            0,
+            1
         ],
         "max_value": [
             96.0,
-            "Infinity",
-            "Infinity",
+            80,
+            20,
             1.0,
-            "Infinity"
+            6.0
         ]
     },
     "actions": {
@@ -36,7 +36,7 @@
         },
         {
             "type": "dropout",
-            "rate": 0.4
+            "rate": 0.2
         },
         {
             "type": "dense",
@@ -45,7 +45,7 @@
         },
         {
             "type": "dropout",
-            "rate": 0.4
+            "rate": 0.2
         },
         {
             "type": "dense",
@@ -72,7 +72,7 @@
         },
         {
             "type": "dropout",
-            "rate": 0.4
+            "rate": 0.2
         },
         {
             "type": "dense",
@@ -81,7 +81,7 @@
         },
         {
             "type": "dropout",
-            "rate": 0.4
+            "rate": 0.2
         },
         {
             "type": "dense",
@@ -98,7 +98,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 1000,
+        "num_steps": 3000,
         "initial_value": 0.6,
         "final_value": 0.00001
     },

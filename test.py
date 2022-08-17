@@ -508,9 +508,6 @@ class Test():
             ax12.plot(range(len(self.monthlyOutdoorTemperature['12'][:])), self.monthlyOutdoorTemperature['12'][:], label = "Dec",color='orange')
             ax12.plot(range(len(self.monthlyUserSetTemperature['12'][:])), self.monthlyUserSetTemperature['12'][:], label = "Dec",color='black')
             ax12.set_title('Dec')
-            
-            #plot power
-            print(self.monthlyHVAC['1'][:])
 
             sub1.set_ylabel('Power')
             sub1.bar(np.arange(95) ,self.monthlyRemain['1'][:] ,label = 'fixLoad',bottom = self.monthlyHVAC['1'][:] , color ='gray')  
