@@ -22,37 +22,49 @@ class HemsEnv(Env):
         self.user = self.mysqlData['user']
         self.passwd = self.mysqlData['passwd']
         self.db = self.mysqlData['db']
-        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db,mode = 'Testing')
-        self.BaseParameter = self.info.experimentData['BaseParameter']
-        self.GridPrice = self.info.experimentData['GridPrice']['price_value'].tolist()
+        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db)
+
+        #import Base Parameter
+        self.BaseParameter = self.info.importBaseParameter()
+        self.batteryCapacity = int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
+        self.socInit = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0])
+
+        #import Grid price
+        self.GridPrice = self.info.importGridPrice()
+        self.GridPrice = self.GridPrice['price_value'].tolist()
 
         #each month pick one day for testing
         self.i = 0
-        self.Load = self.info.experimentData['Load'].iloc[:,self.i].tolist()
-        if self.i % 12 == 0:
-            self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif self.i % 12 == 1:
-            self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif self.i % 12 == 2:
-            self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif self.i % 12 == 3:
-            self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif self.i % 12 == 4:
-            self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif self.i % 12 == 5:
-            self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif self.i % 12 == 6:
-            self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif self.i % 12 == 7:
-            self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif self.i % 12 == 8:
-            self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif self.i % 12 == 9:
-            self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif self.i % 12 == 10:
-            self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif self.i % 12 == 11:
-            self.PV = self.info.experimentData['PV']['Dec'].tolist()
+        #import Load 
+        self.allLoad = self.info.importTrainingLoad()
+        self.Load = self.allLoad.iloc[:,self.i].tolist()
+
+        #import PV
+        self.allPV = self.info.importPhotoVoltaic()        
+        if self.i  == 0:
+            self.PV = self.allPV['Jan'].tolist()
+        elif self.i  == 1:
+            self.PV = self.allPV['Feb'].tolist()
+        elif self.i  == 2:
+            self.PV = self.allPV['Mar'].tolist()
+        elif self.i  == 3:
+            self.PV = self.allPV['Apr'].tolist()
+        elif self.i  == 4:
+            self.PV = self.allPV['May'].tolist()
+        elif self.i  == 5:
+            self.PV = self.allPV['Jun'].tolist()
+        elif self.i  == 6:
+            self.PV = self.allPV['July'].tolist()
+        elif self.i  == 7:
+            self.PV = self.allPV['Aug'].tolist()
+        elif self.i  == 8:
+            self.PV = self.allPV['Sep'].tolist()
+        elif self.i  == 9:
+            self.PV = self.allPV['Oct'].tolist()
+        elif self.i  == 10:
+            self.PV = self.allPV['Nov'].tolist()
+        elif self.i  == 11:
+            self.PV = self.allPV['Dec'].tolist()
         
         #action we take (degree of charging/discharging power)
         self.action_space = spaces.Box(low=-0.1,high=0.1,shape=(1,),dtype=np.float32)
@@ -64,13 +76,13 @@ class HemsEnv(Env):
                 #timeblock
                 96,
                 #load
-                np.finfo(np.float32).max,
+                80.0,
                 #PV
-                np.finfo(np.float32).max,
+                20.0,
                 #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmax','value'],
+                1.0,
                 #pricePerHour
-                np.finfo(np.float32).max,
+                6.0,
             ],
             dtype=np.float32,
         )
@@ -79,16 +91,17 @@ class HemsEnv(Env):
                 #timeblock
                 0,
                 #load
-                np.finfo(np.float32).min,
+                0.0,
                 #PV
-                np.finfo(np.float32).min,
+                0.0,
                 #SOC
-                self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCmin','value'],         
+                0.0,         
                 #pricePerHour
-                np.finfo(np.float32).min,
+                1.0,
             ],
             dtype=np.float32,
         )
+
         self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
         self.state = None
         self.cost = 0
@@ -112,41 +125,19 @@ class HemsEnv(Env):
 
     #interaction
         reward = []
-        # if energy supply is greater than consumption means we don't have to buy grid , this should be encourage .
-        if (pv - soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])) >= load :
-            if (soc + soc_change) < 0 :
-                reward.append(-0.2)
-                cost = 0.0001
-            elif (soc + soc_change) > 1:
-                reward.append(-0.2)
-                cost = 0.0001
-
-            else:
-            #calculate the new soc for next state
-                reward.append(0.1)
-                soc = soc+soc_change
-                cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  ) ## negative , because load < pv - soc_change
+        soc = soc+soc_change
+        if soc > 1:
+            soc = 1
+        elif soc < 0 :
+            soc = 0
+        cost = pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity - pv  ) 
         
-        # if energy supply is less than consumption
-        else:
-            #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc + soc_change) < 0 :
-                reward.append(-0.2)
-                cost = 0.0001
-
-            elif (soc + soc_change) > 1:
-                reward.append(-0.2)
-                cost = 0.0001
-
-            else:
-            #calculate the new soc for next state
-                reward.append(0.1)
-                soc = soc+soc_change
-                cost = pricePerHour * 0.25 *( load + soc_change*float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0]) - pv  ) ## positive , because load > pv - soc_change
+        if sampleTime == 95 and soc >= self.socThreshold:
+            reward.append(10)
 
         #REWARD
       #  if sampleTime!=95:
-        reward.append(-cost/10000)
+        reward.append(-cost/1000)
 
 
         #change to next state
@@ -178,34 +169,34 @@ class HemsEnv(Env):
         self.cost = 0
         #each month pick one day for testing
         self.i += 1
-        self.Load = self.info.experimentData['Load'].iloc[:,self.i]
+        self.Load = self.allLoad.iloc[:,self.i].tolist()
 
-        if self.i % 12 == 0:
-            self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif self.i % 12 == 1:
-            self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif self.i % 12 == 2:
-            self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif self.i % 12 == 3:
-            self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif self.i % 12 == 4:
-            self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif self.i % 12 == 5:
-            self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif self.i % 12 == 6:
-            self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif self.i % 12 == 7:
-            self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif self.i % 12 == 8:
-            self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif self.i % 12 == 9:
-            self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif self.i % 12 == 10:
-            self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif self.i % 12 == 11:
-            self.PV = self.info.experimentData['PV']['Dec'].tolist()
+        if self.i  == 0:
+            self.PV = self.allPV['Jan'].tolist()
+        elif self.i  == 1:
+            self.PV = self.allPV['Feb'].tolist()
+        elif self.i  == 2:
+            self.PV = self.allPV['Mar'].tolist()
+        elif self.i  == 3:
+            self.PV = self.allPV['Apr'].tolist()
+        elif self.i  == 4:
+            self.PV = self.allPV['May'].tolist()
+        elif self.i  == 5:
+            self.PV = self.allPV['Jun'].tolist()
+        elif self.i  == 6:
+            self.PV = self.allPV['July'].tolist()
+        elif self.i  == 7:
+            self.PV = self.allPV['Aug'].tolist()
+        elif self.i  == 8:
+            self.PV = self.allPV['Sep'].tolist()
+        elif self.i  == 9:
+            self.PV = self.allPV['Oct'].tolist()
+        elif self.i  == 10:
+            self.PV = self.allPV['Nov'].tolist()
+        elif self.i  == 11:
+            self.PV = self.allPV['Dec'].tolist()
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0]),self.GridPrice[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.socInit,self.GridPrice[0]])
         return self.state
 
 
