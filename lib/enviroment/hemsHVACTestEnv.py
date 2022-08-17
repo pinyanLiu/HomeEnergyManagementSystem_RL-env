@@ -2,9 +2,9 @@ from  gym.envs.Hems.import_data import ImportData
 from  gym import Env
 from  gym import spaces
 from gym import make
-import math
 import numpy as np
 from  yaml import load , SafeLoader
+from random import randint
 
 class HemsEnv(Env):
     def __init__(self) :
@@ -24,7 +24,7 @@ class HemsEnv(Env):
         self.db = self.mysqlData['db']
         self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db)
 
-    #import Base Parameter
+        #import Base Parameter
         self.BaseParameter = self.info.importBaseParameter()
         self.epsilon = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='epsilon']['value'])[0])
         self.eta = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='eta_HVAC']['value'])[0])
@@ -33,101 +33,101 @@ class HemsEnv(Env):
         self.min_temperature = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='min_temperature(F)']['value'])[0])
         self.initIndoorTemperature= float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='init_indoor_temperature(F)']['value'])[0])
 
-    #import Grid price
+        #import Grid price
         self.GridPrice = self.info.importGridPrice()
         self.GridPrice = self.GridPrice['price_value'].tolist()
-
-        #each month pick one day for testing
-        self.i = 0
-    #import Load 
-        self.allLoad = self.info.importTestingLoad()
-        self.Load = self.allLoad.iloc[:,self.i].tolist()
-
-    #import PV
+        
+        #pick one day from 360 days
+        i = randint(1,359)
+        #import Load 
+        self.allLoad = self.info.importTrainingLoad()
+        self.Load = self.allLoad.iloc[:,i].tolist()
         self.allPV = self.info.importPhotoVoltaic()
-        if self.i == 0:
+        #import PV
+        if int( i / 30) == 0:
             self.PV = self.allPV['Jan'].tolist()
-        elif self.i == 1:
+        elif int(i / 30) == 1:
             self.PV = self.allPV['Feb'].tolist()
-        elif self.i == 2:
+        elif int(i / 30) == 2:
             self.PV = self.allPV['Mar'].tolist()
-        elif self.i == 3:
+        elif int(i / 30) == 3:
             self.PV = self.allPV['Apr'].tolist()
-        elif self.i == 4:
+        elif int(i / 30) == 4:
             self.PV = self.allPV['May'].tolist()
-        elif self.i == 5:
+        elif int(i / 30) == 5:
             self.PV = self.allPV['Jun'].tolist()
-        elif self.i == 6:
+        elif int(i / 30) == 6:
             self.PV = self.allPV['July'].tolist()
-        elif self.i == 7:
+        elif int(i / 30) == 7:
             self.PV = self.allPV['Aug'].tolist()
-        elif self.i == 8:
+        elif int(i / 30) == 8:
             self.PV = self.allPV['Sep'].tolist()
-        elif self.i == 9:
+        elif int(i / 30) == 9:
             self.PV = self.allPV['Oct'].tolist()
-        elif self.i == 10:
+        elif int(i / 30) == 10:
             self.PV = self.allPV['Nov'].tolist()
-        elif self.i == 11:
+        elif int(i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
 
-    #import Temperature
-        self.allOutdoorTemperature = self.info.importTemperatureF()
-        if self.i == 0:
-            self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
-        elif self.i == 1:
-            self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
-        elif self.i == 2:
-            self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
-        elif self.i == 3:
-            self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
-        elif self.i == 4:
-            self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
-        elif self.i == 5:
-            self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
-        elif self.i == 6:
-            self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
-        elif self.i == 7:
-            self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
-        elif self.i == 8:
-            self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
-        elif self.i == 9:
-            self.outdoorTemperature = self.allOutdoorTemperature['Oct'].tolist()
-        elif self.i == 10:
-            self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
-        elif self.i == 11:
-            self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()    
         
+        #import Outdoor Temperature
+        self.allOutdoorTemperature = self.info.importTemperatureF()
+        if int(i / 30) == 0:
+            self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
+        elif int(i / 30) == 1:
+            self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
+        elif int(i / 30) == 2:
+            self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
+        elif int(i / 30) == 3:
+            self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
+        elif int(i / 30) == 4:
+            self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
+        elif int(i / 30) == 5:
+            self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
+        elif int(i / 30) == 6:
+            self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
+        elif int(i / 30) == 7:
+            self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
+        elif int(i / 30) == 8:
+            self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
+        elif int(i / 30) == 9:
+            self.outdoorTemperature = self.allOutdoorTemperature['Oct'].tolist()
+        elif int(i / 30) == 10:
+            self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
+        elif int(i / 30) == 11:
+            self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
+
         #import User set Temperature
         self.allUserSetTemperature = self.info.importUserSetTemperatureF()
-        if int(self.i / 30) == 0:
+        if int(i / 30) == 0:
             self.userSetTemperature = self.allUserSetTemperature['Jan'].tolist()
-        elif int(self.i / 30) == 1:
+        elif int(i / 30) == 1:
             self.userSetTemperature = self.allUserSetTemperature['Feb'].tolist()
-        elif int(self.i / 30) == 2:
+        elif int(i / 30) == 2:
             self.userSetTemperature = self.allUserSetTemperature['Mar'].tolist()
-        elif int(self.i / 30) == 3:
+        elif int(i / 30) == 3:
             self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
-        elif int(self.i / 30) == 4:
+        elif int(i / 30) == 4:
             self.userSetTemperature = self.allUserSetTemperature['May'].tolist()
-        elif int(self.i / 30) == 5:
+        elif int(i / 30) == 5:
             self.userSetTemperature = self.allUserSetTemperature['Jun'].tolist()
-        elif int(self.i / 30) == 6:
+        elif int(i / 30) == 6:
             self.userSetTemperature = self.allUserSetTemperature['July'].tolist()
-        elif int(self.i / 30) == 7:
+        elif int(i / 30) == 7:
             self.userSetTemperature = self.allUserSetTemperature['Aug'].tolist()
-        elif int(self.i / 30) == 8:
+        elif int(i / 30) == 8:
             self.userSetTemperature = self.allUserSetTemperature['Sep'].tolist()
-        elif int(self.i / 30) == 9:
+        elif int(i / 30) == 9:
             self.userSetTemperature = self.allUserSetTemperature['Oct'].tolist()
-        elif int(self.i / 30) == 10:
+        elif int(i / 30) == 10:
             self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
-        elif int(self.i / 30) == 11:
+        elif int(i / 30) == 11:
             self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
 
 
-        #action we take (degree of charging/discharging power)
+        #action we take (degree of HVAC power)
         self.action_space = spaces.Box(low=0,high=2,shape=(1,),dtype=np.float32)
-
+        #observation space 
         self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature','userSetTemperature'])
         upperLimit = np.array(
             [
@@ -169,7 +169,7 @@ class HemsEnv(Env):
         )
         self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
         self.state = None
-
+        
     def step(self,action):
         '''
         interaction of each state(changes while taking action)
@@ -214,12 +214,12 @@ class HemsEnv(Env):
         #     r1 = -3
 
         #new one
-        if nextIndoorTemperature > userSetTemperature:
-            r1 = -abs(nextIndoorTemperature-userSetTemperature)/15
+        if indoorTemperature > userSetTemperature:
+            r1 = -abs(indoorTemperature-userSetTemperature)/10
         else :
             r1 = 0
         #cost reward
-        r2 = -cost/4
+        r2 = -cost/5
 
         reward.append(r1)
         reward.append(r2)
@@ -250,86 +250,88 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
-        #each month pick one day for testing
-        self.i += 1
-        self.Load = self.allLoad.iloc[:,self.i].to_list()
-
-    #setting PV
-        if self.i == 0:
+        #pick one day from 360 days
+        i = randint(1,359)
+        self.Load = self.allLoad.iloc[:,i].tolist()
+        #import PV
+        if int(i / 30) == 0:
             self.PV = self.allPV['Jan'].tolist()
-        elif self.i == 1:
+        elif int(i / 30) == 1:
             self.PV = self.allPV['Feb'].tolist()
-        elif self.i == 2:
+        elif int(i / 30) == 2:
             self.PV = self.allPV['Mar'].tolist()
-        elif self.i == 3:
+        elif int(i / 30) == 3:
             self.PV = self.allPV['Apr'].tolist()
-        elif self.i == 4:
+        elif int(i / 30) == 4:
             self.PV = self.allPV['May'].tolist()
-        elif self.i == 5:
+        elif int(i / 30) == 5:
             self.PV = self.allPV['Jun'].tolist()
-        elif self.i == 6:
+        elif int(i / 30) == 6:
             self.PV = self.allPV['July'].tolist()
-        elif self.i == 7:
+        elif int(i / 30) == 7:
             self.PV = self.allPV['Aug'].tolist()
-        elif self.i == 8:
+        elif int(i / 30) == 8:
             self.PV = self.allPV['Sep'].tolist()
-        elif self.i == 9:
+        elif int(i / 30) == 9:
             self.PV = self.allPV['Oct'].tolist()
-        elif self.i == 10:
+        elif int(i / 30) == 10:
             self.PV = self.allPV['Nov'].tolist()
-        elif self.i == 11:
+        elif int(i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
 
-    #setting Temperature
-        if self.i == 0:
+    
+        
+        #import Temperature
+        if int(i / 30) == 0:
             self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
-        elif self.i == 1:
+        elif int(i / 30) == 1:
             self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
-        elif self.i == 2:
+        elif int(i / 30) == 2:
             self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
-        elif self.i == 3:
+        elif int(i / 30) == 3:
             self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
-        elif self.i == 4:
+        elif int(i / 30) == 4:
             self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
-        elif self.i == 5:
+        elif int(i / 30) == 5:
             self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
-        elif self.i == 6:
+        elif int(i / 30) == 6:
             self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
-        elif self.i == 7:
+        elif int(i / 30) == 7:
             self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
-        elif self.i == 8:
+        elif int(i / 30) == 8:
             self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
-        elif self.i == 9:
+        elif int(i / 30) == 9:
             self.outdoorTemperature = self.allOutdoorTemperature['Oct'].tolist()
-        elif self.i == 10:
+        elif int(i / 30) == 10:
             self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
-        elif self.i == 11:
+        elif int(i / 30) == 11:
             self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
 
+        #import User set Temperature
         self.allUserSetTemperature = self.info.importUserSetTemperatureF()
-        if int(self.i / 30) == 0:
+        if int(i / 30) == 0:
             self.userSetTemperature = self.allUserSetTemperature['Jan'].tolist()
-        elif int(self.i / 30) == 1:
+        elif int(i / 30) == 1:
             self.userSetTemperature = self.allUserSetTemperature['Feb'].tolist()
-        elif int(self.i / 30) == 2:
+        elif int(i / 30) == 2:
             self.userSetTemperature = self.allUserSetTemperature['Mar'].tolist()
-        elif int(self.i / 30) == 3:
+        elif int(i / 30) == 3:
             self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
-        elif int(self.i / 30) == 4:
+        elif int(i / 30) == 4:
             self.userSetTemperature = self.allUserSetTemperature['May'].tolist()
-        elif int(self.i / 30) == 5:
+        elif int(i / 30) == 5:
             self.userSetTemperature = self.allUserSetTemperature['Jun'].tolist()
-        elif int(self.i / 30) == 6:
+        elif int(i / 30) == 6:
             self.userSetTemperature = self.allUserSetTemperature['July'].tolist()
-        elif int(self.i / 30) == 7:
+        elif int(i / 30) == 7:
             self.userSetTemperature = self.allUserSetTemperature['Aug'].tolist()
-        elif int(self.i / 30) == 8:
+        elif int(i / 30) == 8:
             self.userSetTemperature = self.allUserSetTemperature['Sep'].tolist()
-        elif int(self.i / 30) == 9:
+        elif int(i / 30) == 9:
             self.userSetTemperature = self.allUserSetTemperature['Oct'].tolist()
-        elif int(self.i / 30) == 10:
+        elif int(i / 30) == 10:
             self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
-        elif int(self.i / 30) == 11:
+        elif int(i / 30) == 11:
             self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
 
         #reset state
@@ -337,16 +339,14 @@ class HemsEnv(Env):
         return self.state
 
 
+
 if __name__ == '__main__':
-    env = make("Hems-v7")
+    env = make("Hems-v6")
 #     # Initialize episode
     states = env.reset()
     done = False
     step = 0
-    Totalreward = 0
     while not done: # Episode timestep
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
-        Totalreward += reward
-        print(states)
-        
+        print(info)
