@@ -80,9 +80,11 @@ class Test():
         self.agent = Agent.load(directory = 'Soc/saver_dir',environment=self.environment)
         soc = []
         load = []
+        socPower = []
         pv = []
         totalReward = 0
         self.monthlySoc = pd.DataFrame()
+        self.monthlySocPower = pd.DataFrame()
         self.monthlyRemain = pd.DataFrame()
         self.price = []
         for month in range(12):
@@ -94,6 +96,7 @@ class Test():
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
+                socPower.append(actions[0]*100)
                 load.append(states[1])
                 pv.append(states[2])
                 soc.append(states[3])
@@ -105,12 +108,14 @@ class Test():
             #normalize price to [0,1]
             self.price = [(self.price[month]-np.min(self.price))/(np.max(self.price)-np.min(self.price)) for month in range(len(self.price))]  
             self.monthlySoc.insert(month,column=str(month+1),value=soc)
+            self.monthlySocPower.insert(month,column=str(month+1),value=socPower)
             # monthlyLoad.insert(month,column=str(month+1),value=load)
             # monthlyPv.insert(month,column=str(month+1),value=pv)
             self.monthlyRemain.insert(month,column=str(month+1),value=remain)
             load.clear()
             pv.clear()
             soc.clear()
+            socPower.clear()
         print('Agent average episode reward: ', totalReward/12 )
 
     def __testInLoad__(self):
@@ -277,40 +282,52 @@ class Test():
             ax12.set_title('Dec')
 
             sub1.set_ylabel('Power')
-            sub1.plot(range(len(self.monthlyRemain['1'][:])), self.monthlyRemain['1'][:],color='green')  
+            sub1.bar(np.arange(95) ,self.monthlyRemain['1'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['1'][:] , color ='gray')  
+            sub1.bar(np.arange(95) ,self.monthlySocPower['1'][:] ,label = 'socPower',color ='red')  
 
             sub2.set_ylabel('Power')
-            sub2.plot(range(len(self.monthlyRemain['2'][:])), self.monthlyRemain['2'][:],color='green')  
+            sub2.bar(np.arange(95) ,self.monthlyRemain['2'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['2'][:] , color ='gray')  
+            sub2.bar(np.arange(95) ,self.monthlySocPower['2'][:] ,label = 'socPower',color ='red')  
 
             sub3.set_ylabel('Power')
-            sub3.plot(range(len(self.monthlyRemain['3'][:])), self.monthlyRemain['3'][:],color='green')  
+            sub3.bar(np.arange(95) ,self.monthlyRemain['3'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['3'][:] , color ='gray')  
+            sub3.bar(np.arange(95) ,self.monthlySocPower['3'][:] ,label = 'socPower',color ='red')  
 
             sub4.set_ylabel('Power')
-            sub4.plot(range(len(self.monthlyRemain['4'][:])), self.monthlyRemain['4'][:],color='green')  
+            sub4.bar(np.arange(95) ,self.monthlyRemain['4'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['4'][:] , color ='gray')  
+            sub4.bar(np.arange(95) ,self.monthlySocPower['4'][:] ,label = 'socPower',color ='red')  
 
             sub5.set_ylabel('Power')
-            sub5.plot(range(len(self.monthlyRemain['5'][:])), self.monthlyRemain['5'][:],color='green')  
+            sub5.bar(np.arange(95) ,self.monthlyRemain['5'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['5'][:] , color ='gray')  
+            sub5.bar(np.arange(95) ,self.monthlySocPower['5'][:] ,label = 'socPower',color ='red')  
 
             sub6.set_ylabel('Power')
-            sub6.plot(range(len(self.monthlyRemain['6'][:])), self.monthlyRemain['6'][:],color='green')  
+            sub6.bar(np.arange(95) ,self.monthlyRemain['6'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['6'][:] , color ='gray')  
+            sub6.bar(np.arange(95) ,self.monthlySocPower['6'][:] ,label = 'socPower',color ='red')  
 
             sub7.set_ylabel('Power')
-            sub7.plot(range(len(self.monthlyRemain['7'][:])), self.monthlyRemain['7'][:],color='green')  
+            sub7.bar(np.arange(95) ,self.monthlyRemain['7'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['7'][:] , color ='gray')  
+            sub7.bar(np.arange(95) ,self.monthlySocPower['7'][:] ,label = 'socPower',color ='red')  
 
             sub8.set_ylabel('Power')
-            sub8.plot(range(len(self.monthlyRemain['8'][:])), self.monthlyRemain['8'][:],color='green')  
+            sub8.bar(np.arange(95) ,self.monthlyRemain['8'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['8'][:] , color ='gray')  
+            sub8.bar(np.arange(95) ,self.monthlySocPower['8'][:] ,label = 'socPower',color ='red')  
 
             sub9.set_ylabel('Power')
-            sub9.plot(range(len(self.monthlyRemain['9'][:])), self.monthlyRemain['9'][:],color='green')  
+            sub9.bar(np.arange(95) ,self.monthlyRemain['9'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['9'][:] , color ='gray')  
+            sub9.bar(np.arange(95) ,self.monthlySocPower['9'][:] ,label = 'socPower',color ='red')  
 
             sub10.set_ylabel('Power')
-            sub10.plot(range(len(self.monthlyRemain['10'][:])), self.monthlyRemain['10'][:],color='green')  
+            sub10.bar(np.arange(95) ,self.monthlyRemain['10'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['10'][:] , color ='gray')  
+            sub10.bar(np.arange(95) ,self.monthlySocPower['10'][:] ,label = 'socPower', color ='red')  
 
             sub11.set_ylabel('Power')
-            sub11.plot(range(len(self.monthlyRemain['11'][:])), self.monthlyRemain['11'][:],color='green')  
+            sub11.bar(np.arange(95) ,self.monthlyRemain['11'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['11'][:] , color ='gray')  
+            sub11.bar(np.arange(95) ,self.monthlySocPower['11'][:] ,label = 'socPower', color ='red')  
 
             sub12.set_ylabel('Power')
-            sub12.plot(range(len(self.monthlyRemain['12'][:])), self.monthlyRemain['12'][:],color='green')  
+            sub12.bar(np.arange(95) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['12'][:] , color ='gray')  
+            sub12.bar(np.arange(95) ,self.monthlySocPower['12'][:] ,label = 'socPower', color ='red')  
 
         elif self.mode == 'load':
             ax1.plot(range(len(self.price)), self.price, label = "price")

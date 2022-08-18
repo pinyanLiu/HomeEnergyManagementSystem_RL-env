@@ -60,7 +60,7 @@
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.25,
-    "discount": 0.95,
+    "discount": 0.97,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
@@ -99,7 +99,7 @@
         "decay": "linear",
         "unit": "episodes",
         "num_steps": 3000,
-        "initial_value": 0.6,
+        "initial_value": 0.2,
         "final_value": 0.00001
     },
     "variable_noise": 0.0,
