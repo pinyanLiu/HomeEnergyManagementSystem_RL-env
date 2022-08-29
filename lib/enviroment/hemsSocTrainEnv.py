@@ -21,15 +21,14 @@ class HemsEnv(Env):
         self.host = self.mysqlData['host']
         self.user = self.mysqlData['user']
         self.passwd = self.mysqlData['passwd']
-        self.db = self.mysqlData['db']
-        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db,mode='Training')
-        
+        self.db = self.mysqlData['db']        
         self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db)
 
         #import Base Parameter
         self.BaseParameter = self.info.importBaseParameter()
         self.batteryCapacity = int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
         self.socInit = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0])
+        self.socThreshold = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0])
 
         #import Grid price
         self.GridPrice = self.info.importGridPrice()
@@ -68,7 +67,7 @@ class HemsEnv(Env):
             self.PV = self.allPV['Dec'].tolist()
 
         #action we take (degree of charging/discharging power)
-        self.action_space = spaces.Box(low=-0.1,high=0.1,shape=(1,),dtype=np.float32)
+        self.action_space = spaces.Box(low=-0.2,high=0.2,shape=(1,),dtype=np.float32)
         #observation space ( Only SOC matters )
         self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
         upperLimit = np.array(
@@ -101,6 +100,7 @@ class HemsEnv(Env):
             ],
             dtype=np.float32,
         )
+
         self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
         self.state = None
         
@@ -123,41 +123,22 @@ class HemsEnv(Env):
 
     #interaction
         reward = []
-        # if energy supply is greater than consumption means we don't have to buy grid , this should be encourage .
-        if (pv + soc_change*self.batteryCapacity) >= load :
-            if (soc + soc_change) < 0 :
-                reward.append(-0.2)
-                cost = 0.0001
-            elif (soc + soc_change) > 1:
-                reward.append(-0.2)
-                cost = 0.0001
+        soc = soc+soc_change
+        if soc > 1:
+            soc = 1
+        elif soc < 0 :
+            soc = 0
+        cost = pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity - pv  ) 
+        cost = (load+soc_change*self.batteryCapacity-pv)*pricePerHour
+        proportion = soc_change*self.batteryCapacity/(load+soc_change*self.batteryCapacity-pv)
+        cost= cost * proportion        
 
-            else:
-            #calculate the new soc for next state
-                reward.append(0.1)
-                soc = soc+soc_change
-                cost = pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity - pv  ) ## negative , because load < pv + soc_change
-        
-        # if energy supply is less than consumption
-        else:
-            #punish if the agent choose the action which shouldn't be choose(charge when SOC is full or discharge when SOC is null)
-            if (soc + soc_change) < 0 :
-                reward.append(-0.2)
-                cost = 0.0001
-
-            elif (soc + soc_change) > 1:
-                reward.append(-0.2)
-                cost = 0.0001
-
-            else:
-            #calculate the new soc for next state
-                reward.append(0.1)
-                soc = soc+soc_change
-                cost = pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity - pv  ) ## positive , because load > pv + soc_change
+        if sampleTime == 95 and soc >= self.socThreshold:
+            reward.append(10)
 
         #REWARD
       #  if sampleTime!=95:
-        reward.append(-cost/10000)
+        reward.append(-cost/1000)
 
 
         #change to next state

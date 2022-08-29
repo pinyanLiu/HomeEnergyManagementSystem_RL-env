@@ -22,7 +22,7 @@ class ImportData:
             self.cursor = self.conn.cursor()
             print(" connect to mysql successfully")
         except:
-            print("fail to connet to mysql")
+            print("fail to connect to mysql")
 
 
     def importBaseParameter(self):
