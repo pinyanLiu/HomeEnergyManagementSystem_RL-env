@@ -2,7 +2,6 @@ from  gym.envs.Hems.import_data import ImportData
 from  gym import Env
 from  gym import spaces
 from gym import make
-import math
 import numpy as np
 from  yaml import load , SafeLoader
 
@@ -192,7 +191,7 @@ class HemsEnv(Env):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],0,self.GridPrice[sampleTime],0,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime],indoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
 
 
 
@@ -297,7 +296,7 @@ class HemsEnv(Env):
 
 
 if __name__ == '__main__':
-    env = make("Multi-hems-v7")
+    env = make("Multi-hems-v0")
 #     # Initialize episode
     states = env.reset()
     done = False
