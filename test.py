@@ -1,3 +1,4 @@
+from logging import _Level
 from tensorforce import Agent,Environment
 from lib.loads.interrupted import AC
 from lib.loads.uninterrupted import WM
@@ -22,6 +23,9 @@ class Test():
 
     #plot result
         self.__plotResult__()
+
+
+
 
 
     def __testInHVAC__(self):
@@ -96,7 +100,7 @@ class Test():
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
-                socPower.append(actions[0]*100)
+                socPower.append(actions[0])
                 load.append(states[1])
                 pv.append(states[2])
                 soc.append(states[3])

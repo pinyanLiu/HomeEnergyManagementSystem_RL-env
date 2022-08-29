@@ -26,12 +26,8 @@ class HemsEnv(Env):
 
     #import Base Parameter
         self.BaseParameter = self.info.importBaseParameter()
-        self.epsilon = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='epsilon']['value'])[0])
-        self.eta = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='eta_HVAC']['value'])[0])
-        self.A = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='A(KW/F)']['value'])[0])
-        self.max_temperature = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='max_temperature(F)']['value'])[0])
-        self.min_temperature = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='min_temperature(F)']['value'])[0])
         self.initIndoorTemperature= float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='init_indoor_temperature(F)']['value'])[0])
+        self.socInit = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0])
 
     #import Grid price
         self.GridPrice = self.info.importGridPrice()
@@ -127,7 +123,7 @@ class HemsEnv(Env):
         #action we take (degree of charging/discharging power)
         self.action_space = spaces.Box(low=0,high=2,shape=(1,),dtype=np.float32)
 
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'pricePerHour','indoorTemperature','outdoorTemperature','userSetTemperature'])
+        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC','pricePerHour','indoorTemperature','outdoorTemperature','userSetTemperature'])
         upperLimit = np.array(
             [
                 #timeblock
@@ -136,6 +132,8 @@ class HemsEnv(Env):
                 80,
                 #PV
                 20,
+                #SOC
+                1.0,
                 #pricePerHour
                 6,
                 #indoor temperature
@@ -155,6 +153,8 @@ class HemsEnv(Env):
                 0,
                 #PV
                 0,
+                #SOC
+                0.0,     
                 #pricePerHour
                 1,
                 #indoor temperature
@@ -180,50 +180,10 @@ class HemsEnv(Env):
         assert self.action_space.contains(action),err_msg
 
     #STATE (sampleTime,Load,PV,pricePerHour,indoor temperature ,outdoor temperature )
-        sampleTime,load,pv,pricePerHour,indoorTemperature,outdoorTemperature,userSetTemperature = self.state
-        Power_HVAC = float(action)
+        sampleTime,load,pv,soc,pricePerHour,indoorTemperature,outdoorTemperature,userSetTemperature = self.state
 
 
-    #interaction
 
-        #calculate the new indoor temperature for next state
-        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
-
-        #calculate proportion
-        cost = (load+Power_HVAC-pv)*pricePerHour
-        proportion = Power_HVAC/(load+Power_HVAC-pv)
-        cost= cost * proportion
-
-        #REWARD
-        reward = []
-        #temperature reward
-        # if nextIndoorTemperature < (self.max_temperature+self.min_temperature)/2:
-        #     r1 = 2*(nextIndoorTemperature-self.min_temperature)/(self.max_temperature-self.min_temperature)
-        # elif nextIndoorTemperature >= (self.max_temperature+self.min_temperature)/2:    
-        #     r1 = -2*(nextIndoorTemperature-self.max_temperature)/(self.max_temperature-self.min_temperature)
-        # if r1<-1:
-        #     r1 = -0.8
-
-        ##success one
-        # if nextIndoorTemperature > self.max_temperature:
-        #     r1 = nextIndoorTemperature-self.max_temperature
-        # elif nextIndoorTemperature < self.min_temperature:
-        #     r1 = 0
-        # else :
-        #     r1 = -3
-
-        #new one
-        if indoorTemperature > userSetTemperature:
-            r1 = -abs(indoorTemperature-userSetTemperature)/9
-        else :
-            r1 = 0
-        #cost reward
-        r2 = -cost/6
-
-        reward.append(r1)
-        reward.append(r2)
-
-        #change to next state
         sampleTime = int(sampleTime+1)
 
         #check if all day has done
@@ -232,13 +192,13 @@ class HemsEnv(Env):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],0,self.GridPrice[sampleTime],0,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
 
 
 
         #set placeholder for infomation
-        info = {'reward':reward}
-        reward = sum(reward)
+        info = {}
+        reward = 0
 
         return self.state,reward,done,info
 
@@ -332,12 +292,12 @@ class HemsEnv(Env):
             self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.socInit,self.GridPrice[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0]])
         return self.state
 
 
 if __name__ == '__main__':
-    env = make("Hems-v7")
+    env = make("Multi-hems-v7")
 #     # Initialize episode
     states = env.reset()
     done = False
