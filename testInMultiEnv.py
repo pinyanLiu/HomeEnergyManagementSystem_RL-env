@@ -83,7 +83,9 @@ class MultiEnvTest():
                 states, reward, terminal , info = self.hvacSocEnv.step(action=actions)
 
 
-            remain = [load[sampletime]-pv[sampletime] for sampletime in range(95)]
+            remain = [load[sampletime]+hvac[sampletime]+socPower[sampletime]-pv[sampletime] for sampletime in range(95)]
+            self.price = [(self.price[month]-np.min(self.price))/(np.max(self.price)-np.min(self.price)) for month in range(len(self.price))]  
+
             #store testing result in each dictionary
             self.monthlySoc.insert(month,column=str(month+1),value=soc)
             self.monthlySocPower.insert(month,column=str(month+1),value=socPower)
@@ -133,125 +135,125 @@ class MultiEnvTest():
         sub12=ax12.twinx()
 
         ax1.set_ylabel('SOC')
-        ax1.plot(range(len(self.monthlySoc['1'][:])), self.monthlySoc['1'][:], label = "Jan",color='silver')    
+        ax1.plot(range(len(self.monthlySoc['1'][:])), self.monthlySoc['1'][:], label = "Jan",color='dimgray')    
         ax1.plot(range(len(self.price)), self.price, label = "price")
         ax1.set_title('Jan')
 
         ax2.set_ylabel('SOC')
-        ax2.plot(range(len(self.monthlySoc['2'][:])), self.monthlySoc['2'][:], label = "Feb",color='silver')
+        ax2.plot(range(len(self.monthlySoc['2'][:])), self.monthlySoc['2'][:], label = "Feb",color='dimgray')
         ax2.plot(range(len(self.price)), self.price, label = "price")
         ax2.set_title('Feb')
 
         ax3.set_ylabel('SOC')
         ax3.plot(range(len(self.price)), self.price, label = "price")
-        ax3.plot(range(len(self.monthlySoc['3'][:])), self.monthlySoc['3'][:], label = "Mar",color='silver')
+        ax3.plot(range(len(self.monthlySoc['3'][:])), self.monthlySoc['3'][:], label = "Mar",color='dimgray')
         ax3.set_title('Mar')
 
         ax4.set_ylabel('SOC')
-        ax4.plot(range(len(self.monthlySoc['4'][:])), self.monthlySoc['4'][:], label = "Apr",color='silver')
+        ax4.plot(range(len(self.monthlySoc['4'][:])), self.monthlySoc['4'][:], label = "Apr",color='dimgray')
         ax4.plot(range(len(self.price)), self.price, label = "price")
         ax4.set_title('Apr')
 
         ax5.set_ylabel('SOC')
-        ax5.plot(range(len(self.monthlySoc['5'][:])), self.monthlySoc['5'][:], label = "May",color='silver')
+        ax5.plot(range(len(self.monthlySoc['5'][:])), self.monthlySoc['5'][:], label = "May",color='dimgray')
         ax5.plot(range(len(self.price)), self.price, label = "price")
         ax5.set_title('May')
 
         ax6.set_ylabel('SOC')
-        ax6.plot(range(len(self.monthlySoc['6'][:])), self.monthlySoc['6'][:], label = "Jun",color='silver')
+        ax6.plot(range(len(self.monthlySoc['6'][:])), self.monthlySoc['6'][:], label = "Jun",color='dimgray')
         ax6.plot(range(len(self.price)), self.price, label = "price")
         ax6.set_title('Jun')
 
         ax7.set_ylabel('SOC')
-        ax7.plot(range(len(self.monthlySoc['7'][:])), self.monthlySoc['7'][:], label = "July",color='silver')
+        ax7.plot(range(len(self.monthlySoc['7'][:])), self.monthlySoc['7'][:], label = "July",color='dimgray')
         ax7.plot(range(len(self.price)), self.price, label = "price")
         ax7.set_title('July')
 
         ax8.set_ylabel('SOC')
-        ax8.plot(range(len(self.monthlySoc['8'][:])), self.monthlySoc['8'][:], label = "Aug",color='silver')
+        ax8.plot(range(len(self.monthlySoc['8'][:])), self.monthlySoc['8'][:], label = "Aug",color='dimgray')
         ax8.plot(range(len(self.price)), self.price, label = "price")
         ax8.set_title('Aug')
 
         ax9.set_ylabel('SOC')
-        ax9.plot(range(len(self.monthlySoc['9'][:])), self.monthlySoc['9'][:], label = "Sep",color='silver')
+        ax9.plot(range(len(self.monthlySoc['9'][:])), self.monthlySoc['9'][:], label = "Sep",color='dimgray')
         ax9.plot(range(len(self.price)), self.price, label = "price")
         ax9.set_title('Sep')
 
         ax10.set_ylabel('SOC')
-        ax10.plot(range(len(self.monthlySoc['10'][:])), self.monthlySoc['10'][:], label = "Oct",color='silver')
+        ax10.plot(range(len(self.monthlySoc['10'][:])), self.monthlySoc['10'][:], label = "Oct",color='dimgray')
         ax10.plot(range(len(self.price)), self.price, label = "price")
         ax10.set_title('Oct')
 
         ax11.set_ylabel('SOC')
-        ax11.plot(range(len(self.monthlySoc['11'][:])), self.monthlySoc['11'][:], label = "Nov",color='silver')
+        ax11.plot(range(len(self.monthlySoc['11'][:])), self.monthlySoc['11'][:], label = "Nov",color='dimgray')
         ax11.plot(range(len(self.price)), self.price, label = "price")
         ax11.set_title('Nov')
 
         ax12.set_ylabel('SOC')
-        ax12.plot(range(len(self.monthlySoc['12'][:])), self.monthlySoc['12'][:], label = "Dec",color='silver')
+        ax12.plot(range(len(self.monthlySoc['12'][:])), self.monthlySoc['12'][:], label = "Dec",color='dimgray')
         ax12.plot(range(len(self.price)), self.price, label = "price")
         ax12.set_title('Dec')
 
 #-----------------------------------------------------------------------------------------------#
 
         sub1.set_ylabel('Power')
-        sub1.bar(np.arange(95) ,self.monthlyRemain['1'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['1'][:] +self.monthlyHVAC['1'][:], color ='gray')  
-        sub1.bar(np.arange(95) ,self.monthlySocPower['1'][:] ,label = 'socPower',bottom=self.monthlyHVAC['1'][:],color ='silver')  
+        sub1.bar(np.arange(95) ,self.monthlyRemain['1'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['1'][:] +self.monthlyHVAC['1'][:], color ='gainsboro')  
+        sub1.bar(np.arange(95) ,self.monthlySocPower['1'][:] ,label = 'socPower',bottom=self.monthlyHVAC['1'][:],color ='dimgray')  
         sub1.bar(np.arange(95) ,self.monthlyHVAC['1'][:] ,label = 'HVAC',color ='red')  
 
         sub2.set_ylabel('Power')
-        sub2.bar(np.arange(95) ,self.monthlyRemain['2'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['2'][:] +self.monthlyHVAC['2'][:], color ='gray')  
-        sub2.bar(np.arange(95) ,self.monthlySocPower['2'][:] ,label = 'socPower',bottom=self.monthlyHVAC['2'][:],color ='silver')  
+        sub2.bar(np.arange(95) ,self.monthlyRemain['2'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['2'][:] +self.monthlyHVAC['2'][:], color ='gainsboro')  
+        sub2.bar(np.arange(95) ,self.monthlySocPower['2'][:] ,label = 'socPower',bottom=self.monthlyHVAC['2'][:],color ='dimgray')  
         sub2.bar(np.arange(95) ,self.monthlyHVAC['2'][:] ,label = 'HVAC',color ='red')  
 
         sub3.set_ylabel('Power')
-        sub3.bar(np.arange(95) ,self.monthlyRemain['3'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['3'][:] +self.monthlyHVAC['3'][:], color ='gray')  
-        sub3.bar(np.arange(95) ,self.monthlySocPower['3'][:] ,label = 'socPower',bottom=self.monthlyHVAC['3'][:],color ='silver')  
+        sub3.bar(np.arange(95) ,self.monthlyRemain['3'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['3'][:] +self.monthlyHVAC['3'][:], color ='gainsboro')  
+        sub3.bar(np.arange(95) ,self.monthlySocPower['3'][:] ,label = 'socPower',bottom=self.monthlyHVAC['3'][:],color ='dimgray')  
         sub3.bar(np.arange(95) ,self.monthlyHVAC['3'][:] ,label = 'HVAC',color ='red')  
 
         sub4.set_ylabel('Power')
-        sub4.bar(np.arange(95) ,self.monthlyRemain['4'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['4'][:] +self.monthlyHVAC['4'][:], color ='gray')  
-        sub4.bar(np.arange(95) ,self.monthlySocPower['4'][:] ,label = 'socPower',bottom=self.monthlyHVAC['4'][:],color ='silver')  
+        sub4.bar(np.arange(95) ,self.monthlyRemain['4'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['4'][:] +self.monthlyHVAC['4'][:], color ='gainsboro')  
+        sub4.bar(np.arange(95) ,self.monthlySocPower['4'][:] ,label = 'socPower',bottom=self.monthlyHVAC['4'][:],color ='dimgray')  
         sub4.bar(np.arange(95) ,self.monthlyHVAC['4'][:] ,label = 'HVAC',color ='red')  
 
         sub5.set_ylabel('Power')
-        sub5.bar(np.arange(95) ,self.monthlyRemain['5'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['5'][:] +self.monthlyHVAC['5'][:], color ='gray')  
-        sub5.bar(np.arange(95) ,self.monthlySocPower['5'][:] ,label = 'socPower',bottom=self.monthlyHVAC['5'][:],color ='silver')  
+        sub5.bar(np.arange(95) ,self.monthlyRemain['5'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['5'][:] +self.monthlyHVAC['5'][:], color ='gainsboro')  
+        sub5.bar(np.arange(95) ,self.monthlySocPower['5'][:] ,label = 'socPower',bottom=self.monthlyHVAC['5'][:],color ='dimgray')  
         sub5.bar(np.arange(95) ,self.monthlyHVAC['5'][:] ,label = 'HVAC',color ='red')  
 
         sub6.set_ylabel('Power')
-        sub6.bar(np.arange(95) ,self.monthlyRemain['6'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['6'][:] +self.monthlyHVAC['6'][:], color ='gray')  
-        sub6.bar(np.arange(95) ,self.monthlySocPower['6'][:] ,label = 'socPower',bottom=self.monthlyHVAC['6'][:],color ='silver')  
+        sub6.bar(np.arange(95) ,self.monthlyRemain['6'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['6'][:] +self.monthlyHVAC['6'][:], color ='gainsboro')  
+        sub6.bar(np.arange(95) ,self.monthlySocPower['6'][:] ,label = 'socPower',bottom=self.monthlyHVAC['6'][:],color ='dimgray')  
         sub6.bar(np.arange(95) ,self.monthlyHVAC['6'][:] ,label = 'HVAC',color ='red')  
 
         sub7.set_ylabel('Power')
-        sub7.bar(np.arange(95) ,self.monthlyRemain['7'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['7'][:] +self.monthlyHVAC['7'][:], color ='gray')  
-        sub7.bar(np.arange(95) ,self.monthlySocPower['7'][:] ,label = 'socPower',bottom=self.monthlyHVAC['7'][:],color ='silver')  
+        sub7.bar(np.arange(95) ,self.monthlyRemain['7'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['7'][:] +self.monthlyHVAC['7'][:], color ='gainsboro')  
+        sub7.bar(np.arange(95) ,self.monthlySocPower['7'][:] ,label = 'socPower',bottom=self.monthlyHVAC['7'][:],color ='dimgray')  
         sub7.bar(np.arange(95) ,self.monthlyHVAC['7'][:] ,label = 'HVAC',color ='red')  
 
         sub8.set_ylabel('Power')
-        sub8.bar(np.arange(95) ,self.monthlyRemain['8'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['8'][:] +self.monthlyHVAC['8'][:], color ='gray')  
-        sub8.bar(np.arange(95) ,self.monthlySocPower['8'][:] ,label = 'socPower',bottom=self.monthlyHVAC['8'][:],color ='silver')  
+        sub8.bar(np.arange(95) ,self.monthlyRemain['8'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['8'][:] +self.monthlyHVAC['8'][:], color ='gainsboro')  
+        sub8.bar(np.arange(95) ,self.monthlySocPower['8'][:] ,label = 'socPower',bottom=self.monthlyHVAC['8'][:],color ='dimgray')  
         sub8.bar(np.arange(95) ,self.monthlyHVAC['8'][:] ,label = 'HVAC',color ='red')  
 
         sub9.set_ylabel('Power')
-        sub9.bar(np.arange(95) ,self.monthlyRemain['9'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['9'][:] +self.monthlyHVAC['9'][:], color ='gray')  
-        sub9.bar(np.arange(95) ,self.monthlySocPower['9'][:] ,label = 'socPower',bottom=self.monthlyHVAC['9'][:],color ='silver')  
+        sub9.bar(np.arange(95) ,self.monthlyRemain['9'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['9'][:] +self.monthlyHVAC['9'][:], color ='gainsboro')  
+        sub9.bar(np.arange(95) ,self.monthlySocPower['9'][:] ,label = 'socPower',bottom=self.monthlyHVAC['9'][:],color ='dimgray')  
         sub9.bar(np.arange(95) ,self.monthlyHVAC['9'][:] ,label = 'HVAC',color ='red')  
 
         sub10.set_ylabel('Power')
-        sub10.bar(np.arange(95) ,self.monthlyRemain['10'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['10'][:]+self.monthlyHVAC['10'][:] , color ='gray')  
+        sub10.bar(np.arange(95) ,self.monthlyRemain['10'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['10'][:]+self.monthlyHVAC['10'][:] , color ='gainsboro')  
         sub10.bar(np.arange(95) ,self.monthlySocPower['10'][:] ,label = 'socPower',bottom=self.monthlyHVAC['10'][:], color ='red')  
         sub10.bar(np.arange(95) ,self.monthlyHVAC['10'][:] ,label = 'HVAC', color ='red')  
 
         sub11.set_ylabel('Power')
-        sub11.bar(np.arange(95) ,self.monthlyRemain['11'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['11'][:]+self.monthlyHVAC['11'][:] , color ='gray')  
-        sub11.bar(np.arange(95) ,self.monthlySocPower['11'][:] ,label = 'socPower',bottom=self.monthlyHVAC['11'][:],color ='silver')  
+        sub11.bar(np.arange(95) ,self.monthlyRemain['11'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['11'][:]+self.monthlyHVAC['11'][:] , color ='gainsboro')  
+        sub11.bar(np.arange(95) ,self.monthlySocPower['11'][:] ,label = 'socPower',bottom=self.monthlyHVAC['11'][:],color ='dimgray')  
         sub11.bar(np.arange(95) ,self.monthlyHVAC['11'][:] ,label = 'HVAC', color ='red')  
 
         sub12.set_ylabel('Power')
-        sub12.bar(np.arange(95) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['12'][:]+self.monthlyHVAC['12'][:] , color ='gray')  
-        sub12.bar(np.arange(95) ,self.monthlySocPower['12'][:] ,label = 'socPower',bottom=self.monthlyHVAC['12'][:],color ='silver')
+        sub12.bar(np.arange(95) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['12'][:]+self.monthlyHVAC['12'][:] , color ='gainsboro')  
+        sub12.bar(np.arange(95) ,self.monthlySocPower['12'][:] ,label = 'socPower',bottom=self.monthlyHVAC['12'][:],color ='dimgray')
         sub12.bar(np.arange(95) ,self.monthlyHVAC['12'][:] ,label = 'HVAC', color ='red')  
 
         fig.tight_layout()
