@@ -95,6 +95,10 @@ class MultiEnvTest():
             self.monthlyHVAC.insert(month,column=str(month+1),value=hvac)
             self.monthlyUserSetTemperature.insert(month,column=str(month+1),value=userSetTemperature)
 
+            self.monthlyIndoorTemperature = (self.monthlyIndoorTemperature-32) *5/9
+            self.monthlyOutdoorTemperature = (self.monthlyOutdoorTemperature-32) *5/9
+            self.monthlyUserSetTemperature = (self.monthlyUserSetTemperature-32) *5/9
+            
             load.clear()
             pv.clear()
             soc.clear()
@@ -106,9 +110,9 @@ class MultiEnvTest():
         print('Agent average episode reward: ', totalReward/12 )
 
     def __plotResult__(self):
-        plt.rcParams["figure.figsize"] = (12.8, 9.6)
+        plt.rcParams["figure.figsize"] = (12.8,9.6)
         fig,axes = plt.subplots(6,2)
-        plt.title("SOC and Price for each month")
+        #plt.title("SOC and Price for each month")
         ax1=axes[0,0]
         ax2=axes[0,1]
         ax3=axes[1,0]
@@ -134,62 +138,62 @@ class MultiEnvTest():
         sub11=ax11.twinx()
         sub12=ax12.twinx()
 
-        ax1.set_ylabel('SOC')
+        ax1.set_ylabel('SOC',color='dimgray')
         ax1.plot(range(len(self.monthlySoc['1'][:])), self.monthlySoc['1'][:], label = "Jan",color='dimgray')    
         ax1.plot(range(len(self.price)), self.price, label = "price")
         ax1.set_title('Jan')
 
-        ax2.set_ylabel('SOC')
+        ax2.set_ylabel('SOC',color='dimgray')
         ax2.plot(range(len(self.monthlySoc['2'][:])), self.monthlySoc['2'][:], label = "Feb",color='dimgray')
         ax2.plot(range(len(self.price)), self.price, label = "price")
         ax2.set_title('Feb')
 
-        ax3.set_ylabel('SOC')
+        ax3.set_ylabel('SOC',color='dimgray')
         ax3.plot(range(len(self.price)), self.price, label = "price")
         ax3.plot(range(len(self.monthlySoc['3'][:])), self.monthlySoc['3'][:], label = "Mar",color='dimgray')
         ax3.set_title('Mar')
 
-        ax4.set_ylabel('SOC')
+        ax4.set_ylabel('SOC',color='dimgray')
         ax4.plot(range(len(self.monthlySoc['4'][:])), self.monthlySoc['4'][:], label = "Apr",color='dimgray')
         ax4.plot(range(len(self.price)), self.price, label = "price")
         ax4.set_title('Apr')
 
-        ax5.set_ylabel('SOC')
+        ax5.set_ylabel('SOC',color='dimgray')
         ax5.plot(range(len(self.monthlySoc['5'][:])), self.monthlySoc['5'][:], label = "May",color='dimgray')
         ax5.plot(range(len(self.price)), self.price, label = "price")
         ax5.set_title('May')
 
-        ax6.set_ylabel('SOC')
+        ax6.set_ylabel('SOC',color='dimgray')
         ax6.plot(range(len(self.monthlySoc['6'][:])), self.monthlySoc['6'][:], label = "Jun",color='dimgray')
         ax6.plot(range(len(self.price)), self.price, label = "price")
         ax6.set_title('Jun')
 
-        ax7.set_ylabel('SOC')
+        ax7.set_ylabel('SOC',color='dimgray')
         ax7.plot(range(len(self.monthlySoc['7'][:])), self.monthlySoc['7'][:], label = "July",color='dimgray')
         ax7.plot(range(len(self.price)), self.price, label = "price")
         ax7.set_title('July')
 
-        ax8.set_ylabel('SOC')
+        ax8.set_ylabel('SOC',color='dimgray')
         ax8.plot(range(len(self.monthlySoc['8'][:])), self.monthlySoc['8'][:], label = "Aug",color='dimgray')
         ax8.plot(range(len(self.price)), self.price, label = "price")
         ax8.set_title('Aug')
 
-        ax9.set_ylabel('SOC')
+        ax9.set_ylabel('SOC',color='dimgray')
         ax9.plot(range(len(self.monthlySoc['9'][:])), self.monthlySoc['9'][:], label = "Sep",color='dimgray')
         ax9.plot(range(len(self.price)), self.price, label = "price")
         ax9.set_title('Sep')
 
-        ax10.set_ylabel('SOC')
+        ax10.set_ylabel('SOC',color='dimgray')
         ax10.plot(range(len(self.monthlySoc['10'][:])), self.monthlySoc['10'][:], label = "Oct",color='dimgray')
         ax10.plot(range(len(self.price)), self.price, label = "price")
         ax10.set_title('Oct')
 
-        ax11.set_ylabel('SOC')
+        ax11.set_ylabel('SOC',color='dimgray')
         ax11.plot(range(len(self.monthlySoc['11'][:])), self.monthlySoc['11'][:], label = "Nov",color='dimgray')
         ax11.plot(range(len(self.price)), self.price, label = "price")
         ax11.set_title('Nov')
 
-        ax12.set_ylabel('SOC')
+        ax12.set_ylabel('SOC',color='dimgray')
         ax12.plot(range(len(self.monthlySoc['12'][:])), self.monthlySoc['12'][:], label = "Dec",color='dimgray')
         ax12.plot(range(len(self.price)), self.price, label = "price")
         ax12.set_title('Dec')
@@ -255,6 +259,104 @@ class MultiEnvTest():
         sub12.bar(np.arange(95) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['12'][:]+self.monthlyHVAC['12'][:] , color ='gainsboro')  
         sub12.bar(np.arange(95) ,self.monthlySocPower['12'][:] ,label = 'socPower',bottom=self.monthlyHVAC['12'][:],color ='dimgray')
         sub12.bar(np.arange(95) ,self.monthlyHVAC['12'][:] ,label = 'HVAC', color ='red')  
+
+#------------------------------------------------------------------------------------------------------------------#
+
+        sub1a = ax1.twinx()
+        sub1a.spines['right'].set_position(("axes",1.1))
+        sub1a.tick_params(axis='y',colors = "orange")
+        sub1a.set_ylabel('Temperature',color='orange')
+        sub1a.plot(range(len(self.monthlyIndoorTemperature['1'][:])), self.monthlyIndoorTemperature['1'][:], label = "Jan",color='red')    
+        sub1a.plot(range(len(self.monthlyOutdoorTemperature['1'][:])), self.monthlyOutdoorTemperature['1'][:], label = "Jan",color='orange')    
+        sub1a.plot(range(len(self.monthlyUserSetTemperature['1'][:])), self.monthlyUserSetTemperature['1'][:], label = "Jan",color='black')
+
+        sub2a = ax2.twinx()
+        sub2a.spines['right'].set_position(("axes",1.1))
+        sub2a.tick_params(axis='y',colors = "orange")
+        sub2a.set_ylabel('Temperature',color='orange')
+        sub2a.plot(range(len(self.monthlyIndoorTemperature['2'][:])), self.monthlyIndoorTemperature['2'][:], label = "Feb",color='red')    
+        sub2a.plot(range(len(self.monthlyOutdoorTemperature['2'][:])), self.monthlyOutdoorTemperature['2'][:], label = "Feb",color='orange')    
+        sub2a.plot(range(len(self.monthlyUserSetTemperature['2'][:])), self.monthlyUserSetTemperature['2'][:], label = "Feb",color='black')
+
+        sub3a = ax3.twinx()
+        sub3a.spines['right'].set_position(("axes",1.1))
+        sub3a.tick_params(axis='y',colors = "orange")
+        sub3a.set_ylabel('Temperature',color='orange')
+        sub3a.plot(range(len(self.monthlyIndoorTemperature['3'][:])), self.monthlyIndoorTemperature['3'][:], label = "Mar",color='red')    
+        sub3a.plot(range(len(self.monthlyOutdoorTemperature['3'][:])), self.monthlyOutdoorTemperature['3'][:], label = "Mar",color='orange')    
+        sub3a.plot(range(len(self.monthlyUserSetTemperature['3'][:])), self.monthlyUserSetTemperature['3'][:], label = "Mar",color='black')
+
+        sub4a = ax4.twinx()
+        sub4a.spines['right'].set_position(("axes",1.1))
+        sub4a.tick_params(axis='y',colors = "orange")
+        sub4a.set_ylabel('Temperature',color='orange')
+        sub4a.plot(range(len(self.monthlyIndoorTemperature['4'][:])), self.monthlyIndoorTemperature['4'][:], label = "Apr",color='red')    
+        sub4a.plot(range(len(self.monthlyOutdoorTemperature['4'][:])), self.monthlyOutdoorTemperature['4'][:], label = "Apr",color='orange')    
+        sub4a.plot(range(len(self.monthlyUserSetTemperature['4'][:])), self.monthlyUserSetTemperature['4'][:], label = "Apr",color='black')
+
+        sub5a = ax5.twinx()
+        sub5a.spines['right'].set_position(("axes",1.1))
+        sub5a.tick_params(axis='y',colors = "orange")
+        sub5a.set_ylabel('Temperature',color='orange')
+        sub5a.plot(range(len(self.monthlyIndoorTemperature['5'][:])), self.monthlyIndoorTemperature['5'][:], label = "May",color='red')    
+        sub5a.plot(range(len(self.monthlyOutdoorTemperature['5'][:])), self.monthlyOutdoorTemperature['5'][:], label = "May",color='orange')    
+        sub5a.plot(range(len(self.monthlyUserSetTemperature['5'][:])), self.monthlyUserSetTemperature['5'][:], label = "May",color='black')
+
+        sub6a = ax6.twinx()
+        sub6a.spines['right'].set_position(("axes",1.1))
+        sub6a.tick_params(axis='y',colors = "orange")
+        sub6a.set_ylabel('Temperature',color='orange')
+        sub6a.plot(range(len(self.monthlyIndoorTemperature['6'][:])), self.monthlyIndoorTemperature['6'][:], label = "Jun",color='red')    
+        sub6a.plot(range(len(self.monthlyOutdoorTemperature['6'][:])), self.monthlyOutdoorTemperature['6'][:], label = "Jun",color='orange')    
+        sub6a.plot(range(len(self.monthlyUserSetTemperature['6'][:])), self.monthlyUserSetTemperature['6'][:], label = "Jun",color='black')
+
+        sub7a = ax7.twinx()
+        sub7a.spines['right'].set_position(("axes",1.1))
+        sub7a.tick_params(axis='y',colors = "orange")
+        sub7a.set_ylabel('Temperature',color='orange')
+        sub7a.plot(range(len(self.monthlyIndoorTemperature['7'][:])), self.monthlyIndoorTemperature['7'][:], label = "July",color='red')    
+        sub7a.plot(range(len(self.monthlyOutdoorTemperature['7'][:])), self.monthlyOutdoorTemperature['7'][:], label = "July",color='orange')    
+        sub7a.plot(range(len(self.monthlyUserSetTemperature['7'][:])), self.monthlyUserSetTemperature['7'][:], label = "July",color='black')
+
+        sub8a = ax8.twinx()
+        sub8a.spines['right'].set_position(("axes",1.1))
+        sub8a.tick_params(axis='y',colors = "orange")
+        sub8a.set_ylabel('Temperature',color='orange')
+        sub8a.plot(range(len(self.monthlyIndoorTemperature['8'][:])), self.monthlyIndoorTemperature['8'][:], label = "Aug",color='red')    
+        sub8a.plot(range(len(self.monthlyOutdoorTemperature['8'][:])), self.monthlyOutdoorTemperature['8'][:], label = "Aug",color='orange')    
+        sub8a.plot(range(len(self.monthlyUserSetTemperature['8'][:])), self.monthlyUserSetTemperature['8'][:], label = "Aug",color='black')
+
+        sub9a = ax9.twinx()
+        sub9a.spines['right'].set_position(("axes",1.1))
+        sub9a.tick_params(axis='y',colors = "orange")
+        sub9a.set_ylabel('Temperature',color='orange')
+        sub9a.plot(range(len(self.monthlyIndoorTemperature['9'][:])), self.monthlyIndoorTemperature['9'][:], label = "Sep",color='red')    
+        sub9a.plot(range(len(self.monthlyOutdoorTemperature['9'][:])), self.monthlyOutdoorTemperature['9'][:], label = "Sep",color='orange')    
+        sub9a.plot(range(len(self.monthlyUserSetTemperature['9'][:])), self.monthlyUserSetTemperature['9'][:], label = "Sep",color='black')
+
+        sub10a = ax10.twinx()
+        sub10a.spines['right'].set_position(("axes",1.1))
+        sub10a.tick_params(axis='y',colors = "orange")
+        sub10a.set_ylabel('Temperature',color='orange')
+        sub10a.plot(range(len(self.monthlyIndoorTemperature['10'][:])), self.monthlyIndoorTemperature['10'][:], label = "Oct",color='red')    
+        sub10a.plot(range(len(self.monthlyOutdoorTemperature['10'][:])), self.monthlyOutdoorTemperature['10'][:], label = "Oct",color='orange')    
+        sub10a.plot(range(len(self.monthlyUserSetTemperature['10'][:])), self.monthlyUserSetTemperature['10'][:], label = "Oct",color='black')
+
+        sub11a = ax11.twinx()
+        sub11a.spines['right'].set_position(("axes",1.1))
+        sub11a.tick_params(axis='y',colors = "orange")
+        sub11a.set_ylabel('Temperature',color='orange')
+        sub11a.plot(range(len(self.monthlyIndoorTemperature['11'][:])), self.monthlyIndoorTemperature['11'][:], label = "Nov",color='red')    
+        sub11a.plot(range(len(self.monthlyOutdoorTemperature['11'][:])), self.monthlyOutdoorTemperature['11'][:], label = "Nov",color='orange')    
+        sub11a.plot(range(len(self.monthlyUserSetTemperature['11'][:])), self.monthlyUserSetTemperature['11'][:], label = "Nov",color='black')
+
+        sub12a = ax12.twinx()
+        sub12a.spines['right'].set_position(("axes",1.1))
+        sub12a.tick_params(axis='y',colors = "orange")
+        sub12a.set_ylabel('Temperature',color='orange')
+        sub12a.plot(range(len(self.monthlyIndoorTemperature['12'][:])), self.monthlyIndoorTemperature['12'][:], label = "Dec",color='red')    
+        sub12a.plot(range(len(self.monthlyOutdoorTemperature['12'][:])), self.monthlyOutdoorTemperature['12'][:], label = "Dec",color='orange')    
+        sub12a.plot(range(len(self.monthlyUserSetTemperature['12'][:])), self.monthlyUserSetTemperature['12'][:], label = "Dec",color='black')
 
         fig.tight_layout()
         fig.savefig('pic/multi/Multiplot.png')
