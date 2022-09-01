@@ -95,9 +95,7 @@ class MultiEnvTest():
             self.monthlyHVAC.insert(month,column=str(month+1),value=hvac)
             self.monthlyUserSetTemperature.insert(month,column=str(month+1),value=userSetTemperature)
 
-            self.monthlyIndoorTemperature = (self.monthlyIndoorTemperature-32) *5/9
-            self.monthlyOutdoorTemperature = (self.monthlyOutdoorTemperature-32) *5/9
-            self.monthlyUserSetTemperature = (self.monthlyUserSetTemperature-32) *5/9
+
             
             load.clear()
             pv.clear()
@@ -108,6 +106,9 @@ class MultiEnvTest():
             userSetTemperature.clear()
             hvac.clear()
         print('Agent average episode reward: ', totalReward/12 )
+        self.monthlyIndoorTemperature = (self.monthlyIndoorTemperature-32) *5/9
+        self.monthlyOutdoorTemperature = (self.monthlyOutdoorTemperature-32) *5/9
+        self.monthlyUserSetTemperature = (self.monthlyUserSetTemperature-32) *5/9
 
     def __plotResult__(self):
         plt.rcParams["figure.figsize"] = (12.8,9.6)
