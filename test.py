@@ -99,7 +99,7 @@ class Test():
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
-                socPower.append(actions[0])
+                socPower.append(actions[0]*6)
                 load.append(states[1])
                 pv.append(states[2])
                 soc.append(states[3])
@@ -330,7 +330,10 @@ class Test():
 
             sub12.set_ylabel('Power')
             sub12.bar(np.arange(95) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['12'][:] , color ='gray')  
-            sub12.bar(np.arange(95) ,self.monthlySocPower['12'][:] ,label = 'socPower', color ='red')  
+            sub12.bar(np.arange(95) ,self.monthlySocPower['12'][:] ,label = 'socPower', color ='red') 
+
+            fig.tight_layout()
+            fig.savefig('pic/SOC/newestSocResult.png') 
 
         elif self.mode == 'load':
             ax1.plot(range(len(self.price)), self.price, label = "price")
@@ -429,7 +432,10 @@ class Test():
             sub12.set_ylabel('Power')
             sub12.bar(np.arange(95) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.acConsume['12'][:]+self.wmConsume['12'][:] , color ='gray')  
             sub12.bar(np.arange(95) ,self.wmConsume['12'][:] ,label = 'WM',bottom = self.acConsume['12'][:], color ='orange')  
-            sub12.bar(np.arange(95) ,self.acConsume['12'][:] ,label = 'AC', color ='green')  
+            sub12.bar(np.arange(95) ,self.acConsume['12'][:] ,label = 'AC', color ='green') 
+
+            fig.tight_layout()
+            fig.savefig('pic/Loads/newestLoadsResult.png') 
 
         elif self.mode == 'HVAC':
             
@@ -650,8 +656,8 @@ class Test():
             sub12a.plot(range(len(self.price)), self.price, label = "price")
 
 
-        fig.tight_layout()
-        fig.savefig('pic/plot.png')
+            fig.tight_layout()
+            fig.savefig('pic/HVAC/newestHvacResult.png')
 
 
     def showNnConfig(self):
@@ -666,5 +672,6 @@ class Test():
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print('please enter the mode: "soc" or "load" or "HVAC" ')
+        exit()
     test = Test(sys.argv[1])
     test.main()

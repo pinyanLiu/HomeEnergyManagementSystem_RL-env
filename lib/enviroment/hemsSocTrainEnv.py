@@ -67,7 +67,7 @@ class HemsEnv(Env):
             self.PV = self.allPV['Dec'].tolist()
 
         #action we take (degree of charging/discharging power)
-        self.action_space = spaces.Box(low=-0.2,high=0.2,shape=(1,),dtype=np.float32)
+        self.action_space = spaces.Box(low=-0.5,high=0.5,shape=(1,),dtype=np.float32)
         #observation space ( Only SOC matters )
         self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
         upperLimit = np.array(
@@ -126,19 +126,23 @@ class HemsEnv(Env):
         soc = soc+soc_change
         if soc > 1:
             soc = 1
+            reward.append(-0.5)
         elif soc < 0 :
             soc = 0
-        cost = pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity - pv  ) 
-        cost = (load+soc_change*self.batteryCapacity-pv)*pricePerHour
-        proportion = soc_change*self.batteryCapacity/(load+soc_change*self.batteryCapacity-pv)
-        cost= cost * proportion        
+            reward.append(-0.5)
+        if load+soc_change*self.batteryCapacity-pv<0:
+            cost = 0
+        else:
+            proportion = np.abs(soc_change*self.batteryCapacity / (load + soc_change*self.batteryCapacity - pv) )
+            cost =proportion*(pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity ))  
 
-        if sampleTime == 95 and soc >= self.socThreshold:
-            reward.append(10)
+
+        if (sampleTime == 94 and soc >= self.socThreshold):
+            reward.append(2)
 
         #REWARD
       #  if sampleTime!=95:
-        reward.append(-cost/1000)
+        reward.append(-cost)
 
 
         #change to next state

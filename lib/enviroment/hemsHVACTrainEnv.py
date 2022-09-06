@@ -191,36 +191,25 @@ class HemsEnv(Env):
         nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
 
         #calculate proportion
-        cost = (load+Power_HVAC-pv)*pricePerHour
-        proportion = Power_HVAC/(load+Power_HVAC-pv)
-        cost= cost * proportion
+        if (load+Power_HVAC-pv) < 0:
+            cost = 0
+        else:
+            proportion = np.abs(Power_HVAC/(load+Power_HVAC-pv))
+            cost = proportion*(load+Power_HVAC-pv)*pricePerHour*0.25
 
-        #REWARD
-        reward = []
         #temperature reward
-        # if nextIndoorTemperature < (self.max_temperature+self.min_temperature)/2:
-        #     r1 = 2*(nextIndoorTemperature-self.min_temperature)/(self.max_temperature-self.min_temperature)
-        # elif nextIndoorTemperature >= (self.max_temperature+self.min_temperature)/2:    
-        #     r1 = -2*(nextIndoorTemperature-self.max_temperature)/(self.max_temperature-self.min_temperature)
-        # if r1<-1:
-        #     r1 = -0.8
 
-        ##success one
-        # if nextIndoorTemperature > self.max_temperature:
-        #     r1 = nextIndoorTemperature-self.max_temperature
-        # elif nextIndoorTemperature < self.min_temperature:
-        #     r1 = 0
-        # else :
-        #     r1 = -3
 
         #new one
-        if indoorTemperature > userSetTemperature:
-            r1 = -abs(indoorTemperature-userSetTemperature)/9
+        if indoorTemperature > userSetTemperature :
+            r1 = -abs(indoorTemperature-userSetTemperature)/7
         else :
             r1 = 0
         #cost reward
-        r2 = -cost/6
+        r2 = -cost/2
 
+        #REWARD
+        reward = []
         reward.append(r1)
         reward.append(r2)
 

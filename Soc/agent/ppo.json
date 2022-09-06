@@ -23,11 +23,11 @@
     "actions": {
         "type": "float",
         "shape": 1,
-        "max_value": 0.2,
-        "min_value": -0.2
+        "max_value": 0.5,
+        "min_value": -0.5
     },
     "max_episode_timesteps": 96,
-    "batch_size": 96,
+    "batch_size": 200,
     "network": [
         {
             "type": "dense",

@@ -31,7 +31,7 @@
         "min_value": 0
     },
     "max_episode_timesteps": 96,
-    "batch_size": 120,
+    "batch_size": 240,
     "network": [
         {
             "type": "dense",
@@ -83,7 +83,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 6000,
+        "num_steps": 10000,
         "initial_value": 0.2,
         "final_value": 0.00001
     },
