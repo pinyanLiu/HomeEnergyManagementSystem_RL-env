@@ -77,9 +77,9 @@ class HemsEnv(Env):
                 #timeblock
                 96,
                 #load
-                80.0,
+                10.0,
                 #PV
-                20.0,
+                10.0,
                 #SOC
                 1.0,
                 #pricePerHour
@@ -129,15 +129,21 @@ class HemsEnv(Env):
         soc = soc+soc_change
         if soc > 1:
             soc = 1
-            reward.append(-0.5)
+            reward.append(-1)
         elif soc < 0 :
             soc = 0
-            reward.append(-0.5)
+            reward.append(-1)
+
+    #PgridMax reward
+        if (load+soc_change*self.batteryCapacity-pv)>self.PgridMax:
+            reward.append(-1)
+
+    #calculate cost proportion   
         if load+soc_change*self.batteryCapacity-pv<0:
             cost = 0
         else:
             proportion = np.abs(soc_change*self.batteryCapacity / (load + soc_change*self.batteryCapacity - pv) )
-            cost =proportion*(pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity ))  
+            cost = proportion*(pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity - pv ))  
 
 
         if (sampleTime == 94 and soc >= self.socThreshold):

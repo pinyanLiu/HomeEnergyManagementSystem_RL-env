@@ -26,6 +26,7 @@ class HemsEnv(Env):
 
         #import Base Parameter
         self.BaseParameter = self.info.importBaseParameter()
+        self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
         self.epsilon = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='epsilon']['value'])[0])
         self.eta = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='eta_HVAC']['value'])[0])
         self.A = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='A(KW/F)']['value'])[0])
@@ -42,8 +43,8 @@ class HemsEnv(Env):
         #import Load 
         self.allLoad = self.info.importTrainingLoad()
         self.Load = self.allLoad.iloc[:,i].tolist()
-        self.allPV = self.info.importPhotoVoltaic()
         #import PV
+        self.allPV = self.info.importPhotoVoltaic()
         if int( i / 30) == 0:
             self.PV = self.allPV['Jan'].tolist()
         elif int(i / 30) == 1:
@@ -134,9 +135,9 @@ class HemsEnv(Env):
                 #timeblock
                 96,
                 #load
-                80,
+                10,
                 #PV
-                20,
+                10,
                 #pricePerHour
                 6,
                 #indoor temperature
@@ -161,7 +162,7 @@ class HemsEnv(Env):
                 #indoor temperature
                 35,
                 #outdoor temperature
-                50,
+                35,
                 #user set temperature
                 35
             ],
@@ -198,21 +199,24 @@ class HemsEnv(Env):
             cost = proportion*(load+Power_HVAC-pv)*pricePerHour*0.25
 
         #temperature reward
-
-
-        #new one
         if indoorTemperature > userSetTemperature :
             r1 = -abs(indoorTemperature-userSetTemperature)/7
         else :
+            if indoorTemperature >= outdoorTemperature:
+                r1 = 0.01
             r1 = 0
         #cost reward
         r2 = -cost/2
+
 
         #REWARD
         reward = []
         reward.append(r1)
         reward.append(r2)
-
+        #Pgrid max reward
+        if (load+Power_HVAC-pv)>self.PgridMax:
+            reward.append(-1)
+            
         #change to next state
         sampleTime = int(sampleTime+1)
 

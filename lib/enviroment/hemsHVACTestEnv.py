@@ -133,9 +133,9 @@ class HemsEnv(Env):
                 #timeblock
                 96,
                 #load
-                80,
+                10,
                 #PV
-                20,
+                10,
                 #pricePerHour
                 6,
                 #indoor temperature
@@ -160,7 +160,7 @@ class HemsEnv(Env):
                 #indoor temperature
                 35,
                 #outdoor temperature
-                50,
+                35,
                 #user set temperature
                 35
             ],
@@ -197,21 +197,24 @@ class HemsEnv(Env):
             cost = proportion*(load+Power_HVAC-pv)*pricePerHour*0.25
 
         #temperature reward
-
-
-        #new one
         if indoorTemperature > userSetTemperature :
             r1 = -abs(indoorTemperature-userSetTemperature)/7
         else :
+            if indoorTemperature >= outdoorTemperature:
+                r1 = 0.01
             r1 = 0
         #cost reward
         r2 = -cost/2
+
 
         #REWARD
         reward = []
         reward.append(r1)
         reward.append(r2)
-
+        #Pgrid max reward
+        if (load+Power_HVAC-pv)>self.PgridMax:
+            reward.append(-1)
+            
         #change to next state
         sampleTime = int(sampleTime+1)
 

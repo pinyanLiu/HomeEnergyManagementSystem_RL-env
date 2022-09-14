@@ -14,8 +14,8 @@
         ],
         "max_value": [
             96.0,
-            80,
-            20,
+            10,
+            10,
             1.0,
             6.0
         ]
@@ -98,7 +98,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 3000,
+        "num_steps": 6000,
         "initial_value": 0.2,
         "final_value": 0.00001
     },
