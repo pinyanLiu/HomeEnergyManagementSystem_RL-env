@@ -11,7 +11,7 @@ def main(argv):
 
     if argv[1] == 'soc':
         environment = dict(environment='gym', level='Hems-v0')
-    elif argv[1] == 'load':
+    elif argv[1] == 'intload':
         environment = dict(environment='gym', level='Hems-v4')
     elif argv[1] == 'HVAC':    
         environment = dict(environment='gym', level='Hems-v6')

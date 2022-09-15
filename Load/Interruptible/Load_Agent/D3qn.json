@@ -3,32 +3,30 @@
     "states": {
         "type": "float",
         "shape": [
-            6
+            5
         ],
         "min_value": [
             0.0,
-            "-Infinity",
-            "-Infinity",
-            "-Infinity",
-            "-Infinity",
-            "-Infinity"
+            0.0,
+            0.0,
+            1.0,
+            -56.0
         ],
         "max_value": [
-            96.0,
-            "Infinity",
-            "Infinity",
-            "Infinity",
-            "Infinity",
-            "Infinity"
+            95.0,
+            10.0,
+            10.0,
+            6.0,
+            40.0
         ]
     },
     "actions": {
         "type": "int",
         "shape": [],
-        "num_values": 4
+        "num_values": 2
     },
     "max_episode_timesteps": 96,
-    "batch_size": 192,
+    "batch_size": 250,
     "network": [
         {
             "type": "dense",
@@ -76,12 +74,12 @@
     "parallel_interactions": 1,
     "config": null,
     "saver": {
-        "directory": "Load/saver_dir",
+        "directory": "Load/Interruptible/saver_dir",
         "frequency": 250,
         "unit": "episodes"
     },
     "summarizer": {
-        "directory": "Load/summaries",
+        "directory": "Load/InTerruptible/summaries",
         "summaries": "all"
     },
     "tracking": null,

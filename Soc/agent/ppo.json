@@ -27,7 +27,7 @@
         "min_value": -0.5
     },
     "max_episode_timesteps": 96,
-    "batch_size": 200,
+    "batch_size": 250,
     "network": [
         {
             "type": "dense",
@@ -35,17 +35,9 @@
             "activation": "relu"
         },
         {
-            "type": "dropout",
-            "rate": 0.2
-        },
-        {
             "type": "dense",
             "size": 100,
             "activation": "relu"
-        },
-        {
-            "type": "dropout",
-            "rate": 0.2
         },
         {
             "type": "dense",
@@ -71,17 +63,9 @@
             "activation": "relu"
         },
         {
-            "type": "dropout",
-            "rate": 0.2
-        },
-        {
             "type": "dense",
             "size": 75,
             "activation": "relu"
-        },
-        {
-            "type": "dropout",
-            "rate": 0.2
         },
         {
             "type": "dense",
@@ -99,7 +83,7 @@
         "decay": "linear",
         "unit": "episodes",
         "num_steps": 6000,
-        "initial_value": 0.2,
+        "initial_value": 0.3,
         "final_value": 0.00001
     },
     "variable_noise": 0.0,
