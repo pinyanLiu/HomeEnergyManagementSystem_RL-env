@@ -93,7 +93,7 @@
     "config": null,
     "saver": {
         "directory": "Soc/saver_dir",
-        "frequency": 100,
+        "frequency": 500,
         "unit": "episodes"
     },
     "summarizer": {

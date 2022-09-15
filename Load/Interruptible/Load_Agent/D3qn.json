@@ -64,7 +64,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 1000,
+        "num_steps": 500,
         "initial_value": 0.99,
         "final_value": 0.00001
     },
@@ -79,7 +79,7 @@
         "unit": "episodes"
     },
     "summarizer": {
-        "directory": "Load/InTerruptible/summaries",
+        "directory": "Load/Interruptible/summaries",
         "summaries": "all"
     },
     "tracking": null,
