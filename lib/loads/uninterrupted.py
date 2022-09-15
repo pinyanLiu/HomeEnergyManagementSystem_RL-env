@@ -2,7 +2,7 @@ class UninterruptedLoad():
     def __init__(self,demand,AvgPowerConsume,executePeriod):
         self.switch = False
         self.AvgPowerConsume = AvgPowerConsume
-        self.demand = demand  # unit : timeblock
+        self.demand = demand  # # How many times you want the load to execute
         self.alreadyTurnOn = 0  # for calculating the execute time in whole day
         self.alreadyTurnOnInPeriod = 0 # for calculating the execute time in per period
         self.executePeriod = executePeriod # unit : timeblock 
