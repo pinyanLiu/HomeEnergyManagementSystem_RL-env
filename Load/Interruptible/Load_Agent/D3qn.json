@@ -26,11 +26,11 @@
         "num_values": 2
     },
     "max_episode_timesteps": 96,
-    "batch_size": 250,
+    "batch_size": 500,
     "network": [
         {
             "type": "dense",
-            "size": 75,
+            "size": 200,
             "activation": "relu"
         },
         {
@@ -39,7 +39,7 @@
         },
         {
             "type": "dense",
-            "size": 75,
+            "size": 200,
             "activation": "relu"
         },
         {
@@ -48,15 +48,15 @@
         },
         {
             "type": "dense",
-            "size": 75,
+            "size": 200,
             "activation": "relu"
         }
     ],
     "memory": 600,
     "start_updating": 1000,
     "update_frequency": 0.1,
-    "learning_rate": 0.001,
-    "discount": 0.97,
+    "learning_rate": 0.0001,
+    "discount": 0.995,
     "return_processing": null,
     "predict_terminal_values": false,
     "state_preprocessing": "linear_normalization",
@@ -64,7 +64,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 500,
+        "num_steps": 5000,
         "initial_value": 0.99,
         "final_value": 0.00001
     },

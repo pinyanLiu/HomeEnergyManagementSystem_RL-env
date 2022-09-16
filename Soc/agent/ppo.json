@@ -31,17 +31,17 @@
     "network": [
         {
             "type": "dense",
-            "size": 100,
+            "size": 200,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 100,
+            "size": 200,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 100,
+            "size": 200,
             "activation": "relu"
         }
     ],
@@ -59,17 +59,17 @@
     "baseline": [
         {
             "type": "dense",
-            "size": 75,
+            "size": 150,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 75,
+            "size": 150,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 75,
+            "size": 150,
             "activation": "relu"
         }
     ],
@@ -82,7 +82,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 6000,
+        "num_steps": 10000,
         "initial_value": 0.3,
         "final_value": 0.00001
     },

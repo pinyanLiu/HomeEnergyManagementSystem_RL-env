@@ -23,7 +23,7 @@ class InterruptedLoad():
         return -((self.alreadyTurnOn-self.demand)/self.demand)
 
     def reachDemand(self):
-        return (self.alreadyTurnOn >= self.demand)
+        return (self.alreadyTurnOn == self.demand)
 
     def getPowerConsume(self):
         return (self.alreadyTurnOn * self.AvgPowerConsume)
