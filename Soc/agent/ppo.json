@@ -3,28 +3,30 @@
     "states": {
         "type": "float",
         "shape": [
-            5
+            6
         ],
         "min_value": [
             0,
             0,
             0,
             0,
-            1
+            1,
+            0.6
         ],
         "max_value": [
             96.0,
             10,
             10,
             1.0,
-            6.0
+            6.0,
+            1.35
         ]
     },
     "actions": {
         "type": "float",
         "shape": 1,
-        "max_value": 0.5,
-        "min_value": -0.5
+        "max_value": 0.15,
+        "min_value": -0.15
     },
     "max_episode_timesteps": 96,
     "batch_size": 250,

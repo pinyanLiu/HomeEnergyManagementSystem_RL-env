@@ -27,9 +27,6 @@ class HemsEnv(Env):
         #import Base Parameter
         self.BaseParameter = self.info.importBaseParameter()
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
-        self.batteryCapacity = int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
-        self.socInit = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCinit']['value'])[0])
-        self.socThreshold = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0])
 
         #import Grid price
         self.GridPrice = self.info.importGridPrice()
@@ -67,9 +64,7 @@ class HemsEnv(Env):
             self.PV = self.allPV['Nov'].tolist()
         elif self.i  == 11:
             self.PV = self.allPV['Dec'].tolist()
-        self.interruptableLoad = AC(demand=20,AvgPowerConsume=1.5)
-
-        self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
+        self.interruptibleLoad = AC(demand=3,AvgPowerConsume=1.5)
         self.state = None
         # Interruptable load's actions  ( 1.on 2.off )
         self.action_space = spaces.Discrete(2)
@@ -86,7 +81,7 @@ class HemsEnv(Env):
                 #pricePerHour
                 6.0,
                 #Interruptable Remain
-                40.0,
+                4.0,
             ],
             dtype=np.float32,
         )
@@ -101,13 +96,13 @@ class HemsEnv(Env):
                 #pricePerHour
                 1.0,
                 #Interruptable Remain
-                -56.0,
+                0.0,
             ],
             dtype=np.float32,
         )
         self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
         self.state = None
-        
+
     def step(self,action):
         '''
         interaction of each state(changes while taking action)
@@ -124,53 +119,42 @@ class HemsEnv(Env):
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain)
         sampleTime,load,pv,pricePerHour,IntRemain, = self.state
-        
 
-        '''
-        There are 3 kind of penalty
-            1. Cost . The higher the cost , the higher the penalty
-            2. Wrong act in WM . If agent ask WM to stop while WM still haven't reach the Execute period .
-            3. Turn on too much . IF agent ask AC or WM to turn on while they have already reach the daily goal
-
-        There is one mix reward (can be reward or penalty , depends on the state and action )
-            1. Remain . Get reward if the agent ask AC or WM to turn on while there's still remain time steps need to be turned on . Get penalty if the agent ask AC or WM to turn on while they have already reach the Executed period . 
-        '''
 
 
         # 1. on 
-        if action == 0 :
-            self.interruptableLoad.turn_on()
+        if action == 0 and IntRemain>0:
+            self.interruptibleLoad.turn_on()
+            reward.append(0.25)
             #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-            if (load +self.interruptableLoad.AvgPowerConsume - pv) < 0:
+            if (load + self.interruptibleLoad.AvgPowerConsume - pv) < 0:
                 cost = 0 #encourage agent turn on loads when pv is high
             #PgridMax reward
-            elif(load+self.interruptableLoad.AvgPowerConsume-pv>self.PgridMax):
+            elif(load+self.interruptibleLoad.AvgPowerConsume-pv>self.PgridMax):
                 reward.append(-1)
 
             #calculate cost and proportion
             else:
-                proportion = np.abs(self.interruptableLoad.AvgPowerConsume / (load + self.interruptableLoad.AvgPowerConsume - pv) )
-                cost = proportion*(pricePerHour * 0.25 *( load + self.interruptableLoad.AvgPowerConsume - pv ))  
+                proportion = np.abs(self.interruptibleLoad.AvgPowerConsume / (load + self.interruptibleLoad.AvgPowerConsume - pv) )
+                cost = proportion*(pricePerHour * 0.25 *( load + self.interruptibleLoad.AvgPowerConsume - pv ))  
 
         #2.  off
         elif action == 1 : 
-            self.interruptableLoad.turn_off()
+            self.interruptibleLoad.turn_off()
             cost = 0
 
-        reward.append(-cost)
+        reward.append(-0.1*cost+0.2)
 
+        if (sampleTime == 95) and (self.interruptibleLoad.getRemainDemand()!=0):
+            reward.append(-2)
+            
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.interruptableLoad.getRemainDemand()])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.interruptibleLoad.getRemainDemand()])
 
         #check if all day is done
         done =  bool(sampleTime == 95)
         #REWARD
-        if done == True:
-            if IntRemain == 0:
-                reward.append(10)
-            else:
-                reward.append(-10)
 
 
         reward = sum(reward)
@@ -186,8 +170,8 @@ class HemsEnv(Env):
         Starting State
         '''
         #each month pick one day for testing
-        self.interruptableLoad.reset()
-        self.interruptableLoad = AC(demand=20,AvgPowerConsume=1.5)
+        self.interruptibleLoad.reset()
+        self.interruptibleLoad = AC(demand=3,AvgPowerConsume=1.5)
         self.i += 1
         self.Load = self.allLoad.iloc[:,self.i].tolist()
 
@@ -217,7 +201,7 @@ class HemsEnv(Env):
         elif self.i  == 11:
             self.PV = self.allPV['Dec'].tolist()
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.interruptableLoad.demand])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.interruptibleLoad.demand])
         return self.state
 
 

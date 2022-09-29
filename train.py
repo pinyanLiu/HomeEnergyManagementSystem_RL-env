@@ -5,7 +5,7 @@ import sys
 
 def main(argv):
     if len(argv)<4:
-        print('please give parameters 1.Training mode: "soc"/"load"/"HVAC" 2.Agent 3. training episode ')
+        print('please give parameters 1.Training mode: "soc"/"intload"/"HVAC" 2.Agent 3. training episode ')
         return
     agent = argv[2]
 

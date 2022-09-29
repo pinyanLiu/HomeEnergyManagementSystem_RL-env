@@ -68,13 +68,13 @@ class HemsEnv(Env):
             self.PV = self.allPV['Dec'].tolist()
 
         #action we take (degree of charging/discharging power)
-        self.action_space = spaces.Box(low=-0.5,high=0.5,shape=(1,),dtype=np.float32)
+        self.action_space = spaces.Box(low=-0.1,high=0.1,shape=(1,),dtype=np.float32)
         #observation space ( Only SOC matters )
-        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour'])
+        self.observation_space_name = np.array(['sampleTime', 'load', 'pv', 'SOC', 'pricePerHour','degradationCost'])
         upperLimit = np.array(
             [
                 #timeblock
-                96,
+                95,
                 #load
                 10.0,
                 #PV
@@ -83,6 +83,8 @@ class HemsEnv(Env):
                 1.0,
                 #pricePerHour
                 6.0,
+                #degradationCost
+                1.35
             ],
             dtype=np.float32,
         )
@@ -98,6 +100,8 @@ class HemsEnv(Env):
                 0.0,         
                 #pricePerHour
                 1.0,
+                #degradationCost
+                0.6
             ],
             dtype=np.float32,
         )
@@ -115,8 +119,8 @@ class HemsEnv(Env):
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action),err_msg
 
-    #STATE (sampleTime,Load,PV,SOC,pricePerHour)
-        sampleTime,load,pv,soc,pricePerHour = self.state
+    #STATE (sampleTime,Load,PV,SOC,pricePerHour,degradationCost)
+        sampleTime,load,pv,soc,pricePerHour,degradationCost = self.state
         soc_change = float(action)
         # action(soc_change) is the degree of charging/discharging power .
         # if soc_change > 0 means charging , whereas soc_change < 0 means discharging.
@@ -124,6 +128,8 @@ class HemsEnv(Env):
 
     #interaction
         reward = []
+        cost = 0
+        degradationCost = 30*(-0.012*np.power(1-soc,4)+0.033*np.power(1-soc,3)+0.021*np.power(1-soc,2)-0.056*(1-soc)+0.043)
         soc = soc+soc_change
         if soc > 1:
             soc = 1
@@ -131,25 +137,26 @@ class HemsEnv(Env):
         elif soc < 0 :
             soc = 0
             reward.append(-1)
-
-    #PgridMax reward
-        if (load+soc_change*self.batteryCapacity-pv)>self.PgridMax:
-            reward.append(-1)
-
-    #calculate cost proportion   
-        if load+soc_change*self.batteryCapacity-pv<0:
-            cost = 0
         else:
-            proportion = np.abs(soc_change*self.batteryCapacity / (load + soc_change*self.batteryCapacity - pv) )
-            cost = proportion*(pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity - pv ))  
+            #calculate cost proportion   
+            if load+soc_change*self.batteryCapacity-pv<0:
+                cost = degradationCost*abs(soc_change)*self.batteryCapacity
+            #PgridMax penalty
+            elif (load+soc_change*self.batteryCapacity-pv)>self.PgridMax:
+                reward.append(-1)
+            else:
+                #proportion = np.abs(soc_change*self.batteryCapacity / (load + soc_change*self.batteryCapacity - pv) )
+                cost = (pricePerHour * 0.25 *( load + soc_change*self.batteryCapacity-pv )) + degradationCost*abs(soc_change)*self.batteryCapacity
 
 
-        if (sampleTime == 94 and soc >= self.socThreshold):
+
+
+        if (sampleTime == 95 and soc >= self.socThreshold):
             reward.append(2)
 
         #REWARD
       #  if sampleTime!=95:
-        reward.append(-cost)
+        reward.append(-0.1*cost)
 
 
         #change to next state
@@ -161,7 +168,7 @@ class HemsEnv(Env):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime],degradationCost])
 
 
 
@@ -209,7 +216,7 @@ class HemsEnv(Env):
 
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.socInit,self.GridPrice[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.socInit,self.GridPrice[0],30*(-0.012*np.power(1-self.socInit,4)+0.033*np.power(1-self.socInit,3)+0.021*np.power(1-self.socInit,2)-0.056*(1-self.socInit)+0.043)])
         return self.state
 
 
@@ -223,4 +230,4 @@ if __name__ == '__main__':
     while not done: # Episode timestep
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
-        print(info)
+        print(states)

@@ -85,10 +85,12 @@ class Test():
         load = []
         socPower = []
         pv = []
+        degradation = []
         totalReward = 0
         self.monthlySoc = pd.DataFrame()
         self.monthlySocPower = pd.DataFrame()
         self.monthlyRemain = pd.DataFrame()
+        self.monthlyDegradation = pd.DataFrame()
         self.price = []
         for month in range(12):
             states = self.environment.reset()
@@ -103,28 +105,29 @@ class Test():
                 load.append(states[1])
                 pv.append(states[2])
                 soc.append(states[3])
+                degradation.append(states[5])
                 totalReward += reward
                 if month == 11:
                     self.price.append(states[4])
 
             remain = [load[sampletime]-pv[sampletime] for sampletime in range(95)]
             #normalize price to [0,1]
-            self.price = [(self.price[month]-np.min(self.price))/(np.max(self.price)-np.min(self.price)) for month in range(len(self.price))]  
+            #self.price = [(self.price[month]-np.min(self.price))/(np.max(self.price)-np.min(self.price)) for month in range(len(self.price))]  
             self.monthlySoc.insert(month,column=str(month+1),value=soc)
             self.monthlySocPower.insert(month,column=str(month+1),value=socPower)
-            # monthlyLoad.insert(month,column=str(month+1),value=load)
-            # monthlyPv.insert(month,column=str(month+1),value=pv)
             self.monthlyRemain.insert(month,column=str(month+1),value=remain)
+            self.monthlyDegradation.insert(month,column=str(month+1),value=degradation)
             load.clear()
             pv.clear()
             soc.clear()
             socPower.clear()
+            degradation.clear()
         print('Agent average episode reward: ', totalReward/12 )
 
     def __testInInterruptibleLoad__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v5')
         self.agent = Agent.load(directory = 'Load/Interruptible/saver_dir',environment=self.environment)
-        ac_object = AC(demand=5,AvgPowerConsume=1.5)
+        ac_object = AC(demand=60,AvgPowerConsume=1.5)
         load = []
         pv = []
         ac = []
@@ -142,11 +145,11 @@ class Test():
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
                 #1. AC on 
-                if actions == 0:
+                if actions == 0 and ac_object.getRemainDemand()>0:
                     ac_object.turn_on()
                     ac.append(ac_object.AvgPowerConsume)#power
                 #2. AC off 
-                elif actions == 1:
+                else :
                     ac_object.turn_off()
                     ac.append(0)
 
@@ -160,6 +163,7 @@ class Test():
             #normalize price to [0,1]
             self.monthlyRemain.insert(month,column=str(month+1),value=remain)
             self.acConsume.insert(month,column=str(month+1),value=ac)
+            ac_object.reset()
             ac.clear()
             load.clear()
             pv.clear()
@@ -196,63 +200,63 @@ class Test():
 
         if self.mode == 'soc':
             ax1.set_ylabel('SOC')
+            ax1.set_ylim(0,1)
             ax1.plot(range(len(self.monthlySoc['1'][:])), self.monthlySoc['1'][:], label = "Jan",color='red')    
-            ax1.plot(range(len(self.price)), self.price, label = "price")
             ax1.set_title('Jan')
 
             ax2.set_ylabel('SOC')
+            ax2.set_ylim(0,1)
             ax2.plot(range(len(self.monthlySoc['2'][:])), self.monthlySoc['2'][:], label = "Feb",color='red')
-            ax2.plot(range(len(self.price)), self.price, label = "price")
             ax2.set_title('Feb')
 
             ax3.set_ylabel('SOC')
-            ax3.plot(range(len(self.price)), self.price, label = "price")
+            ax3.set_ylim(0,1)
             ax3.plot(range(len(self.monthlySoc['3'][:])), self.monthlySoc['3'][:], label = "Mar",color='red')
             ax3.set_title('Mar')
 
             ax4.set_ylabel('SOC')
+            ax4.set_ylim(0,1)
             ax4.plot(range(len(self.monthlySoc['4'][:])), self.monthlySoc['4'][:], label = "Apr",color='red')
-            ax4.plot(range(len(self.price)), self.price, label = "price")
             ax4.set_title('Apr')
 
             ax5.set_ylabel('SOC')
+            ax5.set_ylim(0,1)
             ax5.plot(range(len(self.monthlySoc['5'][:])), self.monthlySoc['5'][:], label = "May",color='red')
-            ax5.plot(range(len(self.price)), self.price, label = "price")
             ax5.set_title('May')
 
             ax6.set_ylabel('SOC')
+            ax6.set_ylim(0,1)
             ax6.plot(range(len(self.monthlySoc['6'][:])), self.monthlySoc['6'][:], label = "Jun",color='red')
-            ax6.plot(range(len(self.price)), self.price, label = "price")
             ax6.set_title('Jun')
 
             ax7.set_ylabel('SOC')
+            ax7.set_ylim(0,1)
             ax7.plot(range(len(self.monthlySoc['7'][:])), self.monthlySoc['7'][:], label = "July",color='red')
-            ax7.plot(range(len(self.price)), self.price, label = "price")
             ax7.set_title('July')
 
             ax8.set_ylabel('SOC')
+            ax8.set_ylim(0,1)
             ax8.plot(range(len(self.monthlySoc['8'][:])), self.monthlySoc['8'][:], label = "Aug",color='red')
-            ax8.plot(range(len(self.price)), self.price, label = "price")
             ax8.set_title('Aug')
 
             ax9.set_ylabel('SOC')
+            ax9.set_ylim(0,1)
             ax9.plot(range(len(self.monthlySoc['9'][:])), self.monthlySoc['9'][:], label = "Sep",color='red')
-            ax9.plot(range(len(self.price)), self.price, label = "price")
             ax9.set_title('Sep')
 
             ax10.set_ylabel('SOC')
+            ax10.set_ylim(0,1)
             ax10.plot(range(len(self.monthlySoc['10'][:])), self.monthlySoc['10'][:], label = "Oct",color='red')
-            ax10.plot(range(len(self.price)), self.price, label = "price")
             ax10.set_title('Oct')
 
             ax11.set_ylabel('SOC')
+            ax11.set_ylim(0,1)
             ax11.plot(range(len(self.monthlySoc['11'][:])), self.monthlySoc['11'][:], label = "Nov",color='red')
-            ax11.plot(range(len(self.price)), self.price, label = "price")
             ax11.set_title('Nov')
 
             ax12.set_ylabel('SOC')
+            ax12.set_ylim(0,1)
             ax12.plot(range(len(self.monthlySoc['12'][:])), self.monthlySoc['12'][:], label = "Dec",color='red')
-            ax12.plot(range(len(self.price)), self.price, label = "price")
             ax12.set_title('Dec')
 
             sub1.set_ylabel('Power')
@@ -302,6 +306,90 @@ class Test():
             sub12.set_ylabel('Power')
             sub12.bar(np.arange(95) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.monthlySocPower['12'][:] , color ='gray')  
             sub12.bar(np.arange(95) ,self.monthlySocPower['12'][:] ,label = 'socPower', color ='red') 
+
+            sub1a = ax1.twinx()
+            sub1a.spines['right'].set_position(("axes",1.1))
+            sub1a.tick_params(axis='y',colors = "blue")
+            sub1a.set_ylabel('price',color='blue')
+            sub1a.plot(range(len(self.price)), self.price, label = "price")
+            sub1a.plot(range(len(self.monthlyDegradation['1'][:])), self.monthlyDegradation['1'][:], label = "degradation")
+
+            sub2a = ax2.twinx()
+            sub2a.spines['right'].set_position(("axes",1.1))
+            sub2a.tick_params(axis='y',colors = "blue")
+            sub2a.set_ylabel('price',color='blue')
+            sub2a.plot(range(len(self.price)), self.price, label = "price")
+            sub2a.plot(range(len(self.monthlyDegradation['2'][:])), self.monthlyDegradation['2'][:], label = "degradation")
+
+            sub3a = ax3.twinx()
+            sub3a.spines['right'].set_position(("axes",1.1))
+            sub3a.tick_params(axis='y',colors = "blue")
+            sub3a.set_ylabel('price',color='blue')
+            sub3a.plot(range(len(self.price)), self.price, label = "price")
+            sub3a.plot(range(len(self.monthlyDegradation['3'][:])), self.monthlyDegradation['3'][:], label = "degradation")
+
+            sub4a = ax4.twinx()
+            sub4a.spines['right'].set_position(("axes",1.1))
+            sub4a.tick_params(axis='y',colors = "blue")
+            sub4a.set_ylabel('price',color='blue')
+            sub4a.plot(range(len(self.price)), self.price, label = "price")
+            sub4a.plot(range(len(self.monthlyDegradation['4'][:])), self.monthlyDegradation['4'][:], label = "degradation")
+
+            sub5a = ax5.twinx()
+            sub5a.spines['right'].set_position(("axes",1.1))
+            sub5a.tick_params(axis='y',colors = "blue")
+            sub5a.set_ylabel('price',color='blue')
+            sub5a.plot(range(len(self.price)), self.price, label = "price")
+            sub5a.plot(range(len(self.monthlyDegradation['5'][:])), self.monthlyDegradation['5'][:], label = "degradation")
+
+            sub6a = ax6.twinx()
+            sub6a.spines['right'].set_position(("axes",1.1))
+            sub6a.tick_params(axis='y',colors = "blue")
+            sub6a.set_ylabel('price',color='blue')
+            sub6a.plot(range(len(self.price)), self.price, label = "price")
+            sub6a.plot(range(len(self.monthlyDegradation['6'][:])), self.monthlyDegradation['6'][:], label = "degradation")
+
+            sub7a = ax7.twinx()
+            sub7a.spines['right'].set_position(("axes",1.1))
+            sub7a.tick_params(axis='y',colors = "blue")
+            sub7a.set_ylabel('price',color='blue')
+            sub7a.plot(range(len(self.price)), self.price, label = "price")
+            sub7a.plot(range(len(self.monthlyDegradation['7'][:])), self.monthlyDegradation['7'][:], label = "degradation")
+
+            sub8a = ax8.twinx()
+            sub8a.spines['right'].set_position(("axes",1.1))
+            sub8a.tick_params(axis='y',colors = "blue")
+            sub8a.set_ylabel('price',color='blue')
+            sub8a.plot(range(len(self.price)), self.price, label = "price")
+            sub8a.plot(range(len(self.monthlyDegradation['8'][:])), self.monthlyDegradation['8'][:], label = "degradation")
+
+            sub9a = ax9.twinx()
+            sub9a.spines['right'].set_position(("axes",1.1))
+            sub9a.tick_params(axis='y',colors = "blue")
+            sub9a.set_ylabel('price',color='blue')
+            sub9a.plot(range(len(self.price)), self.price, label = "price")
+            sub9a.plot(range(len(self.monthlyDegradation['9'][:])), self.monthlyDegradation['9'][:], label = "degradation")
+
+            sub10a = ax10.twinx()
+            sub10a.spines['right'].set_position(("axes",1.1))
+            sub10a.tick_params(axis='y',colors = "blue")
+            sub10a.set_ylabel('price',color='blue')
+            sub10a.plot(range(len(self.price)), self.price, label = "price")
+            sub10a.plot(range(len(self.monthlyDegradation['10'][:])), self.monthlyDegradation['10'][:], label = "degradation")
+
+            sub11a = ax11.twinx()
+            sub11a.spines['right'].set_position(("axes",1.1))
+            sub11a.tick_params(axis='y',colors = "blue")
+            sub11a.set_ylabel('price',color='blue')
+            sub11a.plot(range(len(self.price)), self.price, label = "price")
+            sub11a.plot(range(len(self.monthlyDegradation['11'][:])), self.monthlyDegradation['11'][:], label = "degradation")
+
+            sub12a = ax12.twinx()
+            sub12a.spines['right'].set_position(("axes",1.1))
+            sub12a.tick_params(axis='y',colors = "blue")
+            sub12a.set_ylabel('price',color='blue')
+            sub12a.plot(range(len(self.price)), self.price, label = "price")
+            sub12a.plot(range(len(self.monthlyDegradation['12'][:])), self.monthlyDegradation['12'][:], label = "degradation")
 
             fig.tight_layout()
             fig.savefig('pic/SOC/newestSocResult.png') 
