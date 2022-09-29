@@ -44,7 +44,7 @@ class UninterruptedLoad():
 
 #WM(washing machine) is sub class of uninterruptedLoad
 class WM(UninterruptedLoad):
-    def __init__(self, demand = 2,executePeriod = 3, AvgPowerConsume = 420):
+    def __init__(self, demand = 2,executePeriod = 3, AvgPowerConsume = 4.2):
         super().__init__(demand,executePeriod ,AvgPowerConsume)
     def turn_on(self):
         self.switch = True
@@ -95,13 +95,14 @@ if __name__ == '__main__':
             wm.turn_on()
         if i == 9:
             wm.turn_on()
+        if i == 15:
+            wm.turn_on()
         wm.step()
         if wm.reachDemand():
             print('---reach demand---')
             
         if wm.reachExecutePeriod():
             print('---reach Period---')
-        print('remaindemand',wm.getRemainDemand())
-        print('powerConsume',wm.getPowerConsume())
+
 
     print(wm.getStatus())
