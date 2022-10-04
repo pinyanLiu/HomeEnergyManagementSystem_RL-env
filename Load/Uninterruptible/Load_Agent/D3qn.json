@@ -1,0 +1,80 @@
+{
+    "agent": "dueling_dqn",
+    "states": {
+        "type": "float",
+        "shape": [
+            5
+        ],
+        "min_value": [
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
+        ],
+        "max_value": [
+            95.0,
+            10.0,
+            10.0,
+            6.0,
+            50.0
+        ]
+    },
+    "actions": {
+        "type": "int",
+        "shape": [],
+        "num_values": 2
+    },
+    "max_episode_timesteps": 96,
+    "batch_size": 500,
+    "network": [
+        {
+            "type": "dense",
+            "size": 200,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 200,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 200,
+            "activation": "relu"
+        }
+    ],
+    "memory": 600,
+    "start_updating": 1000,
+    "update_frequency": 0.5,
+    "learning_rate": 0.0001,
+    "discount": 0.97,
+    "return_processing": null,
+    "predict_terminal_values": false,
+    "state_preprocessing": "linear_normalization",
+    "exploration": {
+        "type": "decaying",
+        "decay": "exponential",
+        "unit": "episodes",
+        "initial_value": 1.0,
+        "num_steps": 1000,
+        "decay_rate": 0.995,
+        "staircase": false
+    },
+    "variable_noise": 0.0,
+    "l2_regularization": 0.0,
+    "entropy_regularization": 0.0,
+    "parallel_interactions": 1,
+    "config": null,
+    "saver": {
+        "directory": "Load/UnInterruptible/saver_dir",
+        "frequency": 250,
+        "unit": "episodes"
+    },
+    "summarizer": {
+        "directory": "Load/UnInterruptible/summaries",
+        "summaries": "all"
+    },
+    "tracking": null,
+    "recorder": null
+}

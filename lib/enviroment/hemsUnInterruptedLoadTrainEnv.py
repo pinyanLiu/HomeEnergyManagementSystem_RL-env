@@ -218,7 +218,7 @@ class HemsEnv(Env):
 
 
 if __name__ == '__main__':
-    env = make("Hems-v4")
+    env = make("Hems-v8")
 #     # Initialize episode
     states = env.reset()
     done = False
