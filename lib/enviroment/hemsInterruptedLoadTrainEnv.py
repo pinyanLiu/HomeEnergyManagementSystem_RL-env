@@ -30,9 +30,10 @@ class HemsEnv(Env):
 
 
         #import Grid price
-        self.GridPrice = self.info.importGridPrice()
-        self.GridPrice = self.GridPrice['price_value'].tolist()
-        
+        #self.GridPrice = self.info.importGridPrice()
+        #self.GridPrice = self.GridPrice['price_value'].tolist()
+        self.GridPrice = (np.random.random(96)*6).tolist()
+
         #pick one day from 360 days
         i = randint(1,359)
         #import Load 
@@ -64,7 +65,7 @@ class HemsEnv(Env):
             self.PV = self.allPV['Nov'].tolist()
         elif int(i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
-        self.interruptibleLoad = AC(demand=randint(1,20),AvgPowerConsume=uniform(0.5,2))
+        self.interruptibleLoad = AC(demand=randint(1,49),AvgPowerConsume=1.5)
         # Interruptable load's actions  ( 1.on 2.off )
         self.action_space = spaces.Discrete(2)
         #self.observation_space_name = np.array(['sampleTime','load', 'pv', 'pricePerHour' ,'Interruptable Remain'])
@@ -80,7 +81,7 @@ class HemsEnv(Env):
                 #pricePerHour
                 6.0,
                 #Interruptable Remain
-                20.0,
+                50.0,
             ],
             dtype=np.float32,
         )
@@ -93,7 +94,7 @@ class HemsEnv(Env):
                 #PV
                 0.0,
                 #pricePerHour
-                1.0,
+                0.0,
                 #Interruptable Remain
                 0.0,
             ],
@@ -131,21 +132,25 @@ class HemsEnv(Env):
             #PgridMax reward
             elif(load+self.interruptibleLoad.AvgPowerConsume-pv>self.PgridMax):
                 reward.append(-1)
+                cost = pricePerHour * 0.25 * self.interruptibleLoad.AvgPowerConsume
 
             #calculate cost and proportion
             else:
-                proportion = np.abs(self.interruptibleLoad.AvgPowerConsume / (load + self.interruptibleLoad.AvgPowerConsume - pv) )
-                cost = proportion*(pricePerHour * 0.25 *( load + self.interruptibleLoad.AvgPowerConsume - pv ))  
-
+                #proportion = np.abs(self.interruptibleLoad.AvgPowerConsume / (load + self.interruptibleLoad.AvgPowerConsume - pv) )
+                #cost = proportion*(pricePerHour * 0.25 *( load + self.interruptibleLoad.AvgPowerConsume - pv ))  
+                cost = pricePerHour * 0.25 * self.interruptibleLoad.AvgPowerConsume
         #2.  off
         elif action == 1 : 
             self.interruptibleLoad.turn_off()
             cost = 0
+        # action = 0 and remain<=0
+        else :
+            reward.append(-1)
 
-        reward.append(-0.1*cost+0.2)
+        reward.append(-0.1*cost)
 
-        if (sampleTime == 95) and (self.interruptibleLoad.getRemainDemand()!=0):
-            reward.append(-2)
+        if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):
+            reward.append(-10)
             
         #change to next state
         sampleTime = int(sampleTime+1)
@@ -172,7 +177,7 @@ class HemsEnv(Env):
         i = randint(1,359)
         self.Load = self.allLoad.iloc[:,i].tolist()
         self.interruptibleLoad.reset()
-        self.interruptibleLoad = AC(demand=randint(1,20),AvgPowerConsume=uniform(0.5,2))
+        self.interruptibleLoad = AC(demand=randint(1,49),AvgPowerConsume=1.5)
         if int( i / 30) == 0:
             self.PV = self.allPV['Jan'].tolist()
         elif int(i / 30) == 1:

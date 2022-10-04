@@ -136,10 +136,10 @@ class HemsEnv(Env):
         soc = soc+soc_change
         if soc > 1:
             soc = 1
-            reward.append(-0.7)
+            reward.append(-0.6)
         elif soc < 0 :
             soc = 0
-            reward.append(-0.7)
+            reward.append(-0.6)
         else:
             #calculate cost proportion   
             if load+soc_change*self.batteryCapacity-pv<0:

@@ -9,7 +9,7 @@
             0.0,
             0.0,
             0.0,
-            1.0,
+            0.0,
             0.0
         ],
         "max_value": [
@@ -17,7 +17,7 @@
             10.0,
             10.0,
             6.0,
-            20.0
+            50.0
         ]
     },
     "actions": {
@@ -34,17 +34,9 @@
             "activation": "relu"
         },
         {
-            "type": "dropout",
-            "rate": 0.4
-        },
-        {
             "type": "dense",
             "size": 200,
             "activation": "relu"
-        },
-        {
-            "type": "dropout",
-            "rate": 0.4
         },
         {
             "type": "dense",
@@ -52,7 +44,7 @@
             "activation": "relu"
         }
     ],
-    "memory": "minimum",
+    "memory": 600,
     "start_updating": 1000,
     "update_frequency": 0.5,
     "learning_rate": 0.0001,
@@ -62,11 +54,12 @@
     "state_preprocessing": "linear_normalization",
     "exploration": {
         "type": "decaying",
-        "decay": "linear",
+        "decay": "exponential",
         "unit": "episodes",
-        "num_steps": 5000,
-        "initial_value": 0.99,
-        "final_value": 0.00001
+        "initial_value": 1.0,
+        "num_steps": 100000,
+        "decay_rate": 0.995,
+        "staircase": false
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,

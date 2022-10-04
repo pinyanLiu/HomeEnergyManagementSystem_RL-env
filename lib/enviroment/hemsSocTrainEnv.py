@@ -32,9 +32,9 @@ class HemsEnv(Env):
         self.socThreshold = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='SOCthreshold']['value'])[0])
 
         #import Grid price
-        self.GridPrice = self.info.importGridPrice()
-        self.GridPrice = self.GridPrice['price_value'].tolist()
-        
+        #self.GridPrice = self.info.importGridPrice()
+        #self.GridPrice = self.GridPrice['price_value'].tolist()
+        self.GridPrice = (np.random.random(96)*6).tolist()
         #pick one day from 360 days
         i = randint(1,359)
         #import Load 
@@ -99,7 +99,7 @@ class HemsEnv(Env):
                 #SOC
                 0.0,         
                 #pricePerHour
-                1.0,
+                0.0,
                 #degradationCost
                 0.6
             ],
@@ -133,10 +133,10 @@ class HemsEnv(Env):
         soc = soc+soc_change
         if soc > 1:
             soc = 1
-            reward.append(-0.7)
+            reward.append(-0.6)
         elif soc < 0 :
             soc = 0
-            reward.append(-0.7)
+            reward.append(-0.6)
         else:
             #calculate cost proportion   
             if load+soc_change*self.batteryCapacity-pv<0:
