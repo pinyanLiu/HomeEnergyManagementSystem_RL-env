@@ -23,75 +23,87 @@ class HemsEnv(Env):
         self.user = self.mysqlData['user']
         self.passwd = self.mysqlData['passwd']
         self.db = self.mysqlData['db']
-        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db,mode = 'Testing')
-        self.BaseParameter = self.info.experimentData['BaseParameter']
-        self.GridPrice = self.info.experimentData['GridPrice']['price_value'].tolist()
+        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db)
+
+        #import Base Parameter
+        self.BaseParameter = self.info.importBaseParameter()
+        self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
+
+        #import Grid price
+        self.GridPrice = self.info.importGridPrice()
+        self.GridPrice = self.GridPrice['price_value'].tolist()
 
         #each month pick one day for testing
         self.i = 0
-        self.Load = self.info.experimentData['Load'].iloc[:,self.i].tolist()
-        if self.i % 12 == 0:
-            self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif self.i % 12 == 1:
-            self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif self.i % 12 == 2:
-            self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif self.i % 12 == 3:
-            self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif self.i % 12 == 4:
-            self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif self.i % 12 == 5:
-            self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif self.i % 12 == 6:
-            self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif self.i % 12 == 7:
-            self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif self.i % 12 == 8:
-            self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif self.i % 12 == 9:
-            self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif self.i % 12 == 10:
-            self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif self.i % 12 == 11:
-            self.PV = self.info.experimentData['PV']['Dec'].tolist()
-        self.ac = AC(demand=40,AvgPowerConsume=3000)
-        self.wm = WM(demand=40,AvgPowerConsume=3000,executePeriod=40)
+        #import Load 
+        self.allLoad = self.info.importTestingLoad()
+        self.Load = self.allLoad.iloc[:,self.i].tolist()
 
-         #action AC take (on,off)
-        self.action_space = spaces.Discrete(4)
+        #import PV
+        self.allPV = self.info.importPhotoVoltaic()        
+        if self.i  == 0:
+            self.PV = self.allPV['Jan'].tolist()
+        elif self.i  == 1:
+            self.PV = self.allPV['Feb'].tolist()
+        elif self.i  == 2:
+            self.PV = self.allPV['Mar'].tolist()
+        elif self.i  == 3:
+            self.PV = self.allPV['Apr'].tolist()
+        elif self.i  == 4:
+            self.PV = self.allPV['May'].tolist()
+        elif self.i  == 5:
+            self.PV = self.allPV['Jun'].tolist()
+        elif self.i  == 6:
+            self.PV = self.allPV['July'].tolist()
+        elif self.i  == 7:
+            self.PV = self.allPV['Aug'].tolist()
+        elif self.i  == 8:
+            self.PV = self.allPV['Sep'].tolist()
+        elif self.i  == 9:
+            self.PV = self.allPV['Oct'].tolist()
+        elif self.i  == 10:
+            self.PV = self.allPV['Nov'].tolist()
+        elif self.i  == 11:
+            self.PV = self.allPV['Dec'].tolist()
+
+        self.uninterruptibleLoad = WM(demand=3,executePeriod=5,AvgPowerConsume=1.5)
+
+
+        #action Uninterruptible load take (1.on 2.do nothing )
+        self.action_space = spaces.Discrete(2)
+        #self.observation_space_name = np.array(['sampleTime','load', 'pv', 'pricePerHour' ,'UnInterruptable Remain'])
         #observation space 
-        self.observation_space_name = np.array(['sampleTime', 'AC','load', 'pv', 'pricePerHour'])
         upperLimit = np.array(
             [
                 #timeblock
-                96,
+                95,
                 #load
-                np.finfo(np.float32).max,
+                10.0,
                 #PV
-                np.finfo(np.float32).max,
+                10.0,
                 #pricePerHour
-                np.finfo(np.float32).max,
-                #AC Remain
-                np.finfo(np.float32).max,
-                #WM Remain
-                np.finfo(np.float32).max
+                6.0,
+                #Interruptable Remain
+                50.0,
+                #Interruptable Switch
+                1.0
             ],
             dtype=np.float32,
         )
         lowerLimit = np.array(
             [
                 #timeblock
-                0,
+                0.0,
                 #load
-                np.finfo(np.float32).min,
+                0.0,
                 #PV
-                np.finfo(np.float32).min,   
+                0.0,
                 #pricePerHour
-                np.finfo(np.float32).min,
-                #AC Remain
-                np.finfo(np.float32).min,
-                #WM Remain
-                np.finfo(np.float32).min
+                0.0,
+                #Interruptable Remain
+                0.0,
+                #Interruptable Switch
+                0.0
             ],
             dtype=np.float32,
         )
@@ -112,111 +124,47 @@ class HemsEnv(Env):
         reward = []
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
-        sampleTime,load,pv,pricePerHour,ACRemain,WMRemain = self.state
+        sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state
         
+        # 1.turn on switch 
+        if action == 0 and UnRemain>0 and UnSwitch==0:
+            self.uninterruptibleLoad.turn_on()
+            reward.append(0.25)
 
-        '''
-        There are 3 kind of penalty
-            1. Cost . The higher the cost , the higher the penalty
-            2. Wrong act in WM . If agent ask WM to stop while WM still haven't reach the Execute period .
-            3. Turn on too much . IF agent ask AC or WM to turn on while they have already reach the daily goal
+        #2.  do nothing
+        elif action == 1 : 
+            pass
 
-        There is one mix reward (can be reward or penalty , depends on the state and action )
-            1. Remain . Get reward if the agent ask AC or WM to turn on while there's still remain time steps need to be turned on . Get penalty if the agent ask AC or WM to turn on while they have already reach the Executed period . 
-        '''
+        # the uninterruptible Load operate itself
+        self.uninterruptibleLoad.step()
 
+        #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
+        if self.uninterruptibleLoad.switch == True:
+            if (load + self.uninterruptibleLoad.AvgPowerConsume - pv) < 0:
+                cost = 0 #encourage agent turn on loads when pv is high
+            #PgridMax reward
+            elif(load+self.uninterruptibleLoad.AvgPowerConsume-pv>self.PgridMax):
+                reward.append(-1)
+                cost = pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume
 
-        # 1. AC on , WM on
-        if action == 0 :
-            self.ac.turn_on()
-            self.wm.turn_on()
-            if ACRemain <= 0 :
-                reward.append(-2)
-            if WMRemain <= 0:
-                reward.append(-0.8*self.wm.executePeriod)
-            #avoid WM can't complete execute period if it starts in nearly end of the day
-            if (95-sampleTime) < self.wm.executePeriod:
-                reward.append(-2)
-            reward.append(ACRemain*0.2)
-            reward.append(WMRemain*0.2)
-            #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-            if (load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv) < 0:
-                cost = -15000 #encourage agent turn on loads when pv is high
+                #calculate cost and proportion
             else:
-                cost = (pricePerHour-self.avgPrice) * 0.25 *( load +self.ac.AvgPowerConsume+self.wm.AvgPowerConsume - pv  )
-            reward.append(-cost/10000)
-        
-        #2. AC on , WM off
-        elif action == 1:
-            self.ac.turn_on()
-            if ACRemain <= 0:
-                reward.append(-2)
-            reward.append(ACRemain*0.1)
-            if(self.wm.reachExecutePeriod() == False):
-                self.wm.turn_on()
-                reward.append(WMRemain*0.2)
-                reward.append(-2)
-                if(load+self.ac.AvgPowerConsume+self.wm.AvgPowerConsume-pv) < 0:
-                    cost = -15000 #encourage agent turn on loads when pv is high
-                else:
-                    cost = (pricePerHour-self.avgPrice) * 0.25 *(load+self.ac.AvgPowerConsume+self.wm.AvgPowerConsume-pv)
-            else:
-                self.wm.turn_off()
-                if (load+self.ac.AvgPowerConsume-pv) < 0:
-                    cost = -15000 #encourage agent turn on loads when pv is high
-                else:
-                    cost = (pricePerHour-self.avgPrice) * 0.25 *(load+self.ac.AvgPowerConsume-pv)
-            reward.append(-cost/10000)
 
-        #3. AC off , WM on
-        elif action == 2:
-            self.ac.turn_off()
-            self.wm.turn_on()
-            if WMRemain <= 0:
-                reward.append(-0.8*self.wm.executePeriod)
-            #avoid WM can't complete execute period if it starts in nearly end of the day
-            if (95-sampleTime) < self.wm.executePeriod:
-                reward.append(-2)
+                cost = pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume    
 
-            reward.append(WMRemain*0.2)
-            if (load + self.wm.AvgPowerConsume-pv) < 0 :
-                cost = -15000 #encourage agent turn on loads when pv is high
-            else :
-                cost = (pricePerHour-self.avgPrice) * 0.25 * (load + self.wm.AvgPowerConsume-pv)
-            reward.append(-cost/10000)
+        reward.append(-0.1*cost)
 
-        #4. AC off , WM off
-        else : 
-            self.ac.turn_off()
-            if(self.wm.reachExecutePeriod() == False):
-                self.wm.turn_on()
-                reward.append(WMRemain*0.2)
-                reward.append(-2)
-                if (load + self.wm.AvgPowerConsume-pv) < 0:
-                    cost = -15000 #encourage agent turn on loads when pv is high
-                else :
-                    cost = (pricePerHour-self.avgPrice) * 0.25 * (load + self.wm.AvgPowerConsume-pv)
-            else:
-                if (load-pv)<0:
-                    cost = -15000 #encourage agent turn on loads when pv is high
-                else:
-                    cost = (pricePerHour-self.avgPrice) * 0.25 *(load-pv)
-                self.wm.turn_off()
-            reward.append(-cost/10000)
-
-
+        if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
+            reward.append(-10)
+            
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.ac.getRemainDemand(),self.wm.getRemainDemand()])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
 
         #check if all day is done
         done =  bool(sampleTime == 95)
         #REWARD
-        if done == True:
-            if self.ac.getRemainDemand() == 0:
-                reward.append(40)
-            if self.wm.getRemainDemand() == 0:
-                reward.append(40)
+
 
         reward = sum(reward)
         info = {'reward':reward}
@@ -231,37 +179,38 @@ class HemsEnv(Env):
         Starting State
         '''
         #each month pick one day for testing
-        self.ac.reset()
-        self.wm.reset()
-        self.i += 1
-        self.Load = self.info.experimentData['Load'].iloc[:,self.i]
+        self.uninterruptibleLoad = WM(demand=3,executePeriod=5,AvgPowerConsume=1.5)
 
-        if self.i % 12 == 0:
-            self.PV = self.info.experimentData['PV']['Jan'].tolist()
-        elif self.i % 12 == 1:
-            self.PV = self.info.experimentData['PV']['Feb'].tolist()
-        elif self.i % 12 == 2:
-            self.PV = self.info.experimentData['PV']['Mar'].tolist()
-        elif self.i % 12 == 3:
-            self.PV = self.info.experimentData['PV']['Apr'].tolist()
-        elif self.i % 12 == 4:
-            self.PV = self.info.experimentData['PV']['May'].tolist()
-        elif self.i % 12 == 5:
-            self.PV = self.info.experimentData['PV']['Jun'].tolist()
-        elif self.i % 12 == 6:
-            self.PV = self.info.experimentData['PV']['July'].tolist()
-        elif self.i % 12 == 7:
-            self.PV = self.info.experimentData['PV']['Aug'].tolist()
-        elif self.i % 12 == 8:
-            self.PV = self.info.experimentData['PV']['Sep'].tolist()
-        elif self.i % 12 == 9:
-            self.PV = self.info.experimentData['PV']['Oct'].tolist()
-        elif self.i % 12 == 10:
-            self.PV = self.info.experimentData['PV']['Nov'].tolist()
-        elif self.i % 12 == 11:
-            self.PV = self.info.experimentData['PV']['Dec'].tolist()
+        self.i += 1
+        self.Load = self.allLoad.iloc[:,self.i].tolist()
+
+        #import PV
+        if self.i  == 0:
+            self.PV = self.allPV['Jan'].tolist()
+        elif self.i  == 1:
+            self.PV = self.allPV['Feb'].tolist()
+        elif self.i  == 2:
+            self.PV = self.allPV['Mar'].tolist()
+        elif self.i  == 3:
+            self.PV = self.allPV['Apr'].tolist()
+        elif self.i  == 4:
+            self.PV = self.allPV['May'].tolist()
+        elif self.i  == 5:
+            self.PV = self.allPV['Jun'].tolist()
+        elif self.i  == 6:
+            self.PV = self.allPV['July'].tolist()
+        elif self.i  == 7:
+            self.PV = self.allPV['Aug'].tolist()
+        elif self.i  == 8:
+            self.PV = self.allPV['Sep'].tolist()
+        elif self.i  == 9:
+            self.PV = self.allPV['Oct'].tolist()
+        elif self.i  == 10:
+            self.PV = self.allPV['Nov'].tolist()
+        elif self.i  == 11:
+            self.PV = self.allPV['Dec'].tolist()
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.ac.demand,self.wm.demand])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
         return self.state
 
 
