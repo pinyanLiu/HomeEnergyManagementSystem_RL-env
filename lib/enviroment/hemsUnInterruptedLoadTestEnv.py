@@ -122,6 +122,7 @@ class HemsEnv(Env):
 
         #list for storing reward
         reward = []
+        cost = 0
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
         sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state
@@ -225,5 +226,5 @@ if __name__ == '__main__':
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
         Totalreward += reward
-    print(states)
+        print(info)
         

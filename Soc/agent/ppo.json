@@ -82,12 +82,11 @@
     "state_preprocessing": "linear_normalization",
     "exploration": {
         "type": "decaying",
-        "decay": "exponential",
+        "decay": "linear",
         "unit": "episodes",
-        "initial_value": 1.0,
         "num_steps": 100000,
-        "decay_rate": 0.995,
-        "staircase": false
+        "initial_value": 0.3,
+        "final_value": 0.00001
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,

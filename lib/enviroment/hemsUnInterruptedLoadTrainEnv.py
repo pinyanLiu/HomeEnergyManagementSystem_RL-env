@@ -124,7 +124,7 @@ class HemsEnv(Env):
 
         #list for storing reward
         reward = []
-
+        cost = 0
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
         sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state
         

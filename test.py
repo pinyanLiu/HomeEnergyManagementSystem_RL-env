@@ -137,7 +137,7 @@ class Test():
     def __testInInterruptibleLoad__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v5')
         self.agent = Agent.load(directory = 'Load/Interruptible/saver_dir',environment=self.environment)
-        ac_object = AC(demand=49,AvgPowerConsume=1.5)
+        ac_object = AC(demand=40,AvgPowerConsume=1.5)
         load = []
         pv = []
         ac = []
