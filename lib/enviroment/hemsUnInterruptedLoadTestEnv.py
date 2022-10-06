@@ -226,5 +226,5 @@ if __name__ == '__main__':
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
         Totalreward += reward
-        print(info)
+        print(info,states)
         

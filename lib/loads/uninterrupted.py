@@ -53,12 +53,12 @@ class WM(UninterruptedLoad):
         self.switch = False
     
     def step(self):
+        if self.reachExecutePeriod():
+            self.turn_off()
+            self.alreadyTurnOnInPeriod = 0
         if(self.switch == True):
             self.alreadyTurnOn += 1
             self.alreadyTurnOnInPeriod +=1
-            if self.reachExecutePeriod():
-                self.turn_off()
-                self.alreadyTurnOnInPeriod = 0
         elif(self.switch == False):
             pass
 
