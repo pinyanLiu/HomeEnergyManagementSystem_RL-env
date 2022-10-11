@@ -4,6 +4,7 @@ class InterruptedLoad():
         self.AvgPowerConsume = AvgPowerConsume
         self.demand = demand
         self.alreadyTurnOn = 0
+        
     def turn_on(self):
         #different kind of Interrupted Load may have different interact with action
         pass
@@ -20,7 +21,7 @@ class InterruptedLoad():
         return ((self.alreadyTurnOn)/self.demand)
 
     def getRemainProcessPercentage(self):
-        return -((self.alreadyTurnOn-self.demand)/self.demand)
+        return ((self.demand-self.alreadyTurnOn)/self.demand)
 
     def reachDemand(self):
         return (self.alreadyTurnOn == self.demand)

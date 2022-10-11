@@ -1,6 +1,6 @@
 from tensorforce import Agent,Environment
 from lib.loads.interrupted import AC
-# from lib.loads.uninterrupted import WM
+from lib.loads.uninterrupted import WM
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -14,9 +14,10 @@ class Test():
     #run test result in different env
         if self.mode == 'soc':
             self.__testInSoc__()
-        
-        elif self.mode == 'load':
+        elif self.mode == 'intload':
             self.__testInInterruptibleLoad__()
+        elif self.mode == 'unintload':
+            self.__testUnInterruptibleLoad__()
         elif self.mode == 'HVAC':
             self.__testInHVAC__()
 
@@ -181,6 +182,52 @@ class Test():
             load.clear()
             pv.clear()
         print('Agent average episode reward: ', totalReward/12 )
+
+    def __testUnInterruptibleLoad__(self):
+        self.environment = Environment.create(environment='gym',level='Hems-v9')
+        self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
+        wmObject = WM(demand=3,executePeriod=5,AvgPowerConsume=1.5)
+        load = []
+        pv = []
+        wm = []
+        totalReward = 0
+        self.monthlyRemain = pd.DataFrame()
+        self.wmConsume = pd.DataFrame()
+        self.price = []
+        for month in range(12):
+            states = self.environment.reset()
+            load.append(states[1])
+            pv.append(states[2])
+            internals = self.agent.initial_internals()
+            terminal = False
+            while not terminal:
+                actions, internals = self.agent.act(
+                    states=states, internals=internals, independent=True, deterministic=True
+                )
+                states, terminal, reward = self.environment.execute(actions=actions)
+                #1. WM on 
+                if states[5]== 1: # washing machine's switch
+                    wm.append(wmObject.AvgPowerConsume)#power
+                #2. do nothing 
+                else :
+                    wm.append(0)
+
+                load.append(states[1])
+                pv.append(states[2])
+                totalReward += reward
+                if month == 11:
+                    self.price.append(states[3])
+
+            wm.append(0)
+            remain = [load[sampletime]-pv[sampletime] for sampletime in range(96)]
+            #normalize price to [0,1]
+            self.monthlyRemain.insert(month,column=str(month+1),value=remain)
+            self.wmConsume.insert(month,column=str(month+1),value=wm)
+            wmObject.reset()
+            wm.clear()
+            load.clear()
+            pv.clear()
+        print('Agent average episode reward: ', totalReward/12 )        
 
     def __plotResult__(self):
         plt.rcParams["figure.figsize"] = (12.8, 9.6)
@@ -407,7 +454,7 @@ class Test():
             fig.tight_layout()
             fig.savefig('pic/SOC/newestSocResult.png') 
 
-        elif self.mode == 'load':
+        elif self.mode == 'intload':
             ax1.plot(range(len(self.price)), self.price, label = "price")
             ax1.set_title('Jan')
 
@@ -446,68 +493,155 @@ class Test():
 
             sub1.set_ylabel('Power')
             sub1.bar(np.arange(96) ,self.monthlyRemain['1'][:] ,label = 'fixLoad',bottom = self.acConsume['1'][:] , color ='gray')  
-            # sub1.bar(np.arange(96) ,self.wmConsume['1'][:] ,label = 'WM',bottom = self.acConsume['1'][:], color ='orange')  
             sub1.bar(np.arange(96) ,self.acConsume['1'][:] ,label = 'AC', color ='green')  
 
             sub2.set_ylabel('Power')
             sub2.bar(np.arange(96) ,self.monthlyRemain['2'][:] ,label = 'fixLoad',bottom = self.acConsume['2'][:] , color ='gray')  
-            # sub2.bar(np.arange(96) ,self.wmConsume['2'][:] ,label = 'WM',bottom = self.acConsume['2'][:], color ='orange')  
             sub2.bar(np.arange(96) ,self.acConsume['2'][:] ,label = 'AC', color ='green')  
 
             sub3.set_ylabel('Power')
             sub3.bar(np.arange(96) ,self.monthlyRemain['3'][:] ,label = 'fixLoad',bottom = self.acConsume['3'][:] , color ='gray')  
-            # sub3.bar(np.arange(96) ,self.wmConsume['3'][:] ,label = 'WM',bottom = self.acConsume['3'][:], color ='orange')  
             sub3.bar(np.arange(96) ,self.acConsume['3'][:] ,label = 'AC', color ='green')  
             
             sub4.set_ylabel('Power')
             sub4.bar(np.arange(96) ,self.monthlyRemain['4'][:] ,label = 'fixLoad',bottom = self.acConsume['4'][:] , color ='gray')  
-            # sub4.bar(np.arange(96) ,self.wmConsume['4'][:] ,label = 'WM',bottom = self.acConsume['4'][:], color ='orange')  
             sub4.bar(np.arange(96) ,self.acConsume['4'][:] ,label = 'AC', color ='green')  
             
             sub5.set_ylabel('Power')
             sub5.bar(np.arange(96) ,self.monthlyRemain['5'][:] ,label = 'fixLoad',bottom = self.acConsume['5'][:] , color ='gray')  
-            # sub5.bar(np.arange(96) ,self.wmConsume['5'][:] ,label = 'WM',bottom = self.acConsume['5'][:], color ='orange')  
             sub5.bar(np.arange(96) ,self.acConsume['5'][:] ,label = 'AC', color ='green')  
 
             sub6.set_ylabel('Power')
             sub6.bar(np.arange(96) ,self.monthlyRemain['6'][:] ,label = 'fixLoad',bottom = self.acConsume['6'][:] , color ='gray')  
-            # sub6.bar(np.arange(96) ,self.wmConsume['6'][:] ,label = 'WM',bottom = self.acConsume['6'][:], color ='orange')  
             sub6.bar(np.arange(96) ,self.acConsume['6'][:] ,label = 'AC', color ='green')  
-            
 
-            
             sub7.set_ylabel('Power')
             sub7.bar(np.arange(96) ,self.monthlyRemain['7'][:] ,label = 'fixLoad',bottom = self.acConsume['7'][:] , color ='gray')  
-            # sub7.bar(np.arange(96) ,self.wmConsume['7'][:] ,label = 'WM',bottom = self.acConsume['7'][:], color ='orange')  
             sub7.bar(np.arange(96) ,self.acConsume['7'][:] ,label = 'AC', color ='green')  
             
             sub8.set_ylabel('Power')
             sub8.bar(np.arange(96) ,self.monthlyRemain['8'][:] ,label = 'fixLoad',bottom = self.acConsume['8'][:] , color ='gray')  
-            # sub8.bar(np.arange(96) ,self.wmConsume['8'][:] ,label = 'WM',bottom = self.acConsume['8'][:], color ='orange')  
             sub8.bar(np.arange(96) ,self.acConsume['8'][:] ,label = 'AC', color ='green')  
 
             sub9.set_ylabel('Power')
             sub9.bar(np.arange(96) ,self.monthlyRemain['9'][:] ,label = 'fixLoad',bottom = self.acConsume['9'][:], color ='gray')  
-            # sub9.bar(np.arange(96) ,self.wmConsume['9'][:] ,label = 'WM',bottom = self.acConsume['9'][:], color ='orange')  
             sub9.bar(np.arange(96) ,self.acConsume['9'][:] ,label = 'AC', color ='green')  
 
             sub10.set_ylabel('Power')
             sub10.bar(np.arange(96) ,self.monthlyRemain['10'][:] ,label = 'fixLoad',bottom = self.acConsume['10'][:] , color ='gray')  
-            # sub10.bar(np.arange(96) ,self.wmConsume['10'][:] ,label = 'WM',bottom = self.acConsume['10'][:], color ='orange')  
             sub10.bar(np.arange(96) ,self.acConsume['10'][:] ,label = 'AC', color ='green')  
 
             sub11.set_ylabel('Power')
             sub11.bar(np.arange(96) ,self.monthlyRemain['11'][:] ,label = 'fixLoad',bottom = self.acConsume['11'][:], color ='gray')  
-            # sub11.bar(np.arange(96) ,self.wmConsume['11'][:] ,label = 'WM',bottom = self.acConsume['11'][:], color ='orange')  
             sub11.bar(np.arange(96) ,self.acConsume['11'][:] ,label = 'AC', color ='green')  
 
             sub12.set_ylabel('Power')
             sub12.bar(np.arange(96) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.acConsume['12'][:], color ='gray')  
-            # sub12.bar(np.arange(96) ,self.wmConsume['12'][:] ,label = 'WM',bottom = self.acConsume['12'][:], color ='orange')  
             sub12.bar(np.arange(96) ,self.acConsume['12'][:] ,label = 'AC', color ='green') 
 
             fig.tight_layout()
-            fig.savefig('pic/Loads/newestLoadsResult.png') 
+            fig.savefig('pic/Loads/newestIntLoadsResult.png') 
+
+        elif self.mode == 'unintload':
+            ax1.plot(range(len(self.price)), self.price, label = "price")
+            ax1.set_title('Jan')
+
+            ax2.plot(range(len(self.price)), self.price, label = "price")
+            ax2.set_title('Feb')
+
+            ax3.plot(range(len(self.price)), self.price, label = "price")
+            ax3.set_title('Mar')
+
+            ax4.plot(range(len(self.price)), self.price, label = "price")
+            ax4.set_title('Apr')
+
+            ax5.plot(range(len(self.price)), self.price, label = "price")
+            ax5.set_title('May')
+
+            ax6.plot(range(len(self.price)), self.price, label = "price")
+            ax6.set_title('Jun')
+
+            ax7.plot(range(len(self.price)), self.price, label = "price")
+            ax7.set_title('July')
+
+            ax8.plot(range(len(self.price)), self.price, label = "price")
+            ax8.set_title('Aug')
+
+            ax9.plot(range(len(self.price)), self.price, label = "price")
+            ax9.set_title('Sep')
+
+            ax10.plot(range(len(self.price)), self.price, label = "price")
+            ax10.set_title('Oct')
+
+            ax11.plot(range(len(self.price)), self.price, label = "price")
+            ax11.set_title('Nov')
+
+            ax12.plot(range(len(self.price)), self.price, label = "price")
+            ax12.set_title('Dec')
+
+            sub1.set_ylabel('Power')
+            sub1.bar(np.arange(96) ,self.monthlyRemain['1'][:] ,label = 'fixLoad',bottom = self.wmConsume['1'][:] , color ='gray')  
+            sub1.bar(np.arange(96) ,self.wmConsume['1'][:] ,label = 'WM', color ='green')  
+            #sub1.bar(np.arange(96) ,self.acConsume['1'][:] ,label = 'AC', color ='gray')  
+
+            sub2.set_ylabel('Power')
+            sub2.bar(np.arange(96) ,self.monthlyRemain['2'][:] ,label = 'fixLoad',bottom = self.wmConsume['2'][:] , color ='gray')  
+            sub2.bar(np.arange(96) ,self.wmConsume['2'][:] ,label = 'WM', color ='green')  
+            #sub2.bar(np.arange(96) ,self.acConsume['2'][:] ,label = 'AC', color ='gray')  
+
+            sub3.set_ylabel('Power')
+            sub3.bar(np.arange(96) ,self.monthlyRemain['3'][:] ,label = 'fixLoad',bottom = self.wmConsume['3'][:] , color ='gray')  
+            sub3.bar(np.arange(96) ,self.wmConsume['3'][:] ,label = 'WM', color ='green')  
+            #sub3.bar(np.arange(96) ,self.acConsume['3'][:] ,label = 'AC', color ='gray')  
+            
+            sub4.set_ylabel('Power')
+            sub4.bar(np.arange(96) ,self.monthlyRemain['4'][:] ,label = 'fixLoad',bottom = self.wmConsume['4'][:] , color ='gray')  
+            sub4.bar(np.arange(96) ,self.wmConsume['4'][:] ,label = 'WM', color ='green')  
+            #sub4.bar(np.arange(96) ,self.acConsume['4'][:] ,label = 'AC', color ='gray')  
+            
+            sub5.set_ylabel('Power')
+            sub5.bar(np.arange(96) ,self.monthlyRemain['5'][:] ,label = 'fixLoad',bottom = self.wmConsume['5'][:] , color ='gray')  
+            sub5.bar(np.arange(96) ,self.wmConsume['5'][:] ,label = 'WM', color ='green')  
+            #sub5.bar(np.arange(96) ,self.acConsume['5'][:] ,label = 'AC', color ='gray')  
+
+            sub6.set_ylabel('Power')
+            sub6.bar(np.arange(96) ,self.monthlyRemain['6'][:] ,label = 'fixLoad',bottom = self.wmConsume['6'][:] , color ='gray')  
+            sub6.bar(np.arange(96) ,self.wmConsume['6'][:] ,label = 'WM', color ='green')  
+            #sub6.bar(np.arange(96) ,self.acConsume['6'][:] ,label = 'AC', color ='gray')  
+    
+            
+            sub7.set_ylabel('Power')
+            sub7.bar(np.arange(96) ,self.monthlyRemain['7'][:] ,label = 'fixLoad',bottom = self.wmConsume['7'][:] , color ='gray')  
+            sub7.bar(np.arange(96) ,self.wmConsume['7'][:] ,label = 'WM', color ='green')  
+            #sub7.bar(np.arange(96) ,self.acConsume['7'][:] ,label = 'AC', color ='gray')  
+            
+            sub8.set_ylabel('Power')
+            sub8.bar(np.arange(96) ,self.monthlyRemain['8'][:] ,label = 'fixLoad',bottom = self.wmConsume['8'][:] , color ='gray')  
+            sub8.bar(np.arange(96) ,self.wmConsume['8'][:] ,label = 'WM', color ='green')  
+            #sub8.bar(np.arange(96) ,self.acConsume['8'][:] ,label = 'AC', color ='gray')  
+
+            sub9.set_ylabel('Power')
+            sub9.bar(np.arange(96) ,self.monthlyRemain['9'][:] ,label = 'fixLoad',bottom = self.wmConsume['9'][:], color ='gray')  
+            sub9.bar(np.arange(96) ,self.wmConsume['9'][:] ,label = 'WM', color ='green')  
+            #sub9.bar(np.arange(96) ,self.acConsume['9'][:] ,label = 'AC', color ='gray')  
+
+            sub10.set_ylabel('Power')
+            sub10.bar(np.arange(96) ,self.monthlyRemain['10'][:] ,label = 'fixLoad',bottom = self.wmConsume['10'][:] , color ='gray')  
+            sub10.bar(np.arange(96) ,self.wmConsume['10'][:] ,label = 'WM', color ='green')  
+            #sub10.bar(np.arange(96) ,self.acConsume['10'][:] ,label = 'AC', color ='gray')  
+
+            sub11.set_ylabel('Power')
+            sub11.bar(np.arange(96) ,self.monthlyRemain['11'][:] ,label = 'fixLoad',bottom = self.wmConsume['11'][:], color ='gray')  
+            sub11.bar(np.arange(96) ,self.wmConsume['11'][:] ,label = 'WM', color ='green')  
+            #sub11.bar(np.arange(96) ,self.acConsume['11'][:] ,label = 'AC', color ='gray')  
+
+            sub12.set_ylabel('Power')
+            sub12.bar(np.arange(96) ,self.monthlyRemain['12'][:] ,label = 'fixLoad',bottom = self.wmConsume['12'][:], color ='gray')  
+            sub12.bar(np.arange(96) ,self.wmConsume['12'][:] ,label = 'WM', color ='green')  
+            #sub12.bar(np.arange(96) ,self.acConsume['12'][:] ,label = 'AC', color ='gray') 
+
+            fig.tight_layout()
+            fig.savefig('pic/Loads/uninterruptible/newestUnIntLoadsResult.png') 
 
         elif self.mode == 'HVAC':
             
