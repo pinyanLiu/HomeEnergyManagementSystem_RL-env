@@ -1,17 +1,25 @@
 # RL Environment for Home Energy Management system
 
-## introduction
+## Introduction
 
 - A RL environment Used for Hems which based on *OpenAI Gym*
 - Build the RL Agent with *Tensorforce*
 
-## brief view of the project
+## Brief view of the project
 -  train.py is for training RL agent in environment "hemsTrainEnv.py" which locate at lib/enviroment
 -  test.py is for testing the agent we've already trained in a different env "hemsTestEnv.py" , and also output a result graph in "pic", which shows the SOC and price in each test.
 -  Difference between  "hemsTrainEnv.py" and "hemsTestEnv.py" is the import data. The previous one grab 360 days load consumption from mysql , while the other one picks up only 12 days for testing.
 -  "agent" stores the json file of hyperparameter for building different kind of RL agents.
 - Using my own mysql Database for the training and testing data , "import_data.py" is for grabbing them from the server.
 
+## Env
+### single agent Env
+- SOC system
+- HVAC system
+- Interruptible load system
+- Uninterruptible load system
+### multi agent Env
+- SOC and HVAC system
 ## details in hemsTrainEnv
 - __init__()
     1. import experiment parameters , training dataset from mysql database
