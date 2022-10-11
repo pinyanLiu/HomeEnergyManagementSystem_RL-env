@@ -68,12 +68,11 @@ class HemsEnv(Env):
         elif int(i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
 
-        UnRandomDemand = randint(1,8)
-        UnRandomPeriod = randint(2,8)
-        self.uninterruptibleLoad = WM(demand=UnRandomDemand,executePeriod=UnRandomPeriod,AvgPowerConsume=1.5)
+
+        self.uninterruptibleLoad = WM(demand=randint(1,3),executePeriod=randint(2,24),AvgPowerConsume=1.5)
         #action Uninterruptible load take (1.on 2.do nothing )
         self.action_space = spaces.Discrete(2)
-        #self.observation_space_name = np.array(['sampleTime','load', 'pv', 'pricePerHour' ,'UnInterruptable Remain'])
+        #self.observation_space_name = np.array(['sampleTime','load', 'pv', 'pricePerHour' ,'UnInterruptable Remain','switch'])
         #observation space 
         upperLimit = np.array(
             [
@@ -85,9 +84,9 @@ class HemsEnv(Env):
                 10.0,
                 #pricePerHour
                 6.0,
-                #Interruptable Remain
-                50.0,
-                #Interruptable Switch
+                #Uninterruptable Remain
+                96.0,
+                #Uninterruptable Switch
                 1.0
             ],
             dtype=np.float32,
@@ -102,9 +101,9 @@ class HemsEnv(Env):
                 0.0,
                 #pricePerHour
                 0.0,
-                #Interruptable Remain
+                #Uninterruptable Remain
                 0.0,
-                #Interruptable Switch
+                #Uninterruptable Switch
                 0.0
             ],
             dtype=np.float32,
@@ -132,7 +131,7 @@ class HemsEnv(Env):
         # 1.turn on switch 
         if action == 0 and UnRemain>0 and UnSwitch==0:
             self.uninterruptibleLoad.turn_on()
-            reward.append(0.25)
+            reward.append(5/self.uninterruptibleLoad.demand)
 
         #2.  do nothing
         elif action == 1 : 
@@ -155,7 +154,7 @@ class HemsEnv(Env):
 
                 cost = pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume    
 
-        reward.append(-0.1*cost)
+        reward.append(-0.2*cost)
 
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
             reward.append(-10)
@@ -181,12 +180,10 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
-        UnRandomDemand = randint(1,8)
-        UnRandomPeriod = randint(2,8)
-        self.uninterruptibleLoad = WM(demand=UnRandomDemand,executePeriod=UnRandomPeriod,AvgPowerConsume=1.5)
+        self.uninterruptibleLoad = WM(demand=randint(1,3),executePeriod=randint(2,24),AvgPowerConsume=1.5)
 
         #pick one day from 360 days
-        i = randint(0,359)
+        i = randint(1,359)
         self.Load = self.allLoad.iloc[:,i].tolist()
         if int( i / 30) == 0:
             self.PV = self.allPV['Jan'].tolist()

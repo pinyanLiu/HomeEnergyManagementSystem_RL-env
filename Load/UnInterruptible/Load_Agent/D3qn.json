@@ -1,21 +1,25 @@
 {
-    "agent": "double_dqn",
+    "agent": "dueling_dqn",
     "states": {
         "type": "float",
         "shape": [
-            4
+            6
         ],
         "min_value": [
             0.0,
-            "-Infinity",
-            "-Infinity",
-            "-Infinity"
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
         ],
         "max_value": [
+            95.0,
+            10.0,
+            10.0,
+            6.0,
             96.0,
-            "Infinity",
-            "Infinity",
-            "Infinity"
+            1.0
         ]
     },
     "actions": {
@@ -24,45 +28,52 @@
         "num_values": 2
     },
     "max_episode_timesteps": 96,
-    "batch_size": 16,
+    "batch_size": 500,
     "network": [
         {
             "type": "dense",
-            "size": 40,
+            "size": 200,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 40,
+            "size": 200,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 40,
+            "size": 200,
             "activation": "relu"
         }
     ],
-    "memory": 540,
-    "start_updating": 64,
-    "update_frequency": 0.002,
+    "memory": 600,
+    "start_updating": 1000,
+    "update_frequency": 0.25,
     "learning_rate": 0.0001,
-    "discount": 0.95,
+    "discount": 0.97,
     "return_processing": null,
     "predict_terminal_values": false,
     "state_preprocessing": "linear_normalization",
-    "exploration": 0.2,
+    "exploration": {
+        "type": "decaying",
+        "decay": "linear",
+        "unit": "episodes",
+        "num_steps": 1000,
+        "initial_value": 0.99,
+        "final_value": 0.00001
+    },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
     "entropy_regularization": 0.0,
     "parallel_interactions": 1,
     "config": null,
     "saver": {
-        "directory": "saver_dir",
-        "frequency": 100,
+        "directory": "Load/UnInterruptible/saver_dir",
+        "frequency": 250,
         "unit": "episodes"
     },
     "summarizer": {
-        "directory": "summaries",
+        "directory": "Load/UnInterruptible/summaries",
         "summaries": "all"
     },
     "tracking": null,

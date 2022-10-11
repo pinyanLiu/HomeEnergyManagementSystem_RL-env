@@ -15,7 +15,7 @@ def main(argv):
         environment = dict(environment='gym', level='Hems-v4')
     elif argv[1] == 'HVAC':    
         environment = dict(environment='gym', level='Hems-v6')
-    elif argv[1] == 'UnLoad':
+    elif argv[1] == 'Unload':
         environment = dict(environment='gym', level='Hems-v8')
     else :
         print('undefined env')

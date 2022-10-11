@@ -1,11 +1,12 @@
 {
-    "agent": "dueling_dqn",
+    "agent": "ddqn",
     "states": {
         "type": "float",
         "shape": [
-            5
+            6
         ],
         "min_value": [
+            0.0,
             0.0,
             0.0,
             0.0,
@@ -17,7 +18,8 @@
             10.0,
             10.0,
             6.0,
-            50.0
+            96.0,
+            1.0
         ]
     },
     "actions": {
@@ -46,7 +48,7 @@
     ],
     "memory": 600,
     "start_updating": 1000,
-    "update_frequency": 0.5,
+    "update_frequency": 0.25,
     "learning_rate": 0.0001,
     "discount": 0.97,
     "return_processing": null,
@@ -54,12 +56,11 @@
     "state_preprocessing": "linear_normalization",
     "exploration": {
         "type": "decaying",
-        "decay": "exponential",
+        "decay": "linear",
         "unit": "episodes",
-        "initial_value": 1.0,
         "num_steps": 1000,
-        "decay_rate": 0.995,
-        "staircase": false
+        "initial_value": 0.99,
+        "final_value": 0.00001
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,

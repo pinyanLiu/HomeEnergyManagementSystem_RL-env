@@ -84,7 +84,7 @@ class HemsEnv(Env):
                 #pricePerHour
                 6.0,
                 #Interruptable Remain
-                50.0,
+                96.0,
                 #Interruptable Switch
                 1.0
             ],
