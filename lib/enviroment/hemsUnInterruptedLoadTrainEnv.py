@@ -34,6 +34,8 @@ class HemsEnv(Env):
 
 
         #import Grid price
+        #self.GridPrice = self.info.importGridPrice()
+        #self.GridPrice = self.GridPrice['price_value'].tolist()
         self.GridPrice = (np.random.random(96)*6).tolist()
 
         #pick one day from 360 days
@@ -69,7 +71,7 @@ class HemsEnv(Env):
             self.PV = self.allPV['Dec'].tolist()
 
 
-        self.uninterruptibleLoad = WM(demand=randint(1,3),executePeriod=randint(2,24),AvgPowerConsume=1.5)
+        self.uninterruptibleLoad = WM(demand=randint(1,3),executePeriod=randint(2,10),AvgPowerConsume=1.5)
         #action Uninterruptible load take (1.on 2.do nothing )
         self.action_space = spaces.Discrete(2)
         #self.observation_space_name = np.array(['sampleTime','load', 'pv', 'pricePerHour' ,'UnInterruptable Remain','switch'])
@@ -131,7 +133,7 @@ class HemsEnv(Env):
         # 1.turn on switch 
         if action == 0 and UnRemain>0 and UnSwitch==0:
             self.uninterruptibleLoad.turn_on()
-            reward.append(5/self.uninterruptibleLoad.demand)
+            reward.append(1/self.uninterruptibleLoad.demand)
 
         #2.  do nothing
         elif action == 1 : 
@@ -180,7 +182,7 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
-        self.uninterruptibleLoad = WM(demand=randint(1,3),executePeriod=randint(2,24),AvgPowerConsume=1.5)
+        self.uninterruptibleLoad = WM(demand=randint(1,3),executePeriod=randint(2,10),AvgPowerConsume=1.5)
 
         #pick one day from 360 days
         i = randint(1,359)

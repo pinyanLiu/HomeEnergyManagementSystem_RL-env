@@ -5,7 +5,7 @@ import sys
 
 def main(argv):
     if len(argv)<4:
-        print('please give parameters 1.Training mode: "soc"/"intload"/"HVAC"/"unload 2.Agent 3. training episode ')
+        print('please give parameters 1.Training mode: "soc"/"intload"/"HVAC"/"unintload 2.Agent 3. training episode ')
         return
     agent = argv[2]
 
@@ -15,7 +15,7 @@ def main(argv):
         environment = dict(environment='gym', level='Hems-v4')
     elif argv[1] == 'HVAC':    
         environment = dict(environment='gym', level='Hems-v6')
-    elif argv[1] == 'Unload':
+    elif argv[1] == 'unintload':
         environment = dict(environment='gym', level='Hems-v8')
     else :
         print('undefined env')

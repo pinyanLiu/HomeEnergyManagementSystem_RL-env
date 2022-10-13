@@ -186,7 +186,7 @@ class Test():
     def __testUnInterruptibleLoad__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v9')
         self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
-        wmObject = WM(demand=3,executePeriod=5,AvgPowerConsume=1.5)
+        wmObject = WM(demand=3,executePeriod=15,AvgPowerConsume=1.5)
         load = []
         pv = []
         wm = []
@@ -205,8 +205,9 @@ class Test():
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
+                #print(states)
                 #1. WM on 
-                if states[5]== 1: # washing machine's switch
+                if states[5] == 1: # washing machine's switch
                     wm.append(wmObject.AvgPowerConsume)#power
                 #2. do nothing 
                 else :

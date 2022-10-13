@@ -130,7 +130,7 @@ class HemsEnv(Env):
         # 1.turn on switch 
         if action == 0 and UnRemain>0 and UnSwitch==0:
             self.uninterruptibleLoad.turn_on()
-            reward.append(0.25)
+            reward.append(1/self.uninterruptibleLoad.demand)
 
         #2.  do nothing
         elif action == 1 : 
@@ -153,7 +153,7 @@ class HemsEnv(Env):
 
                 cost = pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume    
 
-        reward.append(-0.1*cost)
+        reward.append(-0.2*cost)
 
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
             reward.append(-10)
