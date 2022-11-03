@@ -1,6 +1,8 @@
 from tensorforce import Agent,Environment
 from lib.loads.interrupted import AC
 from lib.loads.uninterrupted import WM
+from lib.import_data.import_data import ImportData
+from  yaml import load , SafeLoader
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
@@ -9,7 +11,19 @@ import sys
 class Test():
     def __init__(self,mode) :
         self.mode = mode
-
+    def connetMysql(self):
+        with open("yaml/mysqlData.yaml","r") as f:
+            self.mysqlData = load(f,SafeLoader)
+        self.host = self.mysqlData['host']
+        self.user = self.mysqlData['user']
+        self.passwd = self.mysqlData['passwd']
+        self.db = self.mysqlData['db']
+        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db)
+    def getGridPrice(self):
+        self.allGridPrice = self.info.importGridPrice()
+        self.summerGridPrice = self.allGridPrice['summer_price'].tolist()
+        self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
+        self.testPrice = self.allGridPrice['test_price1'].tolist()
     def main(self):
     #run test result in different env
         if self.mode == 'soc':
@@ -108,6 +122,7 @@ class Test():
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
+                print(states)
                 actions, internals = self.agent.act(
                     states=states, internals=internals, independent=True, deterministic=True
                 )
@@ -184,6 +199,9 @@ class Test():
         print('Agent average episode reward: ', totalReward/12 )
 
     def __testUnInterruptibleLoad__(self):
+        self.connetMysql()
+        self.getGridPrice()
+        summer = [5,6,7,8]
         self.environment = Environment.create(environment='gym',level='Hems-v9')
         self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
         wmObject = WM(demand=3,executePeriod=15,AvgPowerConsume=1.5)
@@ -193,7 +211,7 @@ class Test():
         totalReward = 0
         self.monthlyRemain = pd.DataFrame()
         self.wmConsume = pd.DataFrame()
-        self.price = []
+        self.price = pd.DataFrame()
         for month in range(12):
             states = self.environment.reset()
             load.append(states[1])
@@ -216,8 +234,13 @@ class Test():
                 load.append(states[1])
                 pv.append(states[2])
                 totalReward += reward
-                if month == 11:
-                    self.price.append(states[3])
+            if month not in summer :
+                self.price.insert(month,column = str(month+1),value=self.notSummerGridPrice)
+            else :
+                self.price.insert(month,column = str(month+1),value=self.summerGridPrice)
+            #self.price.insert(month,column = str(month+1),value=self.testPrice)
+                
+
 
             wm.append(0)
             remain = [load[sampletime]-pv[sampletime] for sampletime in range(96)]
@@ -544,41 +567,54 @@ class Test():
             fig.savefig('pic/Loads/newestIntLoadsResult.png') 
 
         elif self.mode == 'unintload':
-            ax1.plot(range(len(self.price)), self.price, label = "price")
+            ax1.plot(range(len(self.price)), self.price['1'][:], label = "price")
             ax1.set_title('Jan')
+            ax1.set_ylim(0,6.5)
 
-            ax2.plot(range(len(self.price)), self.price, label = "price")
+
+            ax2.plot(range(len(self.price)), self.price['2'][:], label = "price")
             ax2.set_title('Feb')
+            ax2.set_ylim(0,6.5)
 
-            ax3.plot(range(len(self.price)), self.price, label = "price")
+            ax3.plot(range(len(self.price)), self.price['3'][:], label = "price")
             ax3.set_title('Mar')
+            ax3.set_ylim(0,6.5)
 
-            ax4.plot(range(len(self.price)), self.price, label = "price")
+            ax4.plot(range(len(self.price)), self.price['4'][:], label = "price")
             ax4.set_title('Apr')
+            ax4.set_ylim(0,6.5)
 
-            ax5.plot(range(len(self.price)), self.price, label = "price")
+            ax5.plot(range(len(self.price)), self.price['5'][:], label = "price")
             ax5.set_title('May')
+            ax5.set_ylim(0,6.5)
 
-            ax6.plot(range(len(self.price)), self.price, label = "price")
+            ax6.plot(range(len(self.price)), self.price['6'][:], label = "price")
             ax6.set_title('Jun')
+            ax6.set_ylim(0,6.5)
 
-            ax7.plot(range(len(self.price)), self.price, label = "price")
+            ax7.plot(range(len(self.price)), self.price['7'][:], label = "price")
             ax7.set_title('July')
+            ax7.set_ylim(0,6.5)
 
-            ax8.plot(range(len(self.price)), self.price, label = "price")
+            ax8.plot(range(len(self.price)), self.price['8'][:], label = "price")
             ax8.set_title('Aug')
+            ax8.set_ylim(0,6.5)
 
-            ax9.plot(range(len(self.price)), self.price, label = "price")
+            ax9.plot(range(len(self.price)), self.price['9'][:], label = "price")
             ax9.set_title('Sep')
+            ax9.set_ylim(0,6.5)
 
-            ax10.plot(range(len(self.price)), self.price, label = "price")
+            ax10.plot(range(len(self.price)), self.price['10'][:], label = "price")
             ax10.set_title('Oct')
+            ax10.set_ylim(0,6.5)
 
-            ax11.plot(range(len(self.price)), self.price, label = "price")
+            ax11.plot(range(len(self.price)), self.price['11'][:], label = "price")
             ax11.set_title('Nov')
+            ax11.set_ylim(0,6.5)
 
-            ax12.plot(range(len(self.price)), self.price, label = "price")
+            ax12.plot(range(len(self.price)), self.price['12'][:], label = "price")
             ax12.set_title('Dec')
+            ax12.set_ylim(0,6.5)
 
             sub1.set_ylabel('Power')
             sub1.bar(np.arange(96) ,self.monthlyRemain['1'][:] ,label = 'fixLoad',bottom = self.wmConsume['1'][:] , color ='gray')  
