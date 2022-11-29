@@ -153,7 +153,7 @@ class Test():
     def __testInInterruptibleLoad__(self):
         self.environment = Environment.create(environment='gym',level='Hems-v5')
         self.agent = Agent.load(directory = 'Load/Interruptible/saver_dir',environment=self.environment)
-        ac_object = AC(demand=40,AvgPowerConsume=1.5)
+        ac_object = AC(demand=40,AvgPowerConsume=0.3)
         load = []
         pv = []
         ac = []
@@ -198,13 +198,13 @@ class Test():
             pv.clear()
         print('Agent average episode reward: ', totalReward/12 )
 
-    def __testUnInterruptibleLoad__(self):
+    def __testUnInterruptibleLoad__(self,mode='normal'):
         self.connetMysql()
         self.getGridPrice()
         summer = [5,6,7,8]
         self.environment = Environment.create(environment='gym',level='Hems-v9')
         self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
-        wmObject = WM(demand=3,executePeriod=15,AvgPowerConsume=1.5)
+        wmObject = WM(demand=6,executePeriod=8,AvgPowerConsume=0.3)
         load = []
         pv = []
         wm = []
@@ -234,11 +234,13 @@ class Test():
                 load.append(states[1])
                 pv.append(states[2])
                 totalReward += reward
-            if month not in summer :
-                self.price.insert(month,column = str(month+1),value=self.notSummerGridPrice)
-            else :
-                self.price.insert(month,column = str(month+1),value=self.summerGridPrice)
-            #self.price.insert(month,column = str(month+1),value=self.testPrice)
+            if mode == 'normal':
+                if month not in summer :
+                    self.price.insert(month,column = str(month+1),value=self.notSummerGridPrice)
+                else :
+                    self.price.insert(month,column = str(month+1),value=self.summerGridPrice)
+            else:
+                self.price.insert(month,column = str(month+1),value=self.testPrice)
                 
 
 

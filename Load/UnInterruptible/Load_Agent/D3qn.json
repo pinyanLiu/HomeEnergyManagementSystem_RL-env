@@ -41,6 +41,10 @@
             "activation": "relu"
         },
         {
+            "type": "dropout",
+            "rate": 0.3
+        },
+        {
             "type": "dense",
             "size": 200,
             "activation": "relu"
@@ -58,7 +62,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 6000,
+        "num_steps": 10000,
         "initial_value": 0.99,
         "final_value": 1e-7
     },
