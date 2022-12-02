@@ -30,13 +30,13 @@ class HemsEnv(Env):
         #import Base Parameter
         self.BaseParameter = self.info.importBaseParameter()
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
-        self.batteryCapacity = int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 
 
         #import Grid price
-        #self.GridPrice = self.info.importGridPrice()
-        #self.GridPrice = self.GridPrice['price_value'].tolist()
-        self.GridPrice = (np.random.random(96)*6).tolist()
+        self.allGridPrice = self.info.importGridPrice()
+        self.summerGridPrice = self.allGridPrice['summer_price'].tolist()
+        self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
+        self.futureGridPrice = np.mean([self.summerGridPrice,self.notSummerGridPrice],axis=0)
 
         #pick one day from 360 days
         i = randint(1,359)
@@ -47,55 +47,70 @@ class HemsEnv(Env):
         #import PV
         if int( i / 30) == 0:
             self.PV = self.allPV['Jan'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 1:
             self.PV = self.allPV['Feb'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 2:
             self.PV = self.allPV['Mar'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 3:
             self.PV = self.allPV['Apr'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 4:
             self.PV = self.allPV['May'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 5:
             self.PV = self.allPV['Jun'].tolist()
+            self.GridPrice = self.summerGridPrice
         elif int(i / 30) == 6:
             self.PV = self.allPV['July'].tolist()
+            self.GridPrice = self.summerGridPrice
         elif int(i / 30) == 7:
             self.PV = self.allPV['Aug'].tolist()
+            self.GridPrice = self.summerGridPrice
         elif int(i / 30) == 8:
             self.PV = self.allPV['Sep'].tolist()
+            self.GridPrice = self.summerGridPrice
         elif int(i / 30) == 9:
             self.PV = self.allPV['Oct'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 10:
             self.PV = self.allPV['Nov'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        
 
 
-        self.uninterruptibleLoad = WM(demand=randint(1,3),executePeriod=randint(2,10),AvgPowerConsume=1.5)
+        self.uninterruptibleLoad = WM(demand=randint(1,5),executePeriod=randint(2,15),AvgPowerConsume=0.3)
         #action Uninterruptible load take (1.on 2.do nothing )
         self.action_space = spaces.Discrete(2)
         #self.observation_space_name = np.array(['sampleTime','load', 'pv', 'pricePerHour' ,'UnInterruptable Remain','switch'])
         #observation space 
         upperLimit = np.array(
             [
-                #timeblock
+                #time block
                 95,
                 #load
                 10.0,
                 #PV
                 10.0,
-                #pricePerHour
-                6.0,
-                #Uninterruptable Remain
-                96.0,
-                #Uninterruptable Switch
+                #price per hour
+                6.2,
+                #future Avg Price per hour
+                6.2,
+                #Uninterruptible Remain
+                75.0,
+                #Uninterruptible Switch
                 1.0
             ],
             dtype=np.float32,
         )
         lowerLimit = np.array(
             [
-                #timeblock
+                #time block
                 0.0,
                 #load
                 0.0,
@@ -103,9 +118,11 @@ class HemsEnv(Env):
                 0.0,
                 #pricePerHour
                 0.0,
-                #Uninterruptable Remain
+                #future Avg Price per hour
                 0.0,
-                #Uninterruptable Switch
+                #Uninterruptible Remain
+                0.0,
+                #Uninterruptible Switch
                 0.0
             ],
             dtype=np.float32,
@@ -128,50 +145,45 @@ class HemsEnv(Env):
         cost = 0
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
-        sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state
+        sampleTime,load,pv,pricePerHour,futureAvgPrice,UnRemain,UnSwitch = self.state
         
         # 1.turn on switch 
         if action == 0 and UnRemain>0 and UnSwitch==0:
             self.uninterruptibleLoad.turn_on()
-            reward.append(1/self.uninterruptibleLoad.demand)
+            cost = 0.3*(pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume*self.uninterruptibleLoad.executePeriod) + 0.7*(futureAvgPrice * 0.25 * self.uninterruptibleLoad.AvgPowerConsume*self.uninterruptibleLoad.executePeriod)
+            reward.append(0.1*self.uninterruptibleLoad.executePeriod)
 
         #2.  do nothing
         elif action == 1 : 
             pass
+        #3. wrong operate
+        else: 
+            reward.append(-0.1)
 
         # the uninterruptible Load operate itself
-        self.uninterruptibleLoad.step()
+        self.uninterruptibleLoad.step()   
 
-        #calculate the cost at this sampletime (multiple 0.25 is for transforming pricePerHour  into per 15 min)
-        if self.uninterruptibleLoad.switch == True:
-            if (load + self.uninterruptibleLoad.AvgPowerConsume - pv) < 0:
-                cost = 0 #encourage agent turn on loads when pv is high
-            #PgridMax reward
-            elif(load+self.uninterruptibleLoad.AvgPowerConsume-pv>self.PgridMax):
-                reward.append(-1)
-                cost = pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume
+        #reward
+        reward.append(-0.6*cost)
+        if (sampleTime == (94-self.uninterruptibleLoad.executePeriod)) and (self.uninterruptibleLoad.getRemainDemand()!=0):
+            reward.append(-0.8*self.uninterruptibleLoad.getRemainDemand())
 
-                #calculate cost and proportion
-            else:
 
-                cost = pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume    
-
-        reward.append(-0.2*cost)
-
-        if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-10)
-            
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
+        if 94-sampleTime<=self.uninterruptibleLoad.executePeriod:
+            self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],sum(self.futureGridPrice[sampleTime:])/len(self.futureGridPrice[sampleTime:]),self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
+
+        else:    
+            self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],sum(self.futureGridPrice[sampleTime+1:sampleTime+self.uninterruptibleLoad.executePeriod])/(self.uninterruptibleLoad.executePeriod-1),self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
 
         #check if all day is done
         done =  bool(sampleTime == 95)
         #REWARD
 
 
-        reward = sum(reward)
         info = {'reward':reward}
+        reward = sum(reward)
 
         return self.state,reward,done,info
 
@@ -182,38 +194,51 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
-        self.uninterruptibleLoad = WM(demand=randint(1,3),executePeriod=randint(2,10),AvgPowerConsume=1.5)
+        self.uninterruptibleLoad = WM(demand=randint(1,5),executePeriod=randint(2,15),AvgPowerConsume=0.3)
+        self.GridPrice = (np.random.random(96)*6).tolist()
 
         #pick one day from 360 days
         i = randint(1,359)
         self.Load = self.allLoad.iloc[:,i].tolist()
         if int( i / 30) == 0:
             self.PV = self.allPV['Jan'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 1:
             self.PV = self.allPV['Feb'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 2:
             self.PV = self.allPV['Mar'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 3:
             self.PV = self.allPV['Apr'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 4:
             self.PV = self.allPV['May'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 5:
             self.PV = self.allPV['Jun'].tolist()
+            self.GridPrice = self.summerGridPrice
         elif int(i / 30) == 6:
             self.PV = self.allPV['July'].tolist()
+            self.GridPrice = self.summerGridPrice
         elif int(i / 30) == 7:
             self.PV = self.allPV['Aug'].tolist()
+            self.GridPrice = self.summerGridPrice
         elif int(i / 30) == 8:
             self.PV = self.allPV['Sep'].tolist()
+            self.GridPrice = self.summerGridPrice
         elif int(i / 30) == 9:
             self.PV = self.allPV['Oct'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 10:
             self.PV = self.allPV['Nov'].tolist()
+            self.GridPrice = self.notSummerGridPrice
         elif int(i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
+            self.GridPrice = self.notSummerGridPrice
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],sum(self.futureGridPrice[1:self.uninterruptibleLoad.executePeriod])/(self.uninterruptibleLoad.executePeriod-1),self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
         return self.state
 
 
@@ -226,5 +251,5 @@ if __name__ == '__main__':
     while not done: # Episode timestep
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
-        print(info,states)
+        print(info)
         
