@@ -7,7 +7,6 @@ class Test():
         self.testResult = {}
         for month in range(1,13):
             self.testResult[month] = pd.DataFrame()
-        self.summer = [5,6,7,8]
     def uninterruptible(self):
         self.environment = Environment.create(environment='gym',level='Hems-v9')
         self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
@@ -51,12 +50,12 @@ class Test():
                 totalReward += reward
             switch.append(0)
             remain = [load[sampletime]-pv[sampletime] for sampletime in range(96)]
-            self.testResult[month]['sampleTime']=sampletime
+            self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
-            self.testResult[month]['price']=price
-            self.testResult[month]['futurePrice']=futurePrice
+            self.testResult[month]['price'] = price
+            self.testResult[month]['futurePrice'] = futurePrice
             self.testResult[month]['unloadRemain'] = unloadRemain
-            self.testResult[month]['switch'] =  switch
+            self.testResult[month]['switch'] = switch
             sampletime.clear()
             load.clear()
             pv.clear()
