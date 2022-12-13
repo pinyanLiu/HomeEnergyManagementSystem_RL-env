@@ -5,7 +5,7 @@ import pandas as pd
 class Test():
     def __init__(self):
         self.testResult = {}
-        for month in range(1,13):
+        for month in range(12):
             self.testResult[month] = pd.DataFrame()
     def uninterruptible(self):
         self.environment = Environment.create(environment='gym',level='Hems-v9')
@@ -19,7 +19,7 @@ class Test():
         switch = []
         unloadRemain = []
         totalReward = 0
-        for month in range(1,13):
+        for month in range(12):
             states = self.environment.reset()
             sampletime.append(states[0])
             load.append(states[1])
@@ -65,6 +65,12 @@ class Test():
             unloadRemain.clear()
         print('Agent average episode reward: ', totalReward/12 ) 
 
+
+    def __del__(self):
+        # Close agent and environment
+        self.agent.close()
+        self.environment.close()
+        
 if __name__ == '__main__':
     test = Test()
     print(test.testResult)

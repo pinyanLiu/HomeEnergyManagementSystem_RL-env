@@ -9,15 +9,29 @@ class Plot():
         self.ax = [self.axes[i,j]for i in range(6) for j in range(2)]
         self.sub = [sub.twinx() for sub in self.ax]
     def power(self):
-        for month in range(1,13):
+        for month in range(0,12):
             self.ax[month].set_ylabel('Power')
-            self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray')            
+            if self.testResult[month]['switch'].tolist():
+                self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',bottom = self.testResult[month]['switch'] ,color ='gray') 
+            else:
+                self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray') 
+
+    def uninterruptibleLoad(self):
+        for month in range(0,12):
+            self.ax[month].set_ylabel('switch')
+            self.ax[month].bar(range(96) ,self.testResult[month]['switch'] ,label = 'switch', color ='green')            
+
     
     def __price__(self):
-        pass
+        for month in range(0,12):
+            self.ax[month].set_ylabel('price')
+            self.ax[month].bar(range(96) ,self.testResult[month]['price'] ,label = 'price', color ='gray')            
+        
 
     def __soc__(self):
-        pass
+        for month in range(0,12):
+            self.ax[month].set_ylabel('Power')
+            self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray')            
 
     def __pv__(self):
         pass
