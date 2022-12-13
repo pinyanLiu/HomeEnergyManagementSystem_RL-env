@@ -16,16 +16,17 @@ class Plot():
             else:
                 self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray') 
 
-    def uninterruptibleLoad(self):
+    def plotUninterruptible(self):
         for month in range(0,12):
-            self.ax[month].set_ylabel('switch')
             self.ax[month].bar(range(96) ,self.testResult[month]['switch'] ,label = 'switch', color ='green')            
 
     
-    def __price__(self):
+    def price(self):
         for month in range(0,12):
-            self.ax[month].set_ylabel('price')
-            self.ax[month].bar(range(96) ,self.testResult[month]['price'] ,label = 'price', color ='gray')            
+            self.sub[month].set_ylabel('price',color='blue')
+            self.sub[month].spines['right'].set_position(("axes",1.1))
+            self.sub[month].tick_params(axis='y',colors = 'blue')
+            self.sub[month].plot(range(len(self.testResult[month]['price'])),self.testResult[month]['price'], label = "price")  
         
 
     def __soc__(self):

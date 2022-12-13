@@ -1,14 +1,15 @@
 from tensorforce import Agent,Environment
 from lib.loads.uninterrupted import WM
 import pandas as pd
+import gym
 
 class Test():
     def __init__(self):
         self.testResult = {}
         for month in range(12):
             self.testResult[month] = pd.DataFrame()
-    def uninterruptible(self):
-        self.environment = Environment.create(environment='gym',level='Hems-v9')
+    def uninterruptible(self,priceModel):
+        self.environment = Environment.create(environment='gym',level='Hems-v9',priceModel = priceModel)
         self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
         wmObject = WM(demand=6,executePeriod=8,AvgPowerConsume=0.3)
         sampletime = []
@@ -68,9 +69,11 @@ class Test():
 
     def __del__(self):
         # Close agent and environment
-        self.agent.close()
-        self.environment.close()
-        
+        if self.agent:
+            self.agent.close()
+        if self.environment:
+            self.environment.close()
+
 if __name__ == '__main__':
     test = Test()
     print(test.testResult)
