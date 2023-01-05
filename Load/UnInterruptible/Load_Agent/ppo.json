@@ -3,29 +3,57 @@
     "states": {
         "type": "float",
         "shape": [
-            5
+            6
         ],
         "min_value": [
-            0.0, "-Infinity", "-Infinity",
-            0.0, "-Infinity"
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            0.0
         ],
         "max_value": [
-            96.0, "Infinity", "Infinity",
-            1.0, "Infinity"
+            95.0,
+            10.0,
+            10.0,
+            6.2,
+            75.0,
+            1.0
         ]
     },
     "actions": {
         "type": "int",
         "shape": [],
-        "num_values": 3
+        "num_values": 2
     },
-    "max_episode_timesteps": 30000,
-    "batch_size": 10,
-    "network": "auto",
+    "max_episode_timesteps": 96,
+    "batch_size": 256,
+    "network": [
+        {
+            "type": "dense",
+            "size": 200,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 200,
+            "activation": "relu"
+        },
+        {
+            "type": "dropout",
+            "rate": 0.3
+        },
+        {
+            "type": "dense",
+            "size": 200,
+            "activation": "relu"
+        }
+    ],
     "use_beta_distribution": false,
     "memory": "minimum",
-    "update_frequency": 2,
-    "learning_rate": 0.0003,
+    "update_frequency": 0.1,
+    "learning_rate": 0.001,
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.2,
@@ -45,12 +73,12 @@
     },
     "state_preprocessing": "linear_normalization",
     "exploration": {
-        "type":"decaying",
-        "decay":"linear",
-        "unit":"episodes",
-        "num_steps":2000,
-        "initial_value" : 0.9999,
-        "final_value":0.0001
+        "type": "decaying",
+        "decay": "linear",
+        "unit": "episodes",
+        "num_steps": 200,
+        "initial_value": 0.9999,
+        "final_value": 0.0001
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
@@ -58,19 +86,14 @@
     "parallel_interactions": 1,
     "config": null,
     "saver": {
-        "directory": "saver_dir",
-        "load": false,
-        "frequency": 50
+        "directory": "Load/UnInterruptible/saver_dir",
+        "frequency": 100,
+        "unit": "episodes"
     },
     "summarizer": {
-        "directory": "summaries",
+        "directory": "Load/UnInterruptible/summaries",
         "summaries": "all"
     },
     "tracking": null,
-    "recorder": null,
-    "internals": {},
-    "initial_internals": {
-        "policy": {},
-        "baseline": {}
-    }
+    "recorder": null
 }

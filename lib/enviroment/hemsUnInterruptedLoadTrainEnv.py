@@ -36,15 +36,15 @@ class HemsEnv(Env):
         self.allGridPrice = self.info.importGridPrice()
         self.summerGridPrice = self.allGridPrice['summer_price'].tolist()
         self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
-        self.futureGridPrice = np.mean([self.summerGridPrice,self.notSummerGridPrice],axis=0)
 
         #pick one day from 360 days
         i = randint(1,359)
         #import Load 
         self.allLoad = self.info.importTrainingLoad()
         self.Load = self.allLoad.iloc[:,i].tolist()
-        self.allPV = self.info.importPhotoVoltaic()
         #import PV
+        self.allPV = self.info.importPhotoVoltaic()
+        
         if int( i / 30) == 0:
             self.PV = self.allPV['Jan'].tolist()
             self.GridPrice = self.notSummerGridPrice
@@ -99,8 +99,6 @@ class HemsEnv(Env):
                 10.0,
                 #price per hour
                 6.2,
-                #future Avg Price per hour
-                6.2,
                 #Uninterruptible Remain
                 75.0,
                 #Uninterruptible Switch
@@ -117,8 +115,6 @@ class HemsEnv(Env):
                 #PV
                 0.0,
                 #pricePerHour
-                0.0,
-                #future Avg Price per hour
                 0.0,
                 #Uninterruptible Remain
                 0.0,
@@ -145,20 +141,20 @@ class HemsEnv(Env):
         cost = 0
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
-        sampleTime,load,pv,pricePerHour,futureAvgPrice,UnRemain,UnSwitch = self.state
+        sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state['states']
         
         # 1.turn on switch 
-        if action == 0 and UnRemain>0 and UnSwitch==0:
+        if action == 0:
             self.uninterruptibleLoad.turn_on()
-            cost = 0.3*(pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume*self.uninterruptibleLoad.executePeriod) + 0.7*(futureAvgPrice * 0.25 * self.uninterruptibleLoad.AvgPowerConsume*self.uninterruptibleLoad.executePeriod)
+            cost = 0.3*(pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume*self.uninterruptibleLoad.executePeriod) 
             reward.append(0.1*self.uninterruptibleLoad.executePeriod)
 
         #2.  do nothing
         elif action == 1 : 
             pass
-        #3. wrong operate
-        else: 
-            reward.append(-0.1)
+
+        assert action == 0 and UnRemain >=0 and UnSwitch != True,'action Invalid'
+
 
         # the uninterruptible Load operate itself
         self.uninterruptibleLoad.step()   
@@ -171,18 +167,16 @@ class HemsEnv(Env):
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        if 94-sampleTime<=self.uninterruptibleLoad.executePeriod:
-            self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],sum(self.futureGridPrice[sampleTime:])/len(self.futureGridPrice[sampleTime:]),self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
-
-        else:    
-            self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],sum(self.futureGridPrice[sampleTime+1:sampleTime+self.uninterruptibleLoad.executePeriod])/(self.uninterruptibleLoad.executePeriod-1),self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
-
+        states=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
+        #action mask
+        action_mask = np.asarray([states[4]>0 and states[5]==False,True])
+        self.state = dict(states=states,action_mask=action_mask)
         #check if all day is done
         done =  bool(sampleTime == 95)
         #REWARD
 
 
-        info = {'reward':reward}
+        info = {'state':states,'action':action}
         reward = sum(reward)
 
         return self.state,reward,done,info
@@ -237,8 +231,12 @@ class HemsEnv(Env):
             self.PV = self.allPV['Dec'].tolist()
             self.GridPrice = self.notSummerGridPrice
 
+
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],sum(self.futureGridPrice[1:self.uninterruptibleLoad.executePeriod])/(self.uninterruptibleLoad.executePeriod-1),self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        states=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        #action mask
+        action_mask = np.asarray([states[4]>0 and states[5]==False,True])
+        self.state = dict(states=states,action_mask=action_mask)
         return self.state
 
 
