@@ -32,12 +32,12 @@
     "network": [
         {
             "type": "dense",
-            "size": 200,
+            "size": 319,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 200,
+            "size": 319,
             "activation": "relu"
         },
         {
@@ -46,17 +46,17 @@
         },
         {
             "type": "dense",
-            "size": 200,
+            "size": 319,
             "activation": "relu"
         }
     ],
     "use_beta_distribution": false,
     "memory": "minimum",
-    "update_frequency": 0.2,
+    "update_frequency": 12,
     "learning_rate": 0.001,
     "multi_step": 10,
     "subsampling_fraction": 0.33,
-    "likelihood_ratio_clipping": 0.2,
+    "likelihood_ratio_clipping": 0.541,
     "discount": 0.99,
     "return_processing": null,
     "advantage_processing": null,
