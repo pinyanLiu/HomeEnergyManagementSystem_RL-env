@@ -1,4 +1,3 @@
-from genericpath import samefile
 from  gym.envs.Hems.import_data import ImportData 
 from gym.envs.Hems.loads.interrupted import AC
 from gym.envs.Hems.loads.uninterrupted import WM
@@ -84,7 +83,7 @@ class HemsEnv(Env):
         
 
 
-        self.uninterruptibleLoad = WM(demand=randint(1,5),executePeriod=randint(2,15),AvgPowerConsume=0.3)
+        self.uninterruptibleLoad = WM(demand=randint(1,4),executePeriod=randint(2,5),AvgPowerConsume=0.3)
         #action Uninterruptible load take (1.on 2.do nothing )
         self.action_space = spaces.Discrete(2)
         #self.observation_space_name = np.array(['sampleTime','load', 'pv', 'pricePerHour' ,'UnInterruptable Remain','switch'])
@@ -100,7 +99,7 @@ class HemsEnv(Env):
                 #price per hour
                 6.2,
                 #Uninterruptible Remain
-                75.0,
+                20.0,
                 #Uninterruptible Switch
                 1.0
             ],
@@ -125,7 +124,10 @@ class HemsEnv(Env):
         )
         self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
         self.state = None
-        
+        self.reward = 0
+        self.done = False
+        self.info = {}
+
     def step(self,action):
         '''
         interaction of each state(changes while taking action)
@@ -135,51 +137,56 @@ class HemsEnv(Env):
         #error message if getting wrong action
         err_msg = f"{action!r} ({type(action)}) invalid"
         assert self.action_space.contains(action),err_msg
+        
+        #invalid action masking
+        if self.action_mask[action]==False:
+            return self.state,self.reward,self.done,self.info
 
         #list for storing reward
         reward = []
         cost = 0
 
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
-        sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state['states']
+        #sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state['states']
+        sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state
+        # err_msg = f"{action}, {UnRemain}, {UnSwitch} invalid"
+        # if action == 1:
+        #     assert   UnRemain >=0 and UnSwitch == False ,err_msg
         
-        # 1.turn on switch 
+        #  do nothing
         if action == 0:
-            self.uninterruptibleLoad.turn_on()
-            cost = 0.3*(pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume*self.uninterruptibleLoad.executePeriod) 
-            reward.append(0.1*self.uninterruptibleLoad.executePeriod)
-
-        #2.  do nothing
-        elif action == 1 : 
             pass
-
-        assert action == 0 and UnRemain >=0 and UnSwitch != True,'action Invalid'
-
+        #  turn on switch 
+        elif action == 1 : 
+            self.uninterruptibleLoad.turn_on()
 
         # the uninterruptible Load operate itself
         self.uninterruptibleLoad.step()   
+        # if the switch is on , calculate the electricity cost
+        if self.uninterruptibleLoad.switch:
+            cost = (pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume) 
+
 
         #reward
-        reward.append(-0.6*cost)
-        if (sampleTime == (94-self.uninterruptibleLoad.executePeriod)) and (self.uninterruptibleLoad.getRemainDemand()!=0):
+        reward.append(-0.5*cost)
+        if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
             reward.append(-0.8*self.uninterruptibleLoad.getRemainDemand())
 
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        states=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
         #action mask
-        action_mask = np.asarray([states[4]>0 and states[5]==False,True])
-        self.state = dict(states=states,action_mask=action_mask)
+        self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
         #check if all day is done
-        done =  bool(sampleTime == 95)
+        self.done =  bool(sampleTime == 95)
         #REWARD
+        self.reward = sum(reward)
 
 
-        info = {'state':states,'action':action}
-        reward = sum(reward)
+        self.info = reward
 
-        return self.state,reward,done,info
+        return self.state,self.reward,self.done,self.info
 
         
     def render(self):
@@ -188,7 +195,7 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
-        self.uninterruptibleLoad = WM(demand=randint(1,5),executePeriod=randint(2,15),AvgPowerConsume=0.3)
+        self.uninterruptibleLoad = WM(demand=randint(1,5),executePeriod=randint(2,4),AvgPowerConsume=0.3)
         self.GridPrice = (np.random.random(96)*6).tolist()
 
         #pick one day from 360 days
@@ -233,10 +240,9 @@ class HemsEnv(Env):
 
 
         #reset state
-        states=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
         #action mask
-        action_mask = np.asarray([states[4]>0 and states[5]==False,True])
-        self.state = dict(states=states,action_mask=action_mask)
+        self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
         return self.state
 
 

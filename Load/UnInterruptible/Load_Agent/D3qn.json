@@ -3,10 +3,9 @@
     "states": {
         "type": "float",
         "shape": [
-            7
+            6
         ],
         "min_value": [
-            0.0,
             0.0,
             0.0,
             0.0,
@@ -19,8 +18,7 @@
             10.0,
             10.0,
             6.2,
-            6.2,
-            75.0,
+            20.0,
             1.0
         ]
     },
@@ -54,7 +52,7 @@
     ],
     "memory": 1000,
     "start_updating": 1000,
-    "update_frequency": 0.25,
+    "update_frequency": 0.1,
     "learning_rate": 0.0004,
     "discount": 0.98,
     "return_processing": null,
@@ -64,7 +62,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 10000,
+        "num_steps": 4000,
         "initial_value": 0.99,
         "final_value": 1e-7
     },
