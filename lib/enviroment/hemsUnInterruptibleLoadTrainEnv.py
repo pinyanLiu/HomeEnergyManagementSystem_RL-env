@@ -13,7 +13,7 @@ class UnIntEnv(HemsEnv):
         '''
         super().__init__()
         #import Base Parameter
-        self.PgridMax = float(list(super.BaseParameter.loc[super.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
+        self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
         
         self.uninterruptibleLoad = WM(demand=randint(1,4),executePeriod=randint(2,5),AvgPowerConsume=0.3)
         #action Uninterruptible load take (1.on 2.do nothing )
@@ -129,14 +129,14 @@ class UnIntEnv(HemsEnv):
 
 
         #reset state
-        self.state=np.array([0,super.Load[0],super.PV[0],super.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
         #action mask
         self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
         return self.state
 
 
 if __name__ == '__main__':
-    env = make("Hems-v18")
+    env = make("Hems-v8")
 #     # Initialize episode
     states = env.reset()
     done = False

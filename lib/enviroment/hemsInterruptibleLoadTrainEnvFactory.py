@@ -1,88 +1,20 @@
-from  gym.envs.Hems.import_data import ImportData 
-from gym.envs.Hems.loads.interrupted import AC
 from gym.envs.Hems.loads.uninterrupted import WM
-from  gym import Env
 from  gym import spaces
 from gym import make
 import numpy as np
-from  yaml import load , SafeLoader
 from random import randint
+from gym.envs.Hems.hemsTrainEnv import HemsEnv
 
-class HemsEnv(Env):
+class UnIntEnv(HemsEnv):
     def __init__(self) :
         '''
         Action space
         observation space
         '''
-        #
-        # The information of ip should   'NOT'   upload to github
-        #
-        with open("yaml/mysqlData.yaml","r") as f:
-            self.mysqlData = load(f,SafeLoader)
-
-        self.host = self.mysqlData['host']
-        self.user = self.mysqlData['user']
-        self.passwd = self.mysqlData['passwd']
-        self.db = self.mysqlData['db']
-        self.info = ImportData(host= self.host ,user= self.user ,passwd= self.passwd ,db= self.db)
-        
+        super().__init__()
         #import Base Parameter
-        self.BaseParameter = self.info.importBaseParameter()
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
-
-
-        #import Grid price
-        self.allGridPrice = self.info.importGridPrice()
-        self.summerGridPrice = self.allGridPrice['summer_price'].tolist()
-        self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
-
-        #pick one day from 360 days
-        i = randint(1,359)
-        #import Load 
-        self.allLoad = self.info.importTrainingLoad()
-        self.Load = self.allLoad.iloc[:,i].tolist()
-        #import PV
-        self.allPV = self.info.importPhotoVoltaic()
         
-        if int( i / 30) == 0:
-            self.PV = self.allPV['Jan'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 1:
-            self.PV = self.allPV['Feb'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 2:
-            self.PV = self.allPV['Mar'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 3:
-            self.PV = self.allPV['Apr'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 4:
-            self.PV = self.allPV['May'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 5:
-            self.PV = self.allPV['Jun'].tolist()
-            self.GridPrice = self.summerGridPrice
-        elif int(i / 30) == 6:
-            self.PV = self.allPV['July'].tolist()
-            self.GridPrice = self.summerGridPrice
-        elif int(i / 30) == 7:
-            self.PV = self.allPV['Aug'].tolist()
-            self.GridPrice = self.summerGridPrice
-        elif int(i / 30) == 8:
-            self.PV = self.allPV['Sep'].tolist()
-            self.GridPrice = self.summerGridPrice
-        elif int(i / 30) == 9:
-            self.PV = self.allPV['Oct'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 10:
-            self.PV = self.allPV['Nov'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 11:
-            self.PV = self.allPV['Dec'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        
-
-
         self.uninterruptibleLoad = WM(demand=randint(1,4),executePeriod=randint(2,5),AvgPowerConsume=0.3)
         #action Uninterruptible load take (1.on 2.do nothing )
         self.action_space = spaces.Discrete(2)
@@ -123,10 +55,7 @@ class HemsEnv(Env):
             dtype=np.float32,
         )
         self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
-        self.state = None
-        self.reward = 0
-        self.done = False
-        self.info = {}
+
 
     def step(self,action):
         '''
@@ -195,48 +124,8 @@ class HemsEnv(Env):
         '''
         Starting State
         '''
+        super().reset()
         self.uninterruptibleLoad = WM(demand=randint(1,5),executePeriod=randint(2,4),AvgPowerConsume=0.3)
-        self.GridPrice = (np.random.random(96)*6).tolist()
-
-        #pick one day from 360 days
-        i = randint(1,359)
-        self.Load = self.allLoad.iloc[:,i].tolist()
-        if int( i / 30) == 0:
-            self.PV = self.allPV['Jan'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 1:
-            self.PV = self.allPV['Feb'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 2:
-            self.PV = self.allPV['Mar'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 3:
-            self.PV = self.allPV['Apr'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 4:
-            self.PV = self.allPV['May'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 5:
-            self.PV = self.allPV['Jun'].tolist()
-            self.GridPrice = self.summerGridPrice
-        elif int(i / 30) == 6:
-            self.PV = self.allPV['July'].tolist()
-            self.GridPrice = self.summerGridPrice
-        elif int(i / 30) == 7:
-            self.PV = self.allPV['Aug'].tolist()
-            self.GridPrice = self.summerGridPrice
-        elif int(i / 30) == 8:
-            self.PV = self.allPV['Sep'].tolist()
-            self.GridPrice = self.summerGridPrice
-        elif int(i / 30) == 9:
-            self.PV = self.allPV['Oct'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 10:
-            self.PV = self.allPV['Nov'].tolist()
-            self.GridPrice = self.notSummerGridPrice
-        elif int(i / 30) == 11:
-            self.PV = self.allPV['Dec'].tolist()
-            self.GridPrice = self.notSummerGridPrice
 
 
         #reset state
