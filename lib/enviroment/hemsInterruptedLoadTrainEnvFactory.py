@@ -6,7 +6,7 @@ from  gym import spaces
 from gym import make
 
 
-class UnIntEnv(HemsEnv):
+class IntEnv(HemsEnv):
     def __init__(self) :
         '''
         Action space
@@ -125,7 +125,6 @@ class UnIntEnv(HemsEnv):
         Starting State
         '''
         super().reset()
-        self.interruptibleLoad.reset()
         self.interruptibleLoad = AC(demand=randint(1,49),AvgPowerConsume=1.5)
 
         #reset state
