@@ -42,7 +42,7 @@
         },
         {
             "type": "dropout",
-            "rate": 0.3
+            "rate": 0.2
         },
         {
             "type": "dense",
@@ -53,7 +53,7 @@
     "use_beta_distribution": false,
     "memory": "minimum",
     "update_frequency": 12,
-    "learning_rate": 0.001,
+    "learning_rate": 0.00041,
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.541,
@@ -64,12 +64,12 @@
     "baseline": [
         {
             "type": "dense",
-            "size": 200,
+            "size": 319,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 200,
+            "size": 319,
             "activation": "relu"
         }
     ],
@@ -84,7 +84,7 @@
         "decay": "linear",
         "unit": "episodes",
         "num_steps": 4000,
-        "initial_value": 0.0000001,
+        "initial_value": 0.5,
         "final_value": 0.0000001
     },
     "variable_noise": 0.0,
