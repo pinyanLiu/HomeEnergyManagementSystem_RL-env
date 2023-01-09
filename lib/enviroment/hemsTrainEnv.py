@@ -26,7 +26,7 @@ class HemsEnv(Env):
         self.BaseParameter = self.info.importBaseParameter()
 
         #import Grid price
-        self.GridPrice = self.info.importGridPrice()
+        self.allGridPrice = self.info.importGridPrice()
         self.summerGridPrice = self.allGridPrice['summer_price'].tolist()
         self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
         
@@ -75,13 +75,7 @@ class HemsEnv(Env):
             self.GridPrice = self.notSummerGridPrice
 
 
-        #action we take (degree of HVAC power)
-        self.action_space = 0
-        #observation space 
-        self.observation_space_name = np.array()
-        upperLimit = np.array()
-        lowerLimit = np.array()
-        self.observation_space = 0
+
         self.state = None
         self.reward = 0
         self.done = False

@@ -97,7 +97,7 @@ class UnIntEnv(HemsEnv):
 
 
         #reward
-        reward.append(-0.5*cost)
+        reward.append(-cost)
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
             reward.append(-0.8*self.uninterruptibleLoad.getRemainDemand())
 
@@ -126,8 +126,6 @@ class UnIntEnv(HemsEnv):
         '''
         super().reset()
         self.uninterruptibleLoad = WM(demand=randint(1,5),executePeriod=randint(2,4),AvgPowerConsume=0.3)
-
-
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
         #action mask
