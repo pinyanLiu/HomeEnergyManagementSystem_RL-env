@@ -2,6 +2,7 @@ from ast import arg
 from tensorforce.execution import Runner  
 from tensorforce import Agent
 import sys
+from lib.enviroment.hemsUnInterruptibleLoadTrainEnvForce import UnIntEnv
 
 def main(argv):
     if len(argv)<4:
@@ -16,7 +17,7 @@ def main(argv):
     elif argv[1] == 'HVAC':    
         environment = dict(environment='gym', level='Hems-v6')
     elif argv[1] == 'unintload':
-        environment = dict(environment='gym', level='Hems-v8')
+        environment = dict(environment=UnIntEnv)
     else :
         print('undefined env')
         return
@@ -24,7 +25,7 @@ def main(argv):
     runner = Runner(
         environment=environment,
         agent= agent,
-        max_episode_timesteps=96,
+        max_episode_timesteps=300,
     )
 
 

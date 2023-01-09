@@ -27,7 +27,7 @@
         "shape": [],
         "num_values": 2
     },
-    "max_episode_timesteps": 300,
+    "max_episode_timesteps": 96,
     "batch_size": 128,
     "network": [
         {
@@ -84,7 +84,7 @@
         "decay": "linear",
         "unit": "episodes",
         "num_steps": 4000,
-        "initial_value": 0.5,
+        "initial_value": 0.2,
         "final_value": 0.0000001
     },
     "variable_noise": 0.0,
