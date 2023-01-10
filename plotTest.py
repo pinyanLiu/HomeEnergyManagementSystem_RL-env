@@ -1,12 +1,9 @@
 from lib.plot import plot
-from projects.RL_firstry.lib.test import uninterruptibleSimulation
+from lib.uninterruptibleSimulation import uninterruptibleSimulation
 
 
 def main():
     simulation = uninterruptibleSimulation.Test()
-    simulation.uninterruptible('allRealistic')
-    simulation.uninterruptible('realisticPredict')
-    simulation.uninterruptible('allPredict')
     output = plot.Plot(simulation.testResult)
     output.power()
     output.plotUninterruptible()

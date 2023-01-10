@@ -18,7 +18,7 @@
             10.0,
             10.0,
             6.2,
-            20.0,
+            75.0,
             1.0
         ]
     },
@@ -41,10 +41,6 @@
             "activation": "relu"
         },
         {
-            "type": "dropout",
-            "rate": 0.2
-        },
-        {
             "type": "dense",
             "size": 319,
             "activation": "relu"
@@ -52,16 +48,21 @@
     ],
     "use_beta_distribution": false,
     "memory": "minimum",
-    "update_frequency": 12,
-    "learning_rate": 0.00041,
+    "update_frequency": 0.1,
+    "learning_rate": 0.00005,
     "multi_step": 10,
     "subsampling_fraction": 0.33,
-    "likelihood_ratio_clipping": 0.541,
+    "likelihood_ratio_clipping": 0.5,
     "discount": 0.99,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
     "baseline": [
+        {
+            "type": "dense",
+            "size": 319,
+            "activation": "relu"
+        },
         {
             "type": "dense",
             "size": 319,
@@ -83,9 +84,9 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 4000,
-        "initial_value": 0.2,
-        "final_value": 0.0000001
+        "num_steps": 8000,
+        "initial_value": 0.25,
+        "final_value": 0.00001
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,

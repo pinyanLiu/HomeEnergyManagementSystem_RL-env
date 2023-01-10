@@ -1,10 +1,9 @@
 from  gym.envs.Hems.import_data import ImportData 
-from  gym import Env
-import numpy as np
 from  yaml import load , SafeLoader
 from random import randint
+from tensorforce import Environment
 
-class HemsEnv(Env):
+class HemsEnv(Environment):
     def __init__(self) :
         '''
         Action space
@@ -13,6 +12,7 @@ class HemsEnv(Env):
         #
         # The information of ip should   'NOT'   upload to github
         #
+        super().__init__()
         with open("yaml/mysqlData.yaml","r") as f:
             self.mysqlData = load(f,SafeLoader)
 
@@ -81,18 +81,16 @@ class HemsEnv(Env):
         self.done = False
         self.info = {}
 
-    def step(self,action):
-        '''
-        interaction of each state(changes while taking action)
-        Rewards
-        Episode Termination condition
-        '''
+    def states(self):
+        pass
+
+    def actions(self):
         pass
 
 
-        
-    def render(self):
+    def close(self):
         pass
+
     def reset(self):
         '''
         Starting State
@@ -136,3 +134,11 @@ class HemsEnv(Env):
         elif int(self.i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
             self.GridPrice = self.notSummerGridPrice
+
+    def execute(self,actions):
+        '''
+        interaction of each state(changes while taking action)
+        Rewards
+        Episode Termination condition
+        '''
+        pass

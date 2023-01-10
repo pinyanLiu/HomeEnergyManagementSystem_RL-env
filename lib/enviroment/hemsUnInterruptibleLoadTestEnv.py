@@ -5,8 +5,9 @@ from  gym import spaces
 from gym import make
 import numpy as np
 from  yaml import load , SafeLoader
+from UnInterruptibleLoadTrainEnv import UnIntEnv
 
-class HemsEnv(Env):
+class HemsEnv(UnIntEnv):
     def __init__(self) :
         '''
         Action space
@@ -85,113 +86,17 @@ class HemsEnv(Env):
             self.GridPrice = self.notSummerGridPrice
 
         self.uninterruptibleLoad = WM(demand=self.unload_demand,executePeriod=self.unload_period,AvgPowerConsume=self.unload_power)
-        #self.GridPrice = self.testPrice
 
-        #action Uninterruptible load take (1.on 2.do nothing )
-        self.action_space = spaces.Discrete(2)
-        #self.observation_space_name = np.array(['sampleTime','load', 'pv', 'pricePerHour' ,'UnInterruptable Remain'])
-        #observation space 
-        upperLimit = np.array(
-            [
-                #time block
-                95,
-                #load
-                10.0,
-                #PV
-                10.0,
-                #price per hour
-                6.2,
-                #future Avg Price per hour
-                6.2,
-                #Uninterruptible Remain
-                75.0,
-                #Uninterruptible Switch
-                1.0
-            ],
-            dtype=np.float32,
-        )
-        lowerLimit = np.array(
-            [
-                #time block
-                0.0,
-                #load
-                0.0,
-                #PV
-                0.0,
-                #pricePerHour
-                0.0,
-                #future Avg Price per hour
-                0.0,
-                #Uninterruptible Remain
-                0.0,
-                #Uninterruptible Switch
-                0.0
-            ],
-            dtype=np.float32,
-        )
-        self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
-        self.state = None
+    def states(self):
+        return super().states()
+
+    def actions(self):
+        return super().actions()
         
-    def step(self,action):
-        '''
-        interaction of each state(changes while taking action)
-        Rewards
-        Episode Termination condition
-        '''
-        #error message if getting wrong action
-        err_msg = f"{action!r} ({type(action)}) invalid"
-        assert self.action_space.contains(action),err_msg
-
-        #list for storing reward
-        reward = []
-        cost = 0
-
-        #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
-        sampleTime,load,pv,pricePerHour,futureAvgPrice,UnRemain,UnSwitch = self.state
-        
-        # 1.turn on switch 
-        if action == 0 and UnRemain>0 and UnSwitch==0:
-            self.uninterruptibleLoad.turn_on()
-            cost = 0.3*(pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume*self.uninterruptibleLoad.executePeriod) + 0.7*(futureAvgPrice * 0.25 * self.uninterruptibleLoad.AvgPowerConsume*self.uninterruptibleLoad.executePeriod)
-            reward.append(0.1*self.uninterruptibleLoad.executePeriod)
-
-        #2.  do nothing
-        elif action == 1 : 
-            pass
-        #3. wrong operate
-        else: 
-            reward.append(-0.1)
-
-        # the uninterruptible Load operate itself
-        self.uninterruptibleLoad.step()   
-
-        #reward
-        reward.append(-0.6*cost)
-        if (sampleTime == (94-self.uninterruptibleLoad.executePeriod)) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-0.8*self.uninterruptibleLoad.getRemainDemand())
+    def execute(self, actions):
+        return super().execute(actions)
 
 
-        #change to next state
-        sampleTime = int(sampleTime+1)
-        if 94-sampleTime<=self.uninterruptibleLoad.executePeriod:
-            self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],sum(self.futureGridPrice[sampleTime:])/len(self.futureGridPrice[sampleTime:]),self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
-
-        else:    
-            self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],sum(self.futureGridPrice[sampleTime+1:sampleTime+self.uninterruptibleLoad.executePeriod])/(self.uninterruptibleLoad.executePeriod-1),self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
-
-        #check if all day is done
-        done =  bool(sampleTime == 95)
-        #REWARD
-
-
-        info = {'reward':reward}
-        reward = sum(reward)
-
-        return self.state,reward,done,info
-
-        
-    def render(self):
-        pass
     def reset(self):
         '''
         Starting State
@@ -242,8 +147,9 @@ class HemsEnv(Env):
             self.GridPrice = self.notSummerGridPrice
 
         #reset state
-
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],sum(self.futureGridPrice[1:self.uninterruptibleLoad.executePeriod])/(self.uninterruptibleLoad.executePeriod-1),self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        #action mask
+        self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
         return self.state
 
 
