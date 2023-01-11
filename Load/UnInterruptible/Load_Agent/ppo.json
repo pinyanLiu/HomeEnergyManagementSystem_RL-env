@@ -3,13 +3,14 @@
     "states": {
         "type": "float",
         "shape": [
-            6
+            7
         ],
         "min_value": [
             0.0,
             0.0,
             0.0,
             0.0,
+            -0.15,
             0.0,
             0.0
         ],
@@ -18,6 +19,7 @@
             10.0,
             10.0,
             6.2,
+            0.15,
             75.0,
             1.0
         ]
@@ -49,12 +51,19 @@
     "use_beta_distribution": false,
     "memory": "minimum",
     "update_frequency": 0.1,
-    "learning_rate": 0.00005,
+    "learning_rate": {
+        "type": "decaying",
+        "decay": "linear",
+        "unit": "episodes",
+        "num_steps": 2000,
+        "initial_value": 1e-3,
+        "final_value": 5e-5
+    },
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.5,
     "discount": 0.99,
-    "return_processing": null,
+    "reward_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
     "baseline": [
@@ -76,7 +85,14 @@
     ],
     "baseline_optimizer": {
         "optimizer": "adam",
-        "learning_rate": 0.0001,
+        "learning_rate": {
+            "type": "decaying",
+            "decay": "linear",
+            "unit": "episodes",
+            "num_steps": 2000,
+            "initial_value": 1e-3,
+            "final_value": 5e-5
+        },
         "multi_step": 10
     },
     "state_preprocessing": "linear_normalization",
@@ -84,9 +100,9 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 8000,
+        "num_steps": 2000,
         "initial_value": 0.25,
-        "final_value": 0.00001
+        "final_value": 1e-5
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
@@ -95,7 +111,7 @@
     "config": null,
     "saver": {
         "directory": "Load/UnInterruptible/saver_dir",
-        "frequency": 100,
+        "frequency": 1000,
         "unit": "episodes"
     },
     "summarizer": {

@@ -1,7 +1,7 @@
 from gym.envs.Hems.loads.uninterrupted import WM
 from  gym import spaces
 import numpy as np
-from random import randint
+from random import randint,uniform
 from gym.envs.Hems.hemsTrainEnv import HemsEnv
 from tensorforce import Environment
 
@@ -14,8 +14,9 @@ class UnIntEnv(HemsEnv):
         super().__init__()
         #import Base Parameter
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
-#        self.uninterruptibleLoad = WM(demand=randint(1,15),executePeriod=randint(2,4),AvgPowerConsume=0.3)
-        self.uninterruptibleLoad = WM(demand=randint(15,25),executePeriod=3,AvgPowerConsume=0.3)
+        self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
+#        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
+        self.uninterruptibleLoad = WM(demand=randint(20,25),executePeriod=3,AvgPowerConsume=0.3)
 
 
 
@@ -31,8 +32,10 @@ class UnIntEnv(HemsEnv):
                 10.0,
                 #price per hour
                 6.2,
+                #SOC
+                0.15,
                 #Uninterruptible Remain
-                60.0,
+                75.0,
                 #Uninterruptible Switch
                 1.0
             ],
@@ -48,6 +51,8 @@ class UnIntEnv(HemsEnv):
                 0.0,
                 #pricePerHour
                 0.0,
+                #SOC
+                -0.15,
                 #Uninterruptible Remain
                 0.0,
                 #Uninterruptible Switch
@@ -70,12 +75,13 @@ class UnIntEnv(HemsEnv):
         Starting State
         '''
         super().reset()
-#        self.uninterruptibleLoad = WM(demand=randint(1,15),executePeriod=randint(2,4),AvgPowerConsume=0.3)
-        self.uninterruptibleLoad = WM(demand=randint(15,25),executePeriod=3,AvgPowerConsume=0.3)
+#        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
+        self.uninterruptibleLoad = WM(demand=randint(20,25),executePeriod=3,AvgPowerConsume=0.3)
+        self.deltaSoc = (uniform(-0.15,0.15))
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc,self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
         #action mask
-        self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
+        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False])
         return self.state
 
     def execute(self,actions):
@@ -88,7 +94,7 @@ class UnIntEnv(HemsEnv):
         reward = []
         cost = 0
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
-        sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state
+        sampleTime,load,pv,pricePerHour,deltaSoc,UnRemain,UnSwitch = self.state
 
         #  do nothing
         if actions == 0:
@@ -101,20 +107,24 @@ class UnIntEnv(HemsEnv):
         self.uninterruptibleLoad.step()   
         # if the switch is on , calculate the electricity cost
         if self.uninterruptibleLoad.switch:
-            cost = (pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume) 
+            Pess = deltaSoc*self.batteryCapacity*0.25
+            cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv-Pess))
+        if cost<0:
+            cost = 0 
 
 
         #reward
         reward.append(0.6-4*cost)
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-10*self.uninterruptibleLoad.getRemainProcessPercentage())
+            reward.append(-20*self.uninterruptibleLoad.getRemainProcessPercentage())
         
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
+        self.deltaSoc = uniform(-0.15,0.15)
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc,self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
         #actions mask
-        self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
+        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False])
         #check if all day is done
         self.done =  bool(sampleTime == 95)
         #REWARD

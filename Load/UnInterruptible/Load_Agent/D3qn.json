@@ -3,13 +3,14 @@
     "states": {
         "type": "float",
         "shape": [
-            6
+            7
         ],
         "min_value": [
             0.0,
             0.0,
             0.0,
             0.0,
+            -0.15,
             0.0,
             0.0
         ],
@@ -18,7 +19,8 @@
             10.0,
             10.0,
             6.2,
-            20.0,
+            0.15,
+            75.0,
             1.0
         ]
     },
@@ -53,18 +55,25 @@
     "memory": 1000,
     "start_updating": 1000,
     "update_frequency": 0.1,
-    "learning_rate": 0.0004,
+    "learning_rate": {
+        "type": "decaying",
+        "decay": "linear",
+        "unit": "episodes",
+        "num_steps": 2000,
+        "initial_value": 0.001,
+        "final_value": 0.00005
+    },
     "discount": 0.98,
-    "return_processing": null,
+    "reward_processing": null,
     "predict_terminal_values": false,
     "state_preprocessing": "linear_normalization",
     "exploration": {
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 4000,
+        "num_steps": 2000,
         "initial_value": 0.99,
-        "final_value": 1e-7
+        "final_value": 1e-5
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
@@ -73,7 +82,7 @@
     "config": null,
     "saver": {
         "directory": "Load/UnInterruptible/saver_dir",
-        "frequency": 100,
+        "frequency": 1000,
         "unit": "episodes"
     },
     "summarizer": {
