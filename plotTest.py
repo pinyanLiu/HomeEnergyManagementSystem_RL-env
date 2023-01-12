@@ -4,6 +4,7 @@ from lib.uninterruptibleSimulation import uninterruptibleSimulation
 
 def main():
     simulation = uninterruptibleSimulation.Test()
+    simulation.uninterruptible()
     output = plot.Plot(simulation.testResult)
     output.power()
     output.plotUninterruptible()

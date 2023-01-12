@@ -2,7 +2,7 @@ from gym.envs.Hems.loads.uninterrupted import WM
 from  gym import spaces
 import numpy as np
 from random import randint,uniform
-from gym.envs.Hems.hemsTrainEnv import HemsEnv
+from lib.enviroment.hemsTrainEnv import HemsEnv
 from tensorforce import Environment
 
 class UnIntEnv(HemsEnv):
@@ -17,6 +17,7 @@ class UnIntEnv(HemsEnv):
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
         self.uninterruptibleLoad = WM(demand=randint(20,25),executePeriod=3,AvgPowerConsume=0.3)
+        self.deltaSoc = uniform(-0.15,0.15)
 
 
 
@@ -108,15 +109,18 @@ class UnIntEnv(HemsEnv):
         # if the switch is on , calculate the electricity cost
         if self.uninterruptibleLoad.switch:
             Pess = deltaSoc*self.batteryCapacity*0.25
-            cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv-Pess))
+            if Pess<0:
+                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv))
+            else:
+                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv-Pess))
         if cost<0:
             cost = 0 
 
 
         #reward
-        reward.append(0.6-4*cost)
+        reward.append(0.5-4*cost)
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-20*self.uninterruptibleLoad.getRemainProcessPercentage())
+            reward.append(-100*self.uninterruptibleLoad.getRemainProcessPercentage())
         
 
         #change to next state

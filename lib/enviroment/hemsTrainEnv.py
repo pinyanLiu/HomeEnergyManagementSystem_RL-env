@@ -1,6 +1,6 @@
 from  gym.envs.Hems.import_data import ImportData 
 from  yaml import load , SafeLoader
-from random import randint
+from random import randint,uniform
 from tensorforce import Environment
 
 class HemsEnv(Environment):
@@ -28,7 +28,8 @@ class HemsEnv(Environment):
         #import Grid price
         self.allGridPrice = self.info.importGridPrice()
         self.summerGridPrice = self.allGridPrice['summer_price'].tolist()
-        self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
+        #self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
+        self.notSummerGridPrice = self.allGridPrice['test_price1'].tolist()
         
         #pick one day from 360 days
         self.i = randint(1,359)
@@ -79,7 +80,6 @@ class HemsEnv(Environment):
         self.state = None
         self.reward = 0
         self.done = False
-        self.info = {}
 
     def states(self):
         pass
@@ -134,6 +134,7 @@ class HemsEnv(Environment):
         elif int(self.i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
             self.GridPrice = self.notSummerGridPrice
+        #self.GridPrice = [uniform(1.73,5.84) for _ in range(96)]
 
     def execute(self,actions):
         '''
