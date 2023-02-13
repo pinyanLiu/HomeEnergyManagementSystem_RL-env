@@ -1,6 +1,6 @@
 from lib.plot import plot
 from lib.uninterruptibleSimulation import uninterruptibleSimulation
-
+from time import localtime , time,asctime
 
 def main():
     simulation = uninterruptibleSimulation.Test()
@@ -9,8 +9,9 @@ def main():
     output.power()
     output.plotUninterruptible()
     output.price()
-    output.fig.tight_layout()
-    output.fig.savefig('lib/plot/testing.png')
+    output.plotReward()
+    output.fig.tight_layout()    
+    output.fig.savefig('lib/plot/Unint/'+str(asctime(localtime(time())))+'.png')
 
 if __name__ == '__main__':
     main()

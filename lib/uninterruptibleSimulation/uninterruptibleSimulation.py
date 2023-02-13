@@ -10,7 +10,7 @@ class Test():
         self.environment = Environment.create(environment = UnIntTest,max_episode_timesteps=96)
         self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
     def uninterruptible(self):
-        wmObject = WM(demand=10,executePeriod=4,AvgPowerConsume=0.3)
+        wmObject = WM(AvgPowerConsume=0.3)
         sampletime = []
         load = []
         pv = []
@@ -18,6 +18,8 @@ class Test():
         deltaSoc = []
         switch = []
         unloadRemain = []
+        Reward = []
+        TotalReward = []
         totalReward = 0
         for month in range(12):
             states = self.environment.reset()
@@ -45,17 +47,22 @@ class Test():
                 load.append(states['state'][1])
                 pv.append(states['state'][2])
                 price.append(states['state'][3])
-                deltaSoc.append(states['state'][4])
+                deltaSoc.append(states['state'][4]*4)
                 unloadRemain.append(states['state'][5])
+                Reward.append(reward)
                 totalReward += reward
             switch.append(0)
-            remain = [load[sampletime]-pv[sampletime] for sampletime in range(96)]
+            Reward.append(0)
+            remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['unloadRemain'] = unloadRemain
             self.testResult[month]['switch'] = switch
+            self.testResult[month]['reward'] = Reward
+            TotalReward.append(totalReward)
+            totalReward=0
             sampletime.clear()
             load.clear()
             pv.clear()
@@ -63,7 +70,9 @@ class Test():
             deltaSoc.clear()
             switch.clear()
             unloadRemain.clear()
-        print('Agent average episode reward: ', totalReward/12 ) 
+            Reward.clear()
+        print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
+        print('reward: ', TotalReward ) 
 
 
     def __del__(self):

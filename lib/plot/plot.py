@@ -11,14 +11,20 @@ class Plot():
     def power(self):
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')
-            if self.testResult[month]['switch'].tolist():
-                self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',bottom = self.testResult[month]['switch'] ,color ='gray') 
-            else:
-                self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray') 
+            self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',bottom = self.testResult[month]['deltaSoc'] ,color ='gray') 
+            self.ax[month].bar(range(96) ,self.testResult[month]['deltaSoc'],label = 'fixLoad',color ='black') 
+
+            # if self.testResult[month]['switch'].tolist():
+            #     self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',bottom = self.testResult[month]['switch'] ,color ='gray') 
+            # else:
+            #     self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray') 
 
     def plotUninterruptible(self):
         for month in range(0,12):
             self.ax[month].bar(range(96) ,self.testResult[month]['switch'] ,label = 'switch', color ='green')            
+    def plotReward(self):
+        for month in range(0,12):
+            self.ax[month].plot(range(96) ,self.testResult[month]['reward'] ,label = 'reward', color ='red')            
 
     
     def price(self):

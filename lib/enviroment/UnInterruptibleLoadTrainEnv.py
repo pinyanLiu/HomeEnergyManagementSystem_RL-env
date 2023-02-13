@@ -16,8 +16,9 @@ class UnIntEnv(HemsEnv):
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
-        self.uninterruptibleLoad = WM(demand=randint(20,25),executePeriod=3,AvgPowerConsume=0.3)
+        self.uninterruptibleLoad = WM(demand=randint(3,12),executePeriod=6,AvgPowerConsume=0.3)
         self.deltaSoc = uniform(-0.15,0.15)
+        self.GridPrice = [uniform(1.73,6.2) for _ in range(96)]
 
 
 
@@ -55,7 +56,7 @@ class UnIntEnv(HemsEnv):
                 #SOC
                 -0.15,
                 #Uninterruptible Remain
-                0.0,
+                60.0,
                 #Uninterruptible Switch
                 0.0
             ],
@@ -75,9 +76,48 @@ class UnIntEnv(HemsEnv):
         '''
         Starting State
         '''
-        super().reset()
+        #pick one day from 360 days
+        self.i = randint(1,359)
+        self.Load = self.allLoad.iloc[:,self.i].tolist()
+        if int( self.i / 30) == 0:
+            self.PV = self.allPV['Jan'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 1:
+            self.PV = self.allPV['Feb'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 2:
+            self.PV = self.allPV['Mar'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 3:
+            self.PV = self.allPV['Apr'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 4:
+            self.PV = self.allPV['May'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 5:
+            self.PV = self.allPV['Jun'].tolist()
+            self.GridPrice = self.summerGridPrice
+        elif int(self.i / 30) == 6:
+            self.PV = self.allPV['July'].tolist()
+            self.GridPrice = self.summerGridPrice
+        elif int(self.i / 30) == 7:
+            self.PV = self.allPV['Aug'].tolist()
+            self.GridPrice = self.summerGridPrice
+        elif int(self.i / 30) == 8:
+            self.PV = self.allPV['Sep'].tolist()
+            self.GridPrice = self.summerGridPrice
+        elif int(self.i / 30) == 9:
+            self.PV = self.allPV['Oct'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 10:
+            self.PV = self.allPV['Nov'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 11:
+            self.PV = self.allPV['Dec'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        self.GridPrice = [uniform(1.73,6.2) for _ in range(96)]
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
-        self.uninterruptibleLoad = WM(demand=randint(20,25),executePeriod=3,AvgPowerConsume=0.3)
+        self.uninterruptibleLoad = WM(demand=randint(3,12),executePeriod=6,AvgPowerConsume=0.3)
         self.deltaSoc = (uniform(-0.15,0.15))
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc,self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
@@ -109,18 +149,18 @@ class UnIntEnv(HemsEnv):
         # if the switch is on , calculate the electricity cost
         if self.uninterruptibleLoad.switch:
             Pess = deltaSoc*self.batteryCapacity*0.25
-            if Pess<0:
-                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv))
+            if Pess>0:
+                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv-Pess))/self.uninterruptibleLoad.demand
             else:
-                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv-Pess))
+                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv))/self.uninterruptibleLoad.demand
         if cost<0:
             cost = 0 
 
 
         #reward
-        reward.append(0.5-4*cost)
+        reward.append(0.08-15*cost)
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-100*self.uninterruptibleLoad.getRemainProcessPercentage())
+            reward.append(-50*self.uninterruptibleLoad.getRemainProcessPercentage())
         
 
         #change to next state

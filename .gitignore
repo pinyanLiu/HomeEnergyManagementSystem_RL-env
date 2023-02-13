@@ -7,3 +7,5 @@ pic
 yaml
 goodsummary
 *.png
+__pycache__/
+*.py[cod]
