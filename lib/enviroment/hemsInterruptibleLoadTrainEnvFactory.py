@@ -1,11 +1,11 @@
-from gym.envs.Hems.loads.uninterrupted import WM
+from gym.envs.Hems.loads.interrupted import AC
 from  gym import spaces
-from gym import make
 import numpy as np
-from random import randint
-from gym.envs.Hems.hemsTrainEnv import HemsEnv
+from random import randint,uniform
+from lib.enviroment.hemsTrainEnv import HemsEnv
+from tensorforce import Environment
 
-class UnIntEnv(HemsEnv):
+class IntEnv(HemsEnv):
     def __init__(self) :
         '''
         Action space
@@ -14,11 +14,13 @@ class UnIntEnv(HemsEnv):
         super().__init__()
         #import Base Parameter
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
+        self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
         
-        self.uninterruptibleLoad = WM(demand=randint(1,4),executePeriod=randint(2,5),AvgPowerConsume=0.3)
-        #action Uninterruptible load take (1.on 2.do nothing )
-        self.action_space = spaces.Discrete(2)
-        #self.observation_space_name = np.array(['sampleTime','load', 'pv', 'pricePerHour' ,'UnInterruptable Remain','switch'])
+        self.interruptibleLoad = AC(demand=randint(1,49),AvgPowerConsume=1.5)
+        self.deltaSoc = [uniform(-0.15,0.15) for _ in range(96)]
+        self.GridPrice = [uniform(1.73,6.2) for _ in range(96)]
+
+    def states(self):
         #observation space 
         upperLimit = np.array(
             [
@@ -30,10 +32,10 @@ class UnIntEnv(HemsEnv):
                 10.0,
                 #price per hour
                 6.2,
-                #Uninterruptible Remain
+                #Delta SOC
+                0.15,
+                #interruptible Remain
                 20.0,
-                #Uninterruptible Switch
-                1.0
             ],
             dtype=np.float32,
         )
@@ -47,14 +49,36 @@ class UnIntEnv(HemsEnv):
                 0.0,
                 #pricePerHour
                 0.0,
-                #Uninterruptible Remain
+                #Delta SOC
+                -0.15,
+                #interruptible Remain
                 0.0,
-                #Uninterruptible Switch
-                0.0
             ],
             dtype=np.float32,
         )
         self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
+        return dict(type='float',shape=self.observation_space.shape,min_value=lowerLimit,max_value=upperLimit)
+
+    def actions(self):
+        #action space
+        return dict(type='int',num_values=2)
+    
+    def close(self):
+        return super().close()
+
+    def reset(self):
+        '''
+        Starting State
+        '''
+        
+        self.interruptibleLoad = AC(demand=randint(1,49),AvgPowerConsume=1.5)
+
+
+        #reset state
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        #action mask
+        self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
+        return self.state
 
 
     def step(self,action):
@@ -120,19 +144,7 @@ class UnIntEnv(HemsEnv):
         
     def render(self):
         pass
-    def reset(self):
-        '''
-        Starting State
-        '''
-        super().reset()
-        self.uninterruptibleLoad = WM(demand=randint(1,5),executePeriod=randint(2,4),AvgPowerConsume=0.3)
 
-
-        #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
-        #action mask
-        self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
-        return self.state
 
 
 if __name__ == '__main__':

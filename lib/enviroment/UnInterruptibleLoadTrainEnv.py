@@ -17,7 +17,7 @@ class UnIntEnv(HemsEnv):
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
         self.uninterruptibleLoad = WM(demand=randint(3,12),executePeriod=6,AvgPowerConsume=0.3)
-        self.deltaSoc = uniform(-0.15,0.15)
+        self.deltaSoc = [uniform(-0.15,0.15) for _ in range(96)]
         self.GridPrice = [uniform(1.73,6.2) for _ in range(96)]
 
 
@@ -34,7 +34,7 @@ class UnIntEnv(HemsEnv):
                 10.0,
                 #price per hour
                 6.2,
-                #SOC
+                #Delta SOC
                 0.15,
                 #Uninterruptible Remain
                 75.0,
@@ -53,7 +53,7 @@ class UnIntEnv(HemsEnv):
                 0.0,
                 #pricePerHour
                 0.0,
-                #SOC
+                #Delta SOC
                 -0.15,
                 #Uninterruptible Remain
                 60.0,
@@ -118,7 +118,7 @@ class UnIntEnv(HemsEnv):
         self.GridPrice = [uniform(1.73,6.2) for _ in range(96)]
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
         self.uninterruptibleLoad = WM(demand=randint(3,12),executePeriod=6,AvgPowerConsume=0.3)
-        self.deltaSoc = (uniform(-0.15,0.15))
+        self.deltaSoc = [uniform(-0.15,0.15) for _ in range(96)]
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc,self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
         #action mask
