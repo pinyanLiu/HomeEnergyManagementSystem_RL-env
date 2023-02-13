@@ -70,67 +70,100 @@ class IntEnv(HemsEnv):
         '''
         Starting State
         '''
-        
+        #pick one day from 360 days
+        self.i = randint(1,359)
+        self.Load = self.allLoad.iloc[:,self.i].tolist()
+        if int( self.i / 30) == 0:
+            self.PV = self.allPV['Jan'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 1:
+            self.PV = self.allPV['Feb'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 2:
+            self.PV = self.allPV['Mar'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 3:
+            self.PV = self.allPV['Apr'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 4:
+            self.PV = self.allPV['May'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 5:
+            self.PV = self.allPV['Jun'].tolist()
+            self.GridPrice = self.summerGridPrice
+        elif int(self.i / 30) == 6:
+            self.PV = self.allPV['July'].tolist()
+            self.GridPrice = self.summerGridPrice
+        elif int(self.i / 30) == 7:
+            self.PV = self.allPV['Aug'].tolist()
+            self.GridPrice = self.summerGridPrice
+        elif int(self.i / 30) == 8:
+            self.PV = self.allPV['Sep'].tolist()
+            self.GridPrice = self.summerGridPrice
+        elif int(self.i / 30) == 9:
+            self.PV = self.allPV['Oct'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 10:
+            self.PV = self.allPV['Nov'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+        elif int(self.i / 30) == 11:
+            self.PV = self.allPV['Dec'].tolist()
+            self.GridPrice = self.notSummerGridPrice
+
+
         self.interruptibleLoad = AC(demand=randint(1,49),AvgPowerConsume=1.5)
 
-
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.interruptibleLoad.demand])
         #action mask
-        self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
+        PgridMaxExceed = self.Load[0]+self.deltaSoc[0]+self.interruptibleLoad.AvgPowerConsume-self.PV[0] >= self.PgridMax
+
+        self.action_mask = np.asarray([True,self.state[5]>0 and not PgridMaxExceed])
         return self.state
 
 
-    def step(self,action):
+    def execute(self,actions):
         '''
         interaction of each state(changes while taking action)
         Rewards
         Episode Termination condition
         '''
-        #error message if getting wrong action
-        err_msg = f"{action!r} ({type(action)}) invalid"
-        assert self.action_space.contains(action),err_msg
-        
-        #invalid action masking
-        if self.action_mask[action]==False:
-            return self.state,self.reward,self.done,self.info
-
         #list for storing reward
         reward = []
         cost = 0
-
-        #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
-        #sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state['states']
-        sampleTime,load,pv,pricePerHour,UnRemain,UnSwitch = self.state
-        # err_msg = f"{action}, {UnRemain}, {UnSwitch} invalid"
-        # if action == 1:
-        #     assert   UnRemain >=0 and UnSwitch == False ,err_msg
-        
+        #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,interruptible load remain)
+        sampleTime,load,pv,pricePerHour,deltaSoc,Remain = self.state
         #  do nothing
-        if action == 0:
+        if actions == 0:
             pass
         #  turn on switch 
-        elif action == 1 : 
-            self.uninterruptibleLoad.turn_on()
+        elif actions == 1 : 
+            self.interruptibleLoad.turn_on()
 
-        # the uninterruptible Load operate itself
-        self.uninterruptibleLoad.step()   
+        # the interruptible Load operate itself
+        self.interruptibleLoad.step()   
         # if the switch is on , calculate the electricity cost
-        if self.uninterruptibleLoad.switch:
-            cost = (pricePerHour * 0.25 * self.uninterruptibleLoad.AvgPowerConsume) 
-
+        if self.interruptibleLoad.switch:
+            Pess = deltaSoc*self.batteryCapacity*0.25
+            if Pess>0:
+                cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv-Pess))/self.interruptibleLoad.demand
+            else:
+                cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv))/self.interruptibleLoad.demand
+        if cost<0:
+            cost = 0 
 
         #reward
         reward.append(-0.5*cost)
-        if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-0.8*self.uninterruptibleLoad.getRemainDemand())
+        if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):
+            reward.append(-50*self.interruptibleLoad.getRemainProcessPercentage())
 
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
-        #action mask
-        self.action_mask = np.asarray([True,self.state[4]>0 and self.state[5]==False])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc[sampleTime],self.interruptibleLoad.getRemainDemand()])
+        #actions mask
+        PgridMaxExceed = self.Load[sampleTime]+self.deltaSoc[sampleTime]+self.interruptibleLoad.AvgPowerConsume-self.PV[sampleTime] >= self.PgridMax
+        self.action_mask = np.asarray([True,self.state[5]>0 and not PgridMaxExceed])
         #check if all day is done
         self.done =  bool(sampleTime == 95)
         #REWARD
@@ -148,13 +181,17 @@ class IntEnv(HemsEnv):
 
 
 if __name__ == '__main__':
-    env = make("Hems-v8")
-#     # Initialize episode
-    states = env.reset()
-    done = False
-    step = 0
-    while not done: # Episode timestep
-        actions = env.action_space.sample()
-        states, reward, done , info = env.step(action=actions)
-        print(info)
+    from tensorforce import Agent
+    environment = Environment.create(environment = IntEnv,max_episode_timesteps=96)
+    agent = Agent.create(agent='/home/hems/LIU/RL_env/projects/RL_firstry/Load/Interruptible/Load_Agent/ppo.json', environment=environment)
+
+    # Train for 100 episodes
+    for _ in range(100):
+        states = environment.reset()
+        terminal = False
+        while not terminal:
+            actions = agent.act(states=states)
+            states, terminal, reward = environment.execute(actions=actions)
+            agent.observe(terminal=terminal, reward=reward)
+        
         

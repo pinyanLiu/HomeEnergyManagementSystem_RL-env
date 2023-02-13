@@ -115,14 +115,16 @@ class UnIntEnv(HemsEnv):
         elif int(self.i / 30) == 11:
             self.PV = self.allPV['Dec'].tolist()
             self.GridPrice = self.notSummerGridPrice
+        self.deltaSoc = [uniform(-0.15,0.15) for _ in range(96)]
         self.GridPrice = [uniform(1.73,6.2) for _ in range(96)]
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
         self.uninterruptibleLoad = WM(demand=randint(3,12),executePeriod=6,AvgPowerConsume=0.3)
-        self.deltaSoc = [uniform(-0.15,0.15) for _ in range(96)]
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc,self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
-        #action mask
-        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        #actions mask
+        PgridMaxExceed = self.Load[0]+self.deltaSoc[0]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[0] >= self.PgridMax
+
+        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False and not PgridMaxExceed])
         return self.state
 
     def execute(self,actions):
@@ -134,7 +136,7 @@ class UnIntEnv(HemsEnv):
         #list for storing reward
         reward = []
         cost = 0
-        #STATE (sampleTime,Load,PV,SOC,pricePerHour,interrupted load remain ,uninterrupted load remain)
+        #STATE (sampleTime,Load,PV,SOC,pricePerHour,Uninterruptible load remain ,uninterruptible load remain)
         sampleTime,load,pv,pricePerHour,deltaSoc,UnRemain,UnSwitch = self.state
 
         #  do nothing
@@ -165,10 +167,11 @@ class UnIntEnv(HemsEnv):
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.deltaSoc = uniform(-0.15,0.15)
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc,self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
         #actions mask
-        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False])
+        PgridMaxExceed = self.Load[sampleTime]+self.deltaSoc[sampleTime]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[sampleTime] >= self.PgridMax
+
+        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False and not PgridMaxExceed])
         #check if all day is done
         self.done =  bool(sampleTime == 95)
         #REWARD
