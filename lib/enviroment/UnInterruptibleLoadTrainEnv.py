@@ -1,4 +1,4 @@
-from gym.envs.Hems.loads.uninterrupted import WM
+from lib.loads.uninterrupted import WM
 from  gym import spaces
 import numpy as np
 from random import randint,uniform
@@ -122,7 +122,7 @@ class UnIntEnv(HemsEnv):
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
         #actions mask
-        PgridMaxExceed = self.Load[0]+self.deltaSoc[0]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[0] >= self.PgridMax
+        PgridMaxExceed = (self.Load[0]+self.deltaSoc[0]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[0]) >= self.PgridMax
 
         self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False and not PgridMaxExceed])
         return self.state
@@ -151,8 +151,8 @@ class UnIntEnv(HemsEnv):
         # if the switch is on , calculate the electricity cost
         if self.uninterruptibleLoad.switch:
             Pess = deltaSoc*self.batteryCapacity*0.25
-            if Pess>0:
-                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv-Pess))/self.uninterruptibleLoad.demand
+            if Pess<0:
+                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv+Pess))/self.uninterruptibleLoad.demand
             else:
                 cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv))/self.uninterruptibleLoad.demand
         if cost<0:
@@ -169,7 +169,7 @@ class UnIntEnv(HemsEnv):
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
         #actions mask
-        PgridMaxExceed = self.Load[sampleTime]+self.deltaSoc[sampleTime]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[sampleTime] >= self.PgridMax
+        PgridMaxExceed = (self.Load[sampleTime]+self.deltaSoc[sampleTime]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[sampleTime]) >= self.PgridMax
 
         self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False and not PgridMaxExceed])
         #check if all day is done

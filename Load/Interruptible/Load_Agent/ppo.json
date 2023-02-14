@@ -3,74 +3,119 @@
     "states": {
         "type": "float",
         "shape": [
-            5
+            6
         ],
         "min_value": [
-            0.0, "-Infinity", "-Infinity",
-            0.0, "-Infinity"
+            0.0,
+            0.0,
+            0.0,
+            0.0,
+            -0.15,
+            0.0
         ],
         "max_value": [
-            96.0, "Infinity", "Infinity",
-            1.0, "Infinity"
+            95,
+            10.0,
+            10.0,
+            6.2,
+            0.15,
+            49.0
         ]
     },
     "actions": {
         "type": "int",
         "shape": [],
-        "num_values": 3
+        "num_values": 2
     },
-    "max_episode_timesteps": 30000,
-    "batch_size": 10,
-    "network": "auto",
+    "max_episode_timesteps": 96,
+    "batch_size": 128,
+    "network": [
+        {
+            "type": "dense",
+            "size": 319,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 319,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 319,
+            "activation": "relu"
+        }
+    ],
     "use_beta_distribution": false,
     "memory": "minimum",
-    "update_frequency": 2,
-    "learning_rate": 0.0003,
+    "update_frequency": 0.1,
+    "learning_rate": {
+        "type": "decaying",
+        "decay": "linear",
+        "unit": "episodes",
+        "num_steps": 7000,
+        "initial_value": 1e-3,
+        "final_value": 5e-5
+    },
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.2,
-    "discount": 0.99,
+    "discount": 1.0,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
-    "baseline": {
-        "type": "auto",
-        "size": 32,
-        "depth": 1
-    },
+    "baseline": [
+        {
+            "type": "dense",
+            "size": 319,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 319,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 319,
+            "activation": "relu"
+        }
+    ],
     "baseline_optimizer": {
         "optimizer": "adam",
-        "learning_rate": 0.001,
+        "learning_rate": {
+            "type": "decaying",
+            "decay": "linear",
+            "unit": "episodes",
+            "num_steps": 7000,
+            "initial_value": 1e-3,
+            "final_value": 5e-5
+        },
         "multi_step": 10
     },
     "state_preprocessing": "linear_normalization",
     "exploration": {
-        "type":"decaying",
-        "decay":"linear",
-        "unit":"episodes",
-        "num_steps":2000,
-        "initial_value" : 0.9999,
-        "final_value":0.0001
+        "type": "decaying",
+        "decay": "linear",
+        "unit": "episodes",
+        "num_steps": 7000,
+        "initial_value": 0.25,
+        "final_value": 1e-5
     },
     "variable_noise": 0.0,
-    "l2_regularization": 0.0,
+    "l2_regularization": 0.2,
     "entropy_regularization": 0.0,
     "parallel_interactions": 1,
     "config": null,
     "saver": {
-        "directory": "saver_dir",
-        "load": false,
-        "frequency": 50
+        "directory": "Load/Interruptible/saver_dir",
+        "frequency": 1000,
+        "unit": "episodes"
     },
     "summarizer": {
-        "directory": "summaries",
+        "directory": "Load/Interruptible/summaries",
         "summaries": "all"
     },
     "tracking": null,
-    "recorder": null,
-    "internals": {},
-    "initial_internals": {
-        "policy": {},
-        "baseline": {}
-    }
+    "recorder": null
 }

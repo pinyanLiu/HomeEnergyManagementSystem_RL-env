@@ -11,6 +11,9 @@ class InterruptedLoad():
     def turn_off(self):
         pass
 
+    def step(self):
+        pass
+
     def getStatus(self):
         return(self.switch,self.AvgPowerConsume,self.demand,self.alreadyTurnOn)
 
@@ -39,10 +42,13 @@ class AC(InterruptedLoad):
         super().__init__(demand, AvgPowerConsume)
     def turn_on(self):
         self.switch = True
-        self.alreadyTurnOn += 1
 
     def turn_off(self):
         self.switch = False
+
+    def step(self):
+        if(self.switch == True):
+            self.alreadyTurnOn += 1
 
     def getStatus(self):
         return super().getStatus()
@@ -64,6 +70,7 @@ class AC(InterruptedLoad):
 
     def reset(self):
         return super().reset()
+
 
 
 if __name__ == '__main__':

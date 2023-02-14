@@ -1,4 +1,4 @@
-from gym.envs.Hems.loads.interrupted import AC
+from lib.loads.interrupted import AC
 from  gym import spaces
 import numpy as np
 from random import randint,uniform
@@ -64,7 +64,7 @@ class IntEnv(HemsEnv):
         return dict(type='int',num_values=2)
     
     def close(self):
-        return super().close()
+        super().close()
 
     def reset(self):
         '''
@@ -116,7 +116,7 @@ class IntEnv(HemsEnv):
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.interruptibleLoad.demand])
         #action mask
-        PgridMaxExceed = self.Load[0]+self.deltaSoc[0]+self.interruptibleLoad.AvgPowerConsume-self.PV[0] >= self.PgridMax
+        PgridMaxExceed = (self.Load[0]+self.deltaSoc[0]+self.interruptibleLoad.AvgPowerConsume-self.PV[0]) >= self.PgridMax
 
         self.action_mask = np.asarray([True,self.state[5]>0 and not PgridMaxExceed])
         return self.state
@@ -133,27 +133,27 @@ class IntEnv(HemsEnv):
         cost = 0
         #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,interruptible load remain)
         sampleTime,load,pv,pricePerHour,deltaSoc,Remain = self.state
-        #  do nothing
+        # Turn off switch
         if actions == 0:
-            pass
+            self.interruptibleLoad.turn_off()
         #  turn on switch 
         elif actions == 1 : 
             self.interruptibleLoad.turn_on()
 
-        # the interruptible Load operate itself
-        self.interruptibleLoad.step()   
+        self.interruptibleLoad.step()
+
         # if the switch is on , calculate the electricity cost
         if self.interruptibleLoad.switch:
             Pess = deltaSoc*self.batteryCapacity*0.25
-            if Pess>0:
-                cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv-Pess))/self.interruptibleLoad.demand
+            if Pess<0:
+                cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv+Pess))/self.interruptibleLoad.demand
             else:
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv))/self.interruptibleLoad.demand
         if cost<0:
             cost = 0 
 
         #reward
-        reward.append(-0.5*cost)
+        reward.append(0.08-15*cost)
         if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):
             reward.append(-50*self.interruptibleLoad.getRemainProcessPercentage())
 
@@ -162,21 +162,17 @@ class IntEnv(HemsEnv):
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc[sampleTime],self.interruptibleLoad.getRemainDemand()])
         #actions mask
-        PgridMaxExceed = self.Load[sampleTime]+self.deltaSoc[sampleTime]+self.interruptibleLoad.AvgPowerConsume-self.PV[sampleTime] >= self.PgridMax
+        PgridMaxExceed = (self.Load[sampleTime]+self.deltaSoc[sampleTime]+self.interruptibleLoad.AvgPowerConsume-self.PV[sampleTime]) >= self.PgridMax
         self.action_mask = np.asarray([True,self.state[5]>0 and not PgridMaxExceed])
         #check if all day is done
         self.done =  bool(sampleTime == 95)
         #REWARD
         self.reward = sum(reward)
+        states = dict(state=self.state,action_mask=self.action_mask)
+
+        return states,self.done,self.reward
 
 
-        self.info = reward
-
-        return self.state,self.reward,self.done,self.info
-
-        
-    def render(self):
-        pass
 
 
 
