@@ -82,9 +82,11 @@ class UnIntTest(UnIntEnv):
             self.GridPrice = self.notSummerGridPrice
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc,self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
-        #action mask
-        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
+        #actions mask
+        PgridMaxExceed = (self.Load[0]+self.deltaSoc[0]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[0]) >= self.PgridMax
+
+        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False and not PgridMaxExceed])
         return self.state
 
 

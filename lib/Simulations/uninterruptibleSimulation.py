@@ -1,15 +1,16 @@
+from lib.Simulations.Simulation import Simulation
 from tensorforce import Agent,Environment
 from lib.enviroment.UnInterruptibleLoadTestEnv import UnIntTest
 from lib.loads.uninterrupted import WM
 import pandas as pd
-class Test():
+from lib.plot.plot import Plot
+
+class UnIntSimulation(Simulation):
     def __init__(self):
-        self.testResult = {}
-        for month in range(12):
-            self.testResult[month] = pd.DataFrame()
+        super().__init__()
         self.environment = Environment.create(environment = UnIntTest,max_episode_timesteps=96)
         self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
-    def uninterruptible(self):
+    def simulation(self):
         wmObject = WM(AvgPowerConsume=0.3)
         sampletime = []
         load = []
@@ -73,7 +74,14 @@ class Test():
             Reward.clear()
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
-
+    
+    def outputResult(self):
+        output = Plot(self.testResult)
+        output.power()
+        output.plotUninterruptible()
+        output.price()
+        output.plotReward()
+        output.plotResult('lib/plot/Unint/')
 
     def __del__(self):
         # Close agent and environment
@@ -81,7 +89,3 @@ class Test():
             self.agent.close()
         if self.environment:
             self.environment.close()
-
-if __name__ == '__main__':
-    test = Test()
-    print(test.testResult)

@@ -41,11 +41,6 @@
             "type": "dense",
             "size": 319,
             "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 319,
-            "activation": "relu"
         }
     ],
     "use_beta_distribution": false,
@@ -55,7 +50,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 7000,
+        "num_steps": 15000,
         "initial_value": 1e-3,
         "final_value": 5e-5
     },
@@ -63,16 +58,11 @@
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.5,
     "discount": 1.0,
-    "l2_regularization": 0.2,
+    "l2_regularization": 0.1,
     "reward_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
     "baseline": [
-        {
-            "type": "dense",
-            "size": 319,
-            "activation": "relu"
-        },
         {
             "type": "dense",
             "size": 319,
@@ -90,7 +80,7 @@
             "type": "decaying",
             "decay": "linear",
             "unit": "episodes",
-            "num_steps": 7000,
+            "num_steps": 15000,
             "initial_value": 1e-3,
             "final_value": 5e-5
         },
@@ -101,7 +91,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 7000,
+        "num_steps": 15000,
         "initial_value": 0.25,
         "final_value": 1e-5
     },

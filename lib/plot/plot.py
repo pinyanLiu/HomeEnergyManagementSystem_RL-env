@@ -1,4 +1,5 @@
 import matplotlib.pyplot as plt
+from time import localtime , time,asctime
 
 
 class Plot():
@@ -38,7 +39,11 @@ class Plot():
     def __soc__(self):
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')
-            self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray')            
+            self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray') 
+                       
+    def plotResult(self,dir):
+        self.fig.tight_layout()
+        self.fig.savefig(dir+str(asctime(localtime(time())))+'.png')
 
     def __pv__(self):
         pass

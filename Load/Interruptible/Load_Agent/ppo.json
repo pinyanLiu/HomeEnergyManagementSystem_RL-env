@@ -39,11 +39,6 @@
             "type": "dense",
             "size": 319,
             "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 319,
-            "activation": "relu"
         }
     ],
     "use_beta_distribution": false,
@@ -53,7 +48,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 7000,
+        "num_steps": 15000,
         "initial_value": 1e-3,
         "final_value": 5e-5
     },
@@ -74,11 +69,6 @@
             "type": "dense",
             "size": 319,
             "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 319,
-            "activation": "relu"
         }
     ],
     "baseline_optimizer": {
@@ -87,7 +77,7 @@
             "type": "decaying",
             "decay": "linear",
             "unit": "episodes",
-            "num_steps": 7000,
+            "num_steps": 15000,
             "initial_value": 1e-3,
             "final_value": 5e-5
         },
@@ -98,12 +88,12 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 7000,
+        "num_steps": 15000,
         "initial_value": 0.25,
         "final_value": 1e-5
     },
     "variable_noise": 0.0,
-    "l2_regularization": 0.2,
+    "l2_regularization": 0.1,
     "entropy_regularization": 0.0,
     "parallel_interactions": 1,
     "config": null,

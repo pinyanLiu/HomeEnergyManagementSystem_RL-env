@@ -153,9 +153,9 @@ class IntEnv(HemsEnv):
             cost = 0 
 
         #reward
-        reward.append(0.08-15*cost)
+        reward.append(0.08-10*cost)
         if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):
-            reward.append(-50*self.interruptibleLoad.getRemainProcessPercentage())
+            reward.append(-10*self.interruptibleLoad.getRemainProcessPercentage())
 
 
         #change to next state
