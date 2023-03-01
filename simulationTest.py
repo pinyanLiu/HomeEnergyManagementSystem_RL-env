@@ -1,9 +1,10 @@
 from lib.Simulations.uninterruptibleSimulation import UnIntSimulation
+from lib.Simulations.interruptibleSimulation import IntSimulation
 
 def __main__():
-    unsimulation = UnIntSimulation()
-    unsimulation.simulation()
-    unsimulation.outputResult()
+    simulation = IntSimulation()
+    simulation.simulation()
+    simulation.outputResult()
 
 
 

@@ -20,7 +20,7 @@ class Plot():
             # else:
             #     self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray') 
 
-    def plotUninterruptible(self):
+    def plotLoadPower(self):
         for month in range(0,12):
             self.ax[month].bar(range(96) ,self.testResult[month]['switch'] ,label = 'switch', color ='green')            
     def plotReward(self):

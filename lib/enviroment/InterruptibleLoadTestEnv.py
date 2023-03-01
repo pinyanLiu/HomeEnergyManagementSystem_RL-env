@@ -1,27 +1,23 @@
-from lib.loads.uninterrupted import WM
+from lib.enviroment.InterruptibleLoadTrainEnv import IntEnv
 from gym import make
 import numpy as np
-from lib.enviroment.UnInterruptibleLoadTrainEnv import UnIntEnv
+from lib.loads.interrupted import AC
 
-class UnIntTest(UnIntEnv):
+class IntTest(IntEnv):
     def __init__(self) :
-        '''
-        Action space
-        observation space
-        '''
         super().__init__()
         #import Base Parameter
-        self.unload_demand =  int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='unload_demand']['value'])[0])
-        self.unload_period =  int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='unload_period']['value'])[0])
-        self.unload_power =  float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='unload_power']['value'])[0])
+        self.intload_demand =  int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='intload_demand']['value'])[0])
+
+        self.intload_power =  float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='intload_power']['value'])[0])
 
         #each month pick one day for testing
         self.i = 0
         #import Load 
         self.allLoad = self.info.importTestingLoad()
         self.Load = self.allLoad.iloc[:,self.i].tolist()
-        #set WM parameter
-        self.uninterruptibleLoad = WM(demand=self.unload_demand,executePeriod=self.unload_period,AvgPowerConsume=self.unload_power)
+        #set AC parameter
+        self.interruptibleLoad = AC(demand=self.intload_demand,AvgPowerConsume=self.intload_power)
 
     def states(self):
         return super().states()
@@ -31,14 +27,13 @@ class UnIntTest(UnIntEnv):
         
     def execute(self, actions):
         return super().execute(actions)
-
-
+    
     def reset(self):
         '''
         Starting State
         '''
         #each month pick one day for testing
-        self.uninterruptibleLoad.reset()
+        self.interruptibleLoad.reset()
         self.i += 1
         self.Load = self.allLoad.iloc[:,self.i].tolist()
 
@@ -82,16 +77,16 @@ class UnIntTest(UnIntEnv):
             self.GridPrice = self.notSummerGridPrice
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
-        #actions mask
-        PgridMaxExceed = (self.Load[0]+self.deltaSoc[0]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[0]) >= self.PgridMax
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.interruptibleLoad.demand])
+        #action mask
+        PgridMaxExceed = (self.Load[0]+self.deltaSoc[0]+self.interruptibleLoad.AvgPowerConsume-self.PV[0]) >= self.PgridMax
 
-        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False and not PgridMaxExceed])
+        self.action_mask = np.asarray([True,self.state[5]>0 and not PgridMaxExceed])
         return self.state
 
 
 if __name__ == '__main__':
-    env = make("Hems-v9")
+    env = make("Hems-v1")
 #     # Initialize episode
     states = env.reset()
     done = False
@@ -101,5 +96,5 @@ if __name__ == '__main__':
         actions = env.action_space.sample()
         states, reward, done , info = env.step(action=actions)
         Totalreward += reward
-        print(info,states)
+    print(states)
         

@@ -1,24 +1,24 @@
 from lib.Simulations.Simulation import Simulation
 from tensorforce import Agent,Environment
-from lib.enviroment.UnInterruptibleLoadTestEnv import UnIntTest
-from lib.loads.uninterrupted import WM
+from lib.enviroment.InterruptibleLoadTestEnv import IntTest
+from lib.loads.interrupted import AC 
 import pandas as pd
 from lib.plot.plot import Plot
 
-class UnIntSimulation(Simulation):
+class IntSimulation(Simulation):
     def __init__(self):
         super().__init__()
-        self.environment = Environment.create(environment = UnIntTest,max_episode_timesteps=96)
-        self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
+        self.environment = Environment.create(environment = IntTest,max_episode_timesteps=96)
+        self.agent = Agent.load(directory = 'Load/Interruptible/saver_dir',environment=self.environment)
     def simulation(self):
-        wmObject = WM(AvgPowerConsume=0.3)
+        acObject = AC(AvgPowerConsume=0.3)
         sampletime = []
         load = []
         pv = []
         price = []
         deltaSoc = []
         switch = []
-        unloadRemain = []
+        intloadRemain = []
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -29,7 +29,7 @@ class UnIntSimulation(Simulation):
             pv.append(states[2])
             price.append(states[3])
             deltaSoc.append(states[4])
-            unloadRemain.append(states[5])
+            intloadRemain.append(states[5])
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -38,8 +38,8 @@ class UnIntSimulation(Simulation):
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
                 #1. switch on 
-                if states['state'][6] == 1: # washing machine's switch
-                    switch.append(wmObject.AvgPowerConsume)#power
+                if actions == 1: # washing machine's switch
+                    switch.append(acObject.AvgPowerConsume)#power
                 #2. do nothing 
                 else :
                     switch.append(0)
@@ -49,7 +49,7 @@ class UnIntSimulation(Simulation):
                 pv.append(states['state'][2])
                 price.append(states['state'][3])
                 deltaSoc.append(states['state'][4]*4)
-                unloadRemain.append(states['state'][5])
+                intloadRemain.append(states['state'][5])
                 Reward.append(reward)
                 totalReward += reward
             switch.append(0)
@@ -59,7 +59,7 @@ class UnIntSimulation(Simulation):
             self.testResult[month]['remain'] = remain
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
-            self.testResult[month]['unloadRemain'] = unloadRemain
+            self.testResult[month]['intloadRemain'] = intloadRemain
             self.testResult[month]['switch'] = switch
             self.testResult[month]['reward'] = Reward
             TotalReward.append(totalReward)
@@ -70,7 +70,7 @@ class UnIntSimulation(Simulation):
             price.clear()
             deltaSoc.clear()
             switch.clear()
-            unloadRemain.clear()
+            intloadRemain.clear()
             Reward.clear()
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
