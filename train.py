@@ -19,7 +19,7 @@ def main(argv):
     elif argv[1] == 'unintload':
         environment = dict(environment=UnIntEnv)
     else :
-        print('undefined env')
+        print('please give parameters 1.Training mode: "soc"/"intload"/"HVAC"/"unintload 2.Agent 3. training episode ')
         return
     
     runner = Runner(

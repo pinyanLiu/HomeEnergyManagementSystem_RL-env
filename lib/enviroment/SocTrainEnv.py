@@ -83,10 +83,10 @@ class SocEnv(HemsEnv):
         soc = soc+delta_soc
         if soc > 1:
             soc = 1
-            reward.append(-0.65)
+            reward.append(-0.5)
         elif soc < 0 :
             soc = 0
-            reward.append(-0.65)
+            reward.append(-0.5)
         else:
             #calculate cost proportion   
             if(delta_soc>0):
@@ -96,7 +96,7 @@ class SocEnv(HemsEnv):
             elif(delta_soc<=0):
                 cost = pricePerHour*0.25*delta_soc*self.batteryCapacity
         if (load+delta_soc*self.batteryCapacity-pv)>self.PgridMax:
-            reward.append(-2)
+            reward.append(-0.5)
 
 
 
