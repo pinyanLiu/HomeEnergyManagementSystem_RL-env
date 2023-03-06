@@ -9,7 +9,7 @@ class Plot():
         self.fig,self.axes = plt.subplots(6,2)
         self.ax = [self.axes[i,j]for i in range(6) for j in range(2)]
         self.sub = [sub.twinx() for sub in self.ax]
-    def power(self):
+    def remainPower(self):
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')
             self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',bottom = self.testResult[month]['deltaSoc'] ,color ='gray') 
@@ -22,7 +22,8 @@ class Plot():
 
     def plotLoadPower(self):
         for month in range(0,12):
-            self.ax[month].bar(range(96) ,self.testResult[month]['switch'] ,label = 'switch', color ='green')            
+            self.ax[month].bar(range(96) ,self.testResult[month]['switch'] ,label = 'switch', color ='green')    
+
     def plotReward(self):
         for month in range(0,12):
             self.ax[month].plot(range(96) ,self.testResult[month]['reward'] ,label = 'reward', color ='red')            
@@ -36,10 +37,9 @@ class Plot():
             self.sub[month].plot(range(len(self.testResult[month]['price'])),self.testResult[month]['price'], label = "price")  
         
 
-    def __soc__(self):
+    def soc(self):
         for month in range(0,12):
-            self.ax[month].set_ylabel('Power')
-            self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad', color ='gray') 
+            self.ax[month].plot(range(96) ,self.testResult[month]['soc'] ,label = 'soc', color ='yellow')    
                        
     def plotResult(self,dir):
         self.fig.tight_layout()

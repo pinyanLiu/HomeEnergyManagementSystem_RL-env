@@ -161,11 +161,14 @@ class IntEnv(HemsEnv):
         #change to next state
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc[sampleTime],self.interruptibleLoad.getRemainDemand()])
+
         #actions mask
         PgridMaxExceed = (self.Load[sampleTime]+self.deltaSoc[sampleTime]+self.interruptibleLoad.AvgPowerConsume-self.PV[sampleTime]) >= self.PgridMax
         self.action_mask = np.asarray([True,self.state[5]>0 and not PgridMaxExceed])
+
         #check if all day is done
         self.done =  bool(sampleTime == 95)
+        
         #REWARD
         self.reward = sum(reward)
         states = dict(state=self.state,action_mask=self.action_mask)

@@ -77,7 +77,7 @@ class UnIntSimulation(Simulation):
     
     def outputResult(self):
         output = Plot(self.testResult)
-        output.power()
+        output.remainPower()
         output.plotLoadPower()
         output.price()
         output.plotReward()

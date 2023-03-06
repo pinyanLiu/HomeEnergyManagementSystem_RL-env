@@ -5,11 +5,6 @@ import numpy as np
 class SocTest(SocEnv):
     def __init__(self) :
         super().__init__()
-        #import Base Parameter
-        self.intload_demand =  int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='intload_demand']['value'])[0])
-
-        self.intload_power =  float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='intload_power']['value'])[0])
-
         #each month pick one day for testing
         self.i = 0
         #import Load 
@@ -72,6 +67,7 @@ class SocTest(SocEnv):
             self.GridPrice = self.notSummerGridPrice
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.socInit,self.GridPrice[0]])
+        
         return self.state
 
 

@@ -1,16 +1,19 @@
 from lib.Simulations.uninterruptibleSimulation import UnIntSimulation
 from lib.Simulations.interruptibleSimulation import IntSimulation
+from lib.Simulations.SocSimulation import SocSimulation
 import sys
 
 def __main__(argv):
     if len(argv)<2:
-        print('please give parameters Testing mode: "soc"/"int"/"HVAC"/"unint"')
+        print('please give parameters Testing mode: "soc"/"int"/"hvac"/"unint"')
         return
     mode = argv[1]
     if mode == 'unint':
         simulation = UnIntSimulation()
     elif mode == 'int':
         simulation = IntSimulation()
+    elif mode == "soc":
+        simulation = SocSimulation()
     
     simulation.simulation()
     simulation.outputResult()

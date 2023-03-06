@@ -2,7 +2,6 @@ from lib.Simulations.Simulation import Simulation
 from tensorforce import Agent,Environment
 from lib.enviroment.InterruptibleLoadTestEnv import IntTest
 from lib.loads.interrupted import AC 
-import pandas as pd
 from lib.plot.plot import Plot
 
 class IntSimulation(Simulation):
@@ -77,7 +76,7 @@ class IntSimulation(Simulation):
     
     def outputResult(self):
         output = Plot(self.testResult)
-        output.power()
+        output.remainPower()
         output.plotLoadPower()
         output.price()
         output.plotReward()

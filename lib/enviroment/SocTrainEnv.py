@@ -104,27 +104,24 @@ class SocEnv(HemsEnv):
         if (sampleTime == 94 and soc <self.socThreshold):
             reward.append(10*(soc-self.socThreshold))
 
-        #REWARD
-      #  if sampleTime!=95:
         reward.append(-cost)
 
 
         #change to next state
         sampleTime = int(sampleTime+1)
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
 
         #check if all day has done
-        done = bool(
-            sampleTime == 95
-        )
+        self.done = bool(sampleTime == 95)
 
 
-        state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
+        states = dict(state = self.state)
+#print(reward)
 
-        print(reward)
+        #REWARD
+        self.reward = sum(reward)
 
-        reward = sum(reward)
-
-        return state,done,reward
+        return states,self.done,self.reward
 
         
 
