@@ -3,7 +3,7 @@ import sys
 from lib.enviroment.UnInterruptibleLoadTrainEnv import UnIntEnv
 from lib.enviroment.InterruptibleLoadTrainEnv import IntEnv
 from lib.enviroment.SocTrainEnv import SocEnv
-
+from lib.enviroment.HVACTrainEnv import HvacEnv
 def main(argv):
     if len(argv)<4:
         print('please give parameters 1.Training mode: "soc"/"intload"/"HVAC"/"unintload 2.Agent 3. training episode ')
@@ -12,11 +12,11 @@ def main(argv):
 
     if argv[1] == 'soc':
         environment = dict(environment=SocEnv)
-    elif argv[1] == 'intload':
+    elif argv[1] == 'int':
         environment = dict(environment=IntEnv)
-    elif argv[1] == 'HVAC':    
-        environment = dict(environment='gym', level='Hems-v6')
-    elif argv[1] == 'unintload':
+    elif argv[1] == 'hvac':    
+        environment = dict(environment=HvacEnv)
+    elif argv[1] == 'unint':
         environment = dict(environment=UnIntEnv)
     else :
         print('please give parameters 1.Training mode: "soc"/"intload"/"HVAC"/"unintload 2.Agent 3. training episode ')

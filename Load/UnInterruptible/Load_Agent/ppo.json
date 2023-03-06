@@ -44,7 +44,7 @@
         }
     ],
     "use_beta_distribution": false,
-    "memory": "minimum",
+    "memory": 25000,
     "update_frequency": 0.1,
     "learning_rate": {
         "type": "decaying",

@@ -31,15 +31,15 @@ class HvacEnv(HemsEnv):
         upperLimit = np.array(
             [
                 #timeblock
-                96,
+                95,
                 #load
                 10,
                 #PV
                 10,
+                #pricePerHour
+                6.2,
                 #deltaSoc
                 0.15,
-                #pricePerHour
-                6,
                 #indoor temperature
                 104,
                 #outdoor temperature
@@ -57,12 +57,12 @@ class HvacEnv(HemsEnv):
                 0,
                 #PV
                 0,
-                #deltaSoc
-                -0.15,
                 #pricePerHour
                 1,
+                #deltaSoc
+                -0.15,
                 #indoor temperature
-                35,
+                20,
                 #outdoor temperature
                 35,
                 #user set temperature
@@ -130,7 +130,7 @@ class HvacEnv(HemsEnv):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.deltaSoc[sampleTime],self.GridPrice[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
         states = dict(state=self.state)
 
 
@@ -210,7 +210,7 @@ class HvacEnv(HemsEnv):
             self.GridPrice = self.notSummerGridPrice
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.deltaSoc[0],self.GridPrice[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0]])
         return self.state
 
 
