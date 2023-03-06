@@ -116,7 +116,6 @@ class SocEnv(HemsEnv):
 
 
         states = dict(state = self.state)
-#print(reward)
 
         #REWARD
         self.reward = sum(reward)
