@@ -132,7 +132,7 @@ class IntEnv(HemsEnv):
         reward = []
         cost = 0
         #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,interruptible load remain)
-        sampleTime,load,pv,pricePerHour,deltaSoc,Remain = self.state
+        sampleTime,load,pv,pricePerHour,deltaSoc,intRemain = self.state
         # Turn off switch
         if actions == 0:
             self.interruptibleLoad.turn_off()
@@ -144,7 +144,7 @@ class IntEnv(HemsEnv):
 
         # if the switch is on , calculate the electricity cost
         if self.interruptibleLoad.switch:
-            Pess = deltaSoc*self.batteryCapacity*0.25
+            Pess = deltaSoc*self.batteryCapacity
             if Pess<0:
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv+Pess))/self.interruptibleLoad.demand
             else:

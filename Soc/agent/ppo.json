@@ -3,23 +3,21 @@
     "states": {
         "type": "float",
         "shape": [
-            6
+            5
         ],
         "min_value": [
             0.0,
             0.0,
             0.0,
             0.0,
-            0.0,
-            0.6
+            0.0
         ],
         "max_value": [
-            96.0,
+            95.0,
             10,
             10,
             1.0,
-            6.0,
-            1.35
+            6.2
         ]
     },
     "actions": {
@@ -49,12 +47,19 @@
     ],
     "use_beta_distribution": false,
     "memory": "minimum",
-    "update_frequency": 0.5,
-    "learning_rate": 1e-4,
+    "update_frequency": 0.1,
+    "learning_rate": {
+        "type": "decaying",
+        "decay": "linear",
+        "unit": "episodes",
+        "num_steps": 15000,
+        "initial_value": 1e-3,
+        "final_value": 5e-5
+    },
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.25,
-    "discount": 0.97,
+    "discount": 1.0,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
@@ -77,16 +82,24 @@
     ],
     "baseline_optimizer": {
         "optimizer": "adam",
-        "learning_rate": 1e-4
+        "learning_rate": {
+            "type": "decaying",
+            "decay": "linear",
+            "unit": "episodes",
+            "num_steps": 15000,
+            "initial_value": 1e-3,
+            "final_value": 5e-5
+        },
+        "multi_step": 10
     },
     "state_preprocessing": "linear_normalization",
     "exploration": {
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 95000,
-        "initial_value": 0.3,
-        "final_value": 0.00001
+        "num_steps": 15000,
+        "initial_value": 0.25,
+        "final_value": 1e-5
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
@@ -95,7 +108,7 @@
     "config": null,
     "saver": {
         "directory": "Soc/saver_dir",
-        "frequency": 500,
+        "frequency": 1000,
         "unit": "episodes"
     },
     "summarizer": {

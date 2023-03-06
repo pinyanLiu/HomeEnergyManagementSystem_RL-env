@@ -81,7 +81,7 @@ class UnIntSimulation(Simulation):
         output.plotLoadPower()
         output.price()
         output.plotReward()
-        output.plotResult('lib/plot/interruptible/')
+        output.plotResult('lib/plot/uninterruptible/')
 
     def __del__(self):
         # Close agent and environment

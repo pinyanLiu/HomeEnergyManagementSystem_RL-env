@@ -2,6 +2,7 @@ from tensorforce.execution import Runner
 import sys
 from lib.enviroment.UnInterruptibleLoadTrainEnv import UnIntEnv
 from lib.enviroment.InterruptibleLoadTrainEnv import IntEnv
+from lib.enviroment.SocTrainEnv import SocEnv
 
 def main(argv):
     if len(argv)<4:
@@ -10,7 +11,7 @@ def main(argv):
     agent = argv[2]
 
     if argv[1] == 'soc':
-        environment = dict(environment='gym', level='Hems-v0')
+        environment = dict(environment=SocEnv)
     elif argv[1] == 'intload':
         environment = dict(environment=IntEnv)
     elif argv[1] == 'HVAC':    
