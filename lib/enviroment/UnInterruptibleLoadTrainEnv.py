@@ -160,7 +160,7 @@ class UnIntEnv(HemsEnv):
 
 
         #reward
-        reward.append(0.08-15*cost)
+        reward.append(0.07-18*cost)
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
             reward.append(-10*self.uninterruptibleLoad.getRemainProcessPercentage())
         

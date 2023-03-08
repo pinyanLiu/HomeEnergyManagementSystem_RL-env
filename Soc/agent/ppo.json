@@ -52,7 +52,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 15000,
+        "num_steps": 5000,
         "initial_value": 1e-3,
         "final_value": 5e-5
     },
@@ -86,7 +86,7 @@
             "type": "decaying",
             "decay": "linear",
             "unit": "episodes",
-            "num_steps": 15000,
+            "num_steps": 5000,
             "initial_value": 1e-3,
             "final_value": 5e-5
         },
@@ -97,7 +97,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 15000,
+        "num_steps": 5000,
         "initial_value": 0.25,
         "final_value": 1e-5
     },

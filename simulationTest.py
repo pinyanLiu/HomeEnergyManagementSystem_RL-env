@@ -1,6 +1,7 @@
 from lib.Simulations.uninterruptibleSimulation import UnIntSimulation
 from lib.Simulations.interruptibleSimulation import IntSimulation
 from lib.Simulations.SocSimulation import SocSimulation
+from lib.Simulations.hvacSimulation import HvacSimulation
 import sys
 
 def __main__(argv):
@@ -14,6 +15,8 @@ def __main__(argv):
         simulation = IntSimulation()
     elif mode == "soc":
         simulation = SocSimulation()
+    elif mode == "hvac":
+        simulation = HvacSimulation()
     
     simulation.simulation()
     simulation.outputResult()

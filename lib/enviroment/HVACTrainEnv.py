@@ -2,7 +2,6 @@ from  gym import spaces
 import numpy as np
 from random import randint,uniform
 from lib.enviroment.hemsTrainEnv import HemsEnv
-from gym import make
 
 class HvacEnv(HemsEnv):
     def __init__(self) :
@@ -165,8 +164,8 @@ class HvacEnv(HemsEnv):
             self.GridPrice = self.notSummerGridPrice
         elif int(self.i / 30) == 3:
             self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
-            self.PV = self.allPV['Apr'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
+            self.PV = self.allPV['Apr'].tolist()
             self.GridPrice = self.notSummerGridPrice
         elif int(self.i / 30) == 4:
             self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
@@ -214,14 +213,3 @@ class HvacEnv(HemsEnv):
         return self.state
 
 
-
-if __name__ == '__main__':
-    env = make("Hems-v6")
-#     # Initialize episode
-    states = env.reset()
-    done = False
-    step = 0
-    while not done: # Episode timestep
-        actions = env.action_space.sample()
-        states, reward, done , info = env.step(action=actions)
-        print(info)
