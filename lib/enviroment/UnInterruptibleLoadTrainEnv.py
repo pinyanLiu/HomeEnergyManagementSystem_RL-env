@@ -15,8 +15,8 @@ class UnIntEnv(HemsEnv):
         #import Base Parameter
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
-#        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
-        self.uninterruptibleLoad = WM(demand=randint(12,24),executePeriod=3,AvgPowerConsume=0.3)
+#        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.7)
+        self.uninterruptibleLoad = WM(demand=24,executePeriod=3,AvgPowerConsume=0.7)
         self.deltaSoc = [uniform(-0.15,0.15) for _ in range(96)]
         self.GridPrice = [uniform(1.73,6.2) for _ in range(96)]
 
@@ -117,8 +117,8 @@ class UnIntEnv(HemsEnv):
             self.GridPrice = self.notSummerGridPrice
         self.deltaSoc = [uniform(-0.15,0.15) for _ in range(96)]
         self.GridPrice = [uniform(1.73,6.2) for _ in range(96)]
-#        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.3)
-        self.uninterruptibleLoad = WM(demand=randint(12,24),executePeriod=3,AvgPowerConsume=0.3)
+#        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.7)
+        self.uninterruptibleLoad = WM(demand=24,executePeriod=3,AvgPowerConsume=0.7)
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch])
         #actions mask
@@ -160,9 +160,9 @@ class UnIntEnv(HemsEnv):
 
 
         #reward
-        reward.append(0.07-18*cost)
+        reward.append(0.07-20*cost)
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-10*self.uninterruptibleLoad.getRemainProcessPercentage())
+            reward.append(-5*self.uninterruptibleLoad.getRemainProcessPercentage())
         
 
         #change to next state

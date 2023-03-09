@@ -61,7 +61,7 @@ class Plot():
     def plotReward(self):
         self.sub3 = [sub3.twinx() for sub3 in self.ax]
         for month in range(0,12):
-            self.sub3[month].plot(range(96) ,self.testResult[month]['reward'] ,label = 'reward', color ='green')            
+            self.sub3[month].plot(range(96) ,self.testResult[month]['reward'] ,label = 'reward', color ='silver')            
 
     def plotResult(self,dir):
         self.fig.tight_layout()

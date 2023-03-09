@@ -144,69 +144,84 @@ class HvacEnv(HemsEnv):
         Starting State
         '''
         #pick one day from 360 days
+        self.randomDeltaPrice  = [uniform(-0.25,0.25) for _ in range(96)]
+        self.randomDeltaPV = [uniform(-0.5,0.5) for _ in range(96)]
+        self.randomDeltaSOC = [uniform(-0.05,0.05) for _ in range(96)]
         self.i = randint(1,359)
         self.Load = self.allLoad.iloc[:,self.i].tolist()
         #import PV,outTmp,userTmp,GridPrice
         if int( self.i / 30) == 0:
             self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Jan'].tolist()
-            self.PV = self.allPV['Jan'].tolist()
-            self.GridPrice = self.notSummerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Jan'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Jan'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 1:
             self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Feb'].tolist()
-            self.PV = self.allPV['Feb'].tolist()
-            self.GridPrice = self.notSummerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Feb'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Feb'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 2:
             self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Mar'].tolist()
-            self.PV = self.allPV['Mar'].tolist()
-            self.GridPrice = self.notSummerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Mar'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Mar'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 3:
             self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
-            self.PV = self.allPV['Apr'].tolist()
-            self.GridPrice = self.notSummerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Apr'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Apr'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 4:
             self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['May'].tolist()
-            self.PV = self.allPV['May'].tolist()
-            self.GridPrice = self.notSummerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['May'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['May'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 5:
             self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Jun'].tolist()
-            self.PV = self.allPV['Jun'].tolist()
-            self.GridPrice = self.summerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Jun'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Jun'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 6:
             self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['July'].tolist()
-            self.PV = self.allPV['July'].tolist()
-            self.GridPrice = self.summerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['July'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['July'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 7:
             self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Aug'].tolist()
-            self.PV = self.allPV['Aug'].tolist()
-            self.GridPrice = self.summerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Aug'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Aug'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 8:
             self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Sep'].tolist()
-            self.PV = self.allPV['Sep'].tolist()
-            self.GridPrice = self.summerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Sep'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Sep'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 9:
             self.outdoorTemperature = self.allOutdoorTemperature['Oct'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Oct'].tolist()
-            self.PV = self.allPV['Oct'].tolist()
-            self.GridPrice = self.notSummerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Oct'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Oct'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 10:
             self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
-            self.PV = self.allPV['Nov'].tolist()
-            self.GridPrice = self.notSummerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Nov'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Nov'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
         elif int(self.i / 30) == 11:
             self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
-            self.PV = self.allPV['Dec'].tolist()
-            self.GridPrice = self.notSummerGridPrice
+            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Dcb'].tolist(),self.randomDeltaSOC)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Dec'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
 
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0]])

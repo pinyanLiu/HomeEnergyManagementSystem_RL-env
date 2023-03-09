@@ -43,6 +43,12 @@ class ImportData:
         PhotoVoltaic.columns = [column[0] for column in self.cursor.description]
         return PhotoVoltaic
 
+    def importDeltaSOC(self):
+        self.cursor.execute("SELECT * FROM DeltaSOC")
+        DeltaSOC = pd.DataFrame(self.cursor.fetchall())
+        DeltaSOC.columns = [column[0] for column in self.cursor.description]
+        return DeltaSOC
+
     def importTrainingLoad(self):
         self.cursor.execute("SELECT * FROM TrainingData")
         TrainingData = pd.DataFrame(self.cursor.fetchall())

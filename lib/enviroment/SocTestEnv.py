@@ -1,7 +1,8 @@
 from lib.enviroment.SocTrainEnv import SocEnv
 from gym import make
 import numpy as np
-
+from random import randint,uniform
+ 
 class SocTest(SocEnv):
     def __init__(self) :
         super().__init__()
@@ -24,17 +25,19 @@ class SocTest(SocEnv):
         '''
         Starting State
         '''
+        
         self.i += 1
         self.Load = self.allLoad.iloc[:,self.i].tolist()
+        self.randomDeltaPrice  = [uniform(-1,1) for _ in range(96)]
 
         #import PV
         if self.i  == 0:
             self.PV = self.allPV['Jan'].tolist()
             self.GridPrice = self.notSummerGridPrice
-
         elif self.i  == 1:
             self.PV = self.allPV['Feb'].tolist()
             self.GridPrice = self.notSummerGridPrice
+            # self.GridPrice = self.notSummerGridPrice
         elif self.i  == 2:
             self.PV = self.allPV['Mar'].tolist()
             self.GridPrice = self.notSummerGridPrice

@@ -11,7 +11,7 @@ class UnIntSimulation(Simulation):
         self.environment = Environment.create(environment = UnIntTest,max_episode_timesteps=96)
         self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
     def simulation(self):
-        wmObject = WM(AvgPowerConsume=0.3)
+        wmObject = WM(AvgPowerConsume=0.7)
         sampletime = []
         load = []
         pv = []

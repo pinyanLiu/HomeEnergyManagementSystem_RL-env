@@ -9,3 +9,4 @@ goodsummary
 *.png
 *__pycache__/
 *.py[cod]
+uploadSOC.py

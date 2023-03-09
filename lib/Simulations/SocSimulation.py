@@ -3,11 +3,13 @@ from tensorforce import Agent,Environment
 from lib.enviroment.SocTestEnv import SocTest
 from lib.plot.plot import Plot
 
+
 class SocSimulation(Simulation):
     def __init__(self):
         super().__init__()
         self.environment = Environment.create(environment = SocTest,max_episode_timesteps=96)
         self.agent = Agent.load(directory = 'Soc/saver_dir',environment=self.environment)
+        
     def simulation(self):
         sampletime = []
         load = []
@@ -75,3 +77,5 @@ class SocSimulation(Simulation):
             self.agent.close()
         if self.environment:
             self.environment.close()
+
+
