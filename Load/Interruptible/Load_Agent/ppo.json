@@ -10,7 +10,7 @@
             0.0,
             0.0,
             0.0,
-            -0.15,
+            -0.25,
             0.0
         ],
         "max_value": [
@@ -18,7 +18,7 @@
             10.0,
             10.0,
             6.2,
-            0.15,
+            0.25,
             49.0
         ]
     },
@@ -48,7 +48,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 15000,
+        "num_steps": 5000,
         "initial_value": 1e-3,
         "final_value": 5e-5
     },
@@ -77,7 +77,7 @@
             "type": "decaying",
             "decay": "linear",
             "unit": "episodes",
-            "num_steps": 15000,
+            "num_steps": 5000,
             "initial_value": 1e-3,
             "final_value": 5e-5
         },
@@ -88,7 +88,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 15000,
+        "num_steps": 5000,
         "initial_value": 0.25,
         "final_value": 1e-5
     },
