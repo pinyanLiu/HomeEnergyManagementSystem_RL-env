@@ -102,7 +102,7 @@ class HvacEnv(HemsEnv):
 
         #temperature reward
         if indoorTemperature > userSetTemperature :
-            r1 = -pow(indoorTemperature-userSetTemperature,2)/10
+            r1 = -pow(indoorTemperature-userSetTemperature,2)/5
         else :
             if indoorTemperature >= outdoorTemperature:
                 r1 = 0.01

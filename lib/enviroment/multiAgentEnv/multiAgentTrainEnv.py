@@ -1,7 +1,11 @@
 from  lib.import_data.import_data import ImportData 
 from  yaml import load , SafeLoader
-from random import randint
 from tensorforce import Environment
+from lib.enviroment.multiAgentEnv.LLA.LLA import socLLA,hvacLLA,intLLA,unintLLA 
+import numpy as np
+from  gym import spaces
+from random import randint,uniform
+
 
 class multiAgentTrainEnv(Environment):
     def __init__(self) :
@@ -56,10 +60,52 @@ class multiAgentTrainEnv(Environment):
         self.done = False
 
     def states(self):
-        pass
+        #observation space 
+        #state abstraction
+        upperLimit = np.array(
+            [
+                #time block
+                95,
+                #SOC
+                1.0,
+                #Remain
+                10.0,
+                #price per hour
+                6.2,
+                #HVAC state
+                1,
+                #Int state
+                1,
+                #Unint state
+                1,
+            ],
+            dtype=np.float32,
+        )
+        lowerLimit = np.array(
+            [
+                #time block
+                0,
+                #SOC
+                0.0,
+                #Remain
+                0.0,
+                #pricePerHour
+                0.0,
+                #HVAC state
+                0,
+                #Int state
+                0,
+                #Unint state
+                0
+            ],
+            dtype=np.float32,
+        )
+        self.observation_space = spaces.Box(lowerLimit,upperLimit,dtype=np.float32)
+        return dict(type='float',shape=self.observation_space.shape,min_value=lowerLimit,max_value=upperLimit)
 
     def actions(self):
-        pass
+        return dict(type='int',num_values=4)
+
 
 
     def close(self):

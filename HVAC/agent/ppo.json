@@ -85,7 +85,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 5000,
+        "num_steps": 7000,
         "initial_value": 0.2,
         "final_value": 0.00001
     },
