@@ -40,6 +40,7 @@ class SocSimulation(Simulation):
                 pv.append(states['state'][2])
                 soc.append(states['state'][3])
                 price.append(states['state'][4])
+                self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
             deltaSoc.append(0)
@@ -71,11 +72,14 @@ class SocSimulation(Simulation):
         output.plotReward()
         output.plotResult('lib/plot/soc/')
 
+    def getMean(self):
+        return super().getMean()
+
+    def getStd(self):
+        return super().getStd()
+
+
     def __del__(self):
-        # Close agent and environment
-        if self.agent:
-            self.agent.close()
-        if self.environment:
-            self.environment.close()
+        return super().__del__()
 
 

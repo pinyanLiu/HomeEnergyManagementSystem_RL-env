@@ -10,3 +10,4 @@ goodsummary
 *__pycache__/
 *.py[cod]
 uploadSOC.py
+uploadMeanStd.py

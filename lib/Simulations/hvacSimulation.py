@@ -48,6 +48,7 @@ class HvacSimulation(Simulation):
                 indoorTemperature.append(states['state'][5])
                 outdoorTemperature.append(states['state'][6])
                 userSetTemperature.append(states['state'][7])
+                self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
             hvac.append(0)
@@ -85,9 +86,11 @@ class HvacSimulation(Simulation):
         output.plotReward()
         output.plotResult('lib/plot/hvac/')
 
+    def getMean(self):
+        return super().getMean()
+
+    def getStd(self):
+        return super().getStd()
+        
     def __del__(self):
-        # Close agent and environment
-        if self.agent:
-            self.agent.close()
-        if self.environment:
-            self.environment.close()
+        return super().__del__()

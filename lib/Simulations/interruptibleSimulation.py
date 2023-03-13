@@ -47,8 +47,9 @@ class IntSimulation(Simulation):
                 load.append(states['state'][1])
                 pv.append(states['state'][2])
                 price.append(states['state'][3])
-                deltaSoc.append(states['state'][4]*4)
+                deltaSoc.append(states['state'][4])
                 intloadRemain.append(states['state'][5])
+                self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
             switch.append(0)
@@ -82,9 +83,11 @@ class IntSimulation(Simulation):
         output.plotReward()
         output.plotResult('lib/plot/interruptible/')
 
+    def getMean(self):
+        return super().getMean()
+
+    def getStd(self):
+        return super().getStd()
+
     def __del__(self):
-        # Close agent and environment
-        if self.agent:
-            self.agent.close()
-        if self.environment:
-            self.environment.close()
+        return super().__del__()

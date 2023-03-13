@@ -21,6 +21,9 @@ class SocTest(SocEnv):
     def execute(self, actions):
         return super().execute(actions)
 
+    def close(self):
+        return super().close()
+
     def reset(self):
         '''
         Starting State

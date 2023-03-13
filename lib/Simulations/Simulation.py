@@ -1,10 +1,12 @@
 import pandas as pd
+import numpy as np
 
 class Simulation():
     def __init__(self) -> None:
         self.testResult = {}
         for month in range(12):
             self.testResult[month] = pd.DataFrame()
+        self.totalReward = []
     
     def simulation(self):
         print("do simulation")
@@ -12,5 +14,13 @@ class Simulation():
     def outputResult(self):
         print("plot result")
 
+    def getMean(self):
+        return(np.mean(self.totalReward))
+
+    def getStd(self):
+        return(np.std(self.totalReward))
+        
     def __del__(self):
-        pass
+        # Close agent and environment
+        self.agent.close()
+        self.environment.close()

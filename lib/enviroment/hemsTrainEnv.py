@@ -48,7 +48,7 @@ class HemsEnv(Environment):
 
 
     def close(self):
-        pass
+        super().close()
 
     def reset(self):
         '''
