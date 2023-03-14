@@ -180,6 +180,7 @@ class IntEnv(HemsEnv):
 
         #actions mask
         PgridMaxExceed = (self.Load[sampleTime]+self.deltaSoc[sampleTime]+self.interruptibleLoad.AvgPowerConsume-self.PV[sampleTime]) >= self.PgridMax
+        
         self.action_mask = np.asarray([True,self.state[5]>0 and not PgridMaxExceed])
 
         #check if all day is done

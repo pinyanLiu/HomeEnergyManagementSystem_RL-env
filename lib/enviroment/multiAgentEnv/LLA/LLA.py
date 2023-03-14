@@ -12,13 +12,14 @@ class LLA():
 
 
     def execute(self) -> None:
-        actions, internals = self.agent.act(
+        self.actions, internals = self.agent.act(
                     states=self.states, internals=internals, independent=True, deterministic=True
                 )
-        states, terminal, self.reward = self.environment.execute(actions=actions)
+        self.state, terminal, self.reward = self.environment.execute(actions=self.actions) 
 
-    def rewardStandardization(self) -> float:
-        return (self.reward - self.mean)/self.std
+
+    def rewardStandardization(self) -> None:
+        self.reward =  (self.reward - self.mean)/self.std
 
     def __del__(self):
         # Close agent and environment
@@ -37,6 +38,7 @@ class socLLA(LLA):
 
     def execute(self) -> None:
         return super().execute()
+
 
     def rewardStandardization(self) -> float:
         return super().rewardStandardization()

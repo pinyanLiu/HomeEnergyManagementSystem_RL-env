@@ -84,3 +84,9 @@ class ImportData:
         UserSetTemperatureC = pd.DataFrame(self.cursor.fetchall())
         UserSetTemperatureC.columns = [column[0]for column in self.cursor.description]
         return UserSetTemperatureC
+
+    def importStatisticalData(self):
+        self.cursor.execute("SELECT * FROM TestResult_Statistical_Data")
+        statisticalData = pd.DataFrame(self.cursor.fetchall())
+        statisticalData.columns = [column[0]for column in self.cursor.description]
+        return statisticalData
