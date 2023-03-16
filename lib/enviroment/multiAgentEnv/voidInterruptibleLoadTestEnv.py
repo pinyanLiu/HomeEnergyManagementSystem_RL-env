@@ -3,7 +3,7 @@ from gym import make
 import numpy as np
 from lib.loads.interrupted import AC
 
-class IntTest(IntEnv):
+class VoidIntTest(IntEnv):
     def __init__(self) :
         pass
 

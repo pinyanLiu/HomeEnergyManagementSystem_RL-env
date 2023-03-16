@@ -3,7 +3,7 @@ from gym import make
 import numpy as np
 from lib.enviroment.UnInterruptibleLoadTrainEnv import UnIntEnv
 
-class UnIntTest(UnIntEnv):
+class VoidUnIntTest(UnIntEnv):
     def __init__(self) :
         pass
 

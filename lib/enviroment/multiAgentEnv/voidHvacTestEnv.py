@@ -1,7 +1,7 @@
 from lib.enviroment.HVACTrainEnv import HvacEnv
 import numpy as np
 
-class HvacTest(HvacEnv):
+class VoidHvacTest(HvacEnv):
     def __init__(self) :
         pass
 
@@ -72,3 +72,15 @@ class HvacTest(HvacEnv):
     
     def reset(self):
         pass
+
+
+
+
+
+
+
+
+
+
+
+

@@ -4,7 +4,7 @@ from lib.enviroment.UnInterruptibleLoadTrainEnv import UnIntEnv
 from lib.enviroment.InterruptibleLoadTrainEnv import IntEnv
 from lib.enviroment.SocTrainEnv import SocEnv
 from lib.enviroment.HVACTrainEnv import HvacEnv
-from lib.enviroment.multiAgentEnv import multiAgentTrainEnv
+from lib.enviroment.multiAgentEnv.multiAgentTrainEnv import multiAgentTrainEnv
 def main(argv):
     if len(argv)<4:
         print('please give parameters 1.Training mode: "soc"/"intload"/"HVAC"/"unintload"/"hla" 2.Agent 3. training episode ')

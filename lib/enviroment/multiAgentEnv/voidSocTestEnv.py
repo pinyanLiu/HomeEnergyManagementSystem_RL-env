@@ -3,9 +3,11 @@ from gym import make
 import numpy as np
 from random import randint,uniform
  
-class SocTest(SocEnv):
-    def __init__(self) :
-        pass
+class VoidSocTest(SocEnv):
+    def __init__(self,baseParameter) :
+        self.BaseParameter = baseParameter
+        self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
+        self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 
     def states(self):
         return super().states()
@@ -13,8 +15,8 @@ class SocTest(SocEnv):
     def actions(self):
         return super().actions()
         
-    def execute(self, actions, states):
-        sampleTime,load,pv,soc,pricePerHour = states
+    def execute(self, actions):
+        sampleTime,load,pv,soc,pricePerHour = self.state
         delta_soc = float(actions)
     #interaction
         reward = []
@@ -48,7 +50,7 @@ class SocTest(SocEnv):
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([0,0,0,0,0])
+        self.state=np.array([sampleTime,load,pv,soc,pricePerHour])
 
         #check if all day has done
         self.done = bool(sampleTime == 95)
@@ -62,5 +64,8 @@ class SocTest(SocEnv):
         return states,self.done,self.reward        
     
     def reset(self):
-        pass
+        return  np.array([0,0.0,0.0,0.0,0.0])
         
+
+    def updateState(self,states):
+        self.state =  states
