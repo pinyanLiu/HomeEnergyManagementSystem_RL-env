@@ -47,8 +47,7 @@ class multiAgentTrainEnv(Environment):
         self.summerGridPrice = self.allGridPrice['summer_price'].tolist()
         #self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
         self.notSummerGridPrice = self.allGridPrice['test_price1'].tolist()
-        #pick one day from 360 days
-        self.i = randint(1,359)
+
         #import Load 
         self.allLoad = self.info.importTrainingLoad()
         self.Load = self.allLoad.iloc[:,self.i].tolist()
@@ -59,17 +58,19 @@ class multiAgentTrainEnv(Environment):
         self.allOutdoorTemperature = self.info.importTemperatureF()
         self.allStatisticalData = self.info.importStatisticalData()
 
+
+
+
+
         #construct all LLAs
-        self.socAgent = socLLA(environment=voidSocTestEnv,agent=Agent.load(directory = 'Soc/saver_dir',environment=voidSocTestEnv,),mean=self.allStatisticalData.loc["SOC","mean"],std=self.allStatisticalData.loc["SOC","std"])
+        self.socAgent = socLLA(environment=voidSocTestEnv,agent=Agent.load(directory = 'Soc/saver_dir',environment=voidSocTestEnv,),mean=self.allStatisticalData.loc["SOC","mean"],std=self.allStatisticalData.loc["SOC","std"],Int=self.interruptibleLoad)
         
-        self.hvacAgent = hvacLLA(environment=voidHvacTestEnv,agent=Agent.load(directory = 'HVAC/saver_dir',environment=voidHvacTestEnv,),mean=self.allStatisticalData.loc["HVAC","mean"],std=self.allStatisticalData.loc["HVAC","std"])
+        self.hvacAgent = hvacLLA(environment=voidHvacTestEnv,agent=Agent.load(directory = 'HVAC/saver_dir',environment=voidHvacTestEnv,),mean=self.allStatisticalData.loc["HVAC","mean"],std=self.allStatisticalData.loc["HVAC","std"],unInt=self.uninterruptibleLoad)
         
         self.intAgent = intLLA(environment=voidInterruptibleLoadTestEnv,agent=Agent.load(directory = 'Load/Interruptible/saver_dir',environment=voidInterruptibleLoadTestEnv,),mean=self.allStatisticalData.loc["Interruptible","mean"],std=self.allStatisticalData.loc["Interruptible","std"])
         
         self.unIntAgent = unintLLA(environment=voidUnInterruptibleLoadTestEnv,agent=Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=voidUnInterruptibleLoadTestEnv,),mean=self.allStatisticalData.loc["Uninterruptible","mean"],std=self.allStatisticalData.loc["Uninterruptible","std"])
-        #AC/WM object
-        self.interruptibleLoad = AC(demand=randint(1,49),AvgPowerConsume=1.5)
-        self.uninterruptibleLoad = WM(demand=24,executePeriod=3,AvgPowerConsume=0.7)
+
 
         self.state = None
         self.totalState = {
@@ -148,7 +149,97 @@ class multiAgentTrainEnv(Environment):
         '''
         Starting State
         '''
-        pass
+        #pick one day from 360 days
+        self.i = randint(1,359)
+        #AC/WM object
+        self.interruptibleLoad = AC(demand=randint(1,49),AvgPowerConsume=1.5)
+        self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=uniform(0.5,1))
+        self.randomDeltaPrice  = [uniform(-1,1) for _ in range(96)]
+        self.randomDeltaPV = [uniform(-0.5,0.5) for _ in range(96)]        
+        self.randomTemperature = [uniform(-2,2)for _ in range(96)]
+        
+        #import PV,outTmp,userTmp,GridPrice
+        if int( self.i / 30) == 0:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Jan'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Jan'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Jan'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 1:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Feb'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Feb'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Feb'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 2:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Mar'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Mar'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Mar'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 3:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Apr'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Apr'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Apr'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 4:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['May'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['May'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['May'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 5:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Jun'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Jun'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Jun'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 6:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['July'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['July'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['July'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 7:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Aug'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Aug'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Aug'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 8:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Sep'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Sep'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Sep'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 9:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Oct'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Oct'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Oct'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 10:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Nov'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Nov'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Nov'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
+        elif int(self.i / 30) == 11:
+            self.outdoorTemperature = [min(max(x+y,35),104) for x,y in zip(self.allOutdoorTemperature['Dcb'].tolist(),self.randomTemperature)]
+            self.userSetTemperature = [min(max(x+y,35),104) for x,y in zip(self.allUserSetTemperature['Dcb'].tolist(),self.randomTemperature)]
+            self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Dec'].tolist(),self.randomDeltaPV)]
+            self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
+
+        #reset state
+        self.totalState = {
+            "sampleTime":0,
+            "fixLoad":self.Load[0],
+            "PV":self.PV[0],
+            "SOC":self.socInit,
+            "pricePerHour":self.GridPrice[0],
+            "deltaSoc":0,
+            "indoorTemperature":self.initIndoorTemperature,
+            "outdoorTemperature":self.outdoorTemperature[0],
+            "userSetTemperature":self.userSetTemperature[0],
+            "intRemain":self.interruptibleLoad.demand,
+            "unintRemain":self.uninterruptibleLoad.demand,
+            "unintSwitch":self.uninterruptibleLoad.switch,
+            "order":0
+        }
+
+        self.state = self.stateAbstraction(self.totalState)
+        return self.state
+
 
     def execute(self,actions):
         '''
@@ -210,19 +301,19 @@ class multiAgentTrainEnv(Environment):
     def stateAbstraction(self,totalState) -> np.array:
         res = []
         #sampleTime
-        res.append(totalState[0])
+        res.append(totalState['sampleTime'])
         #SOC
-        res.append(totalState[3])
+        res.append(totalState['SOC'])
         #remain power
-        res.append(totalState[1]+totalState[2]+totalState[5]*self.batteryCapacity)
+        res.append(totalState['fixLoad']+totalState['PV']+totalState['deltaSoc']*self.batteryCapacity)
         #pricePerHour
-        res.append(totalState[4])
+        res.append(totalState['pricePerHour'])
         #HVAC state
-        res.append(True if totalState[8]< totalState[6] else False)
+        res.append(True if totalState['userSetTemperature']< totalState['indoorTemperature'] else False)
         #interruptible load state
-        res.append(True if totalState[9]==0 else False)
+        res.append(True if totalState['intRemain']==0 else False)
         #uninterruptible load state
-        res.append(True if totalState[10]==0 else False)
+        res.append(True if totalState['unintRemain']==0 else False)
         return np.array(res)
 
     def updateTotalState(self,mode) :
@@ -238,7 +329,7 @@ class multiAgentTrainEnv(Environment):
         elif mode == "unint":
             if self.unIntAgent.state[6]==1:
                 self.totalState["fixLoad"]+=self.uninterruptibleLoad.AvgPowerConsume
-        #Order
-        Order = (self.totalState["order"]+1 if self.totalState["order"]<=4 else 0 )
+        #Order = 0,1,2,3
+        self.totalState["order"] = (self.totalState["order"]+1 if self.totalState["order"]<3 else 0 )
         #SampleTime
-        sampleTime = (int(self.totalState["sampleTime"]+1) if self.totalState["order"]==0 else int(self.totalState["sampleTime"]))
+        self.totalState["sampleTime"] = (int(self.totalState["sampleTime"]+1) if self.totalState["order"]==0 else int(self.totalState["sampleTime"]))

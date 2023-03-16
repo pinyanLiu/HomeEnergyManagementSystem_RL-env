@@ -12,10 +12,7 @@ class LLA():
 
 
     def execute(self) -> None:
-        self.actions, internals = self.agent.act(
-                    states=self.states, internals=internals, independent=True, deterministic=True
-                )
-        self.state, terminal, self.reward = self.environment.execute(actions=self.actions) 
+        pass 
 
 
     def rewardStandardization(self) -> None:
@@ -34,11 +31,17 @@ class socLLA(LLA):
 
     def getState(self, allStates) -> None:
         ##timeblock load PV SOC pricePerHour
-        self.states = [allStates[i] for i in [0,1,2,3,5]]
+        self.states.append(allStates['sampleTime'])
+        self.states.append(allStates['fixLoad'])
+        self.states.append(allStates['PV'])
+        self.states.append(allStates['SOC'])
+        self.states.append(allStates['pricePerHour'])
 
     def execute(self) -> None:
-        return super().execute()
-
+        self.actions, internals = self.agent.act(
+                    states=self.states, internals=internals, independent=True, deterministic=True
+                )
+        self.state, terminal, self.reward = self.environment.execute(actions=self.actions,states = self.state) 
 
     def rewardStandardization(self) -> float:
         return super().rewardStandardization()
@@ -52,10 +55,20 @@ class hvacLLA(LLA):
 
     def getState(self, allStates) -> None:
         #[timeblock,load,PV,pricePerHour,deltaSoc,indoor Temperature,outdoor temperature,user set temperature]
-        self.states = [allStates[i] for i in [0,1,2,4,5,6,7,8]]
+        self.states.append(allStates['sampleTime'])
+        self.states.append(allStates['fixLoad'])
+        self.states.append(allStates['PV'])
+        self.states.append(allStates['pricePerHour'])
+        self.states.append(allStates['deltaSoc'])
+        self.states.append(allStates['indoorTemperature'])
+        self.states.append(allStates['outdoorTemperature'])
+        self.states.append(allStates['userSetTemperature'])
 
     def execute(self) -> None:
-        return super().execute()
+        self.actions, internals = self.agent.act(
+                    states=self.states, internals=internals, independent=True, deterministic=True
+                )
+        self.state, terminal, self.reward = self.environment.execute(actions=self.actions,states = self.state) 
 
     def rewardStandardization(self) -> float:
         return super().rewardStandardization()
@@ -64,15 +77,24 @@ class hvacLLA(LLA):
         return super().__del__()
 
 class intLLA(LLA):
-    def __init__(self, environment, agent, mean, std) -> None:
-        super().__init__(environment, agent, mean, std)
+    def __init__(self, environment, agent, mean, std ,Int) -> None:
+        super().__init__(environment, agent, mean, std )
+        self.interruptibleLoad = Int
 
     def getState(self, allStates) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , interruptible Remain]
-        self.states = [allStates[i] for i in [0,1,2,4,5,9]]
+        self.states.append(allStates['sampleTime'])
+        self.states.append(allStates['fixLoad'])
+        self.states.append(allStates['PV'])
+        self.states.append(allStates['pricePerHour'])
+        self.states.append(allStates['deltaSoc'])
+        self.states.append(allStates['intRemain'])
 
     def execute(self) -> None:
-        return super().execute()
+        self.actions, internals = self.agent.act(
+                    states=self.states, internals=internals, independent=True, deterministic=True
+                )
+        self.state, terminal, self.reward = self.environment.execute(actions=self.actions,states = self.state , interruptiblLoad=self.interruptibleLoad) 
 
     def rewardStandardization(self) -> float:
         return super().rewardStandardization()
@@ -81,15 +103,25 @@ class intLLA(LLA):
         return super().__del__()
 
 class unintLLA(LLA):
-    def __init__(self, environment, agent, mean, std) -> None:
+    def __init__(self, environment, agent, mean, std ,unInt) -> None:
         super().__init__(environment, agent, mean, std)
+        self.uninterruptibleLoad = unInt
 
     def getState(self, allStates) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , Uninterruptible Remain , Uninterruptible Switch]
-        self.states = [allStates[i] for i in [0,1,2,4,5,10,11]]
+        self.states.append(allStates['sampleTime'])
+        self.states.append(allStates['fixLoad'])
+        self.states.append(allStates['PV'])
+        self.states.append(allStates['pricePerHour'])
+        self.states.append(allStates['deltaSoc'])
+        self.states.append(allStates['unintRemain'])
+        self.states.append(allStates['unintSwitch'])
 
     def execute(self) -> None:
-        return super().execute()
+        self.actions, internals = self.agent.act(
+                    states=self.states, internals=internals, independent=True, deterministic=True
+                )
+        self.state, terminal, self.reward = self.environment.execute(actions=self.actions,states = self.state , uninterruptibleLoad=self.uninterruptibleLoad) 
 
     def rewardStandardization(self) -> float:
         return super().rewardStandardization()
