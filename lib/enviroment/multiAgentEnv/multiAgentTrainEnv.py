@@ -71,13 +71,16 @@ class multiAgentTrainEnv(Environment):
         self.socAgent.environment.reset()
 
         
-        self.hvacAgent = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]))
+        self.hvacAgent = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]),baseParameter=self.BaseParameter,allOutdoorTemperature=self.allOutdoorTemperature,allUserSetTemperature=self.allUserSetTemperature)
+        self.hvacAgent.environment.reset()
         
         
-        self.intAgent = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),Int=self.interruptibleLoad)
+        self.intAgent = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad)
+        self.intAgent.environment.reset()
         
         
-        self.unIntAgent = unintLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['std'])[0]),unInt=self.uninterruptibleLoad)
+        self.unIntAgent = unintLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['std'])[0]),baseParameter=self.BaseParameter,unInt=self.uninterruptibleLoad)
+        self.unIntAgent.environment.reset()
 
 
         self.state = None
@@ -246,6 +249,12 @@ class multiAgentTrainEnv(Environment):
         }
 
         self.state = self.stateAbstraction(self.totalState)
+        self.socAgent.agent.internals = self.socAgent.agent.initial_internals()
+        self.hvacAgent.agent.internals = self.hvacAgent.agent.initial_internals()
+        self.intAgent.agent.internals = self.intAgent.agent.initial_internals()
+        self.unIntAgent.agent.internals = self.unIntAgent.agent.initial_internals()
+
+
         return self.state
 
 
@@ -274,28 +283,32 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True])]
             
 
-        # elif actions == 1:
-        #     self.hvacAgent.getState(self.totalState)
-        #     self.hvacAgent.execute()
-        #     self.updateTotalState("hvac")
-        #     self.hvacAgent.rewardStandardization()            
-        #     reward.append(self.hvacAgent.reward)
-        #     self.action_mask = np.asarray(self.action_mask and [True,False,True,True])
+        elif actions == 1:
+            self.hvacAgent.getState(self.totalState)
+            self.hvacAgent.environment.updateState(self.hvacAgent.states)
+            self.hvacAgent.execute()
+            self.updateTotalState("hvac")
+            self.hvacAgent.rewardStandardization()            
+            reward.append(self.hvacAgent.reward)
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True])]
 
-        # elif actions == 2:
-        #     self.intAgent.getState(self.totalState)
-        #     self.intAgent.execute()
-        #     self.updateTotalState("int")
-        #     self.intAgent.rewardStandardization()
-        #     reward.append(self.intAgent.reward)
-        #     self.action_mask = np.asarray(self.action_mask and [True,True,False,True])
-        # elif actions == 3:
-        #     self.unIntAgent.getState(self.totalState)
-        #     self.unIntAgent.execute()
-        #     self.updateTotalState("unint")
-        #     self.unIntAgent.rewardStandardization()
-        #     reward.append(self.unIntAgent.reward)
-        #     self.action_mask = np.asarray(self.action_mask and [True,True,True,False])
+        elif actions == 2:
+            self.intAgent.getState(self.totalState)
+            self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
+            self.intAgent.execute()
+            self.updateTotalState("int")
+            self.intAgent.rewardStandardization()
+            reward.append(self.intAgent.reward)
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True])]
+
+        elif actions == 3:
+            self.unIntAgent.getState(self.totalState)
+            self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
+            self.unIntAgent.execute()
+            self.updateTotalState("unint")
+            self.unIntAgent.rewardStandardization()
+            reward.append(self.unIntAgent.reward)
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False])]
 
 
         reward = sum(reward)
@@ -305,42 +318,29 @@ class multiAgentTrainEnv(Environment):
         done =  bool(sampleTime == 95 and order == 3)
 
         states = dict(state=self.state,action_mask = self.action_mask)
-        print(states)
+       # print("states: ",states)
+        print("total states: ",states)
 
         return states, done ,reward
 
     def stateAbstraction(self,totalState) -> np.array:
-        # res = []
-        # #sampleTime
-        # res.append()
-        # #SOC
-        # res.append()
-        # #remain power
-        # res.append()
-        # #pricePerHour
-        # res.append()
-        # #HVAC state
-        # res.append()
-        # #interruptible load state
-        # res.append()
-        # #uninterruptible load state
-        # res.append()
-        # res.append()
         return np.array([totalState['sampleTime'],totalState['SOC'],totalState['fixLoad']+totalState['PV']+totalState['deltaSoc']*self.batteryCapacity,totalState['pricePerHour'],True if totalState['userSetTemperature']< totalState['indoorTemperature'] else False,True if totalState['intRemain']==0 else False,True if totalState['unintRemain']==0 else False,totalState['order']],dtype=np.float32)
 
     def updateTotalState(self,mode) :
         if mode == "soc":
-            self.totalState["deltaSoc"] += self.socAgent.actions*self.batteryCapacity
-            self.totalState["SOC"]+=self.socAgent.actions
+            self.totalState["deltaSoc"] = self.socAgent.actions[0]
+            self.totalState["SOC"]+=self.socAgent.actions[0]
         elif mode == "hvac":
-            self.totalState["fixLoad"]+=self.hvacAgent.actions
-            self.totalState["indoorTemperature"] = self.hvacAgent.state[5]
+            self.totalState["fixLoad"]+=self.hvacAgent.actions[0]
+            self.totalState["indoorTemperature"] = self.hvacAgent.states["state"][5]
         elif mode == "int":
             if self.intAgent.actions==1:
                 self.totalState["fixLoad"]+=self.interruptibleLoad.AvgPowerConsume
+                self.interruptibleLoad = self.intAgent.interruptibleLoad
         elif mode == "unint":
-            if self.unIntAgent.state[6]==1:
+            if self.unIntAgent.states["state"][6]==1:
                 self.totalState["fixLoad"]+=self.uninterruptibleLoad.AvgPowerConsume
+                self.uninterruptibleLoad = self.unIntAgent.uninterruptibleLoad
         #Order = 0,1,2,3
         self.totalState["order"] = (self.totalState["order"]+1 if self.totalState["order"]<3 else 0 )
         #SampleTime

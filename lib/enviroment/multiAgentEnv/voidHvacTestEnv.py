@@ -2,8 +2,16 @@ from lib.enviroment.HVACTrainEnv import HvacEnv
 import numpy as np
 
 class VoidHvacTest(HvacEnv):
-    def __init__(self) :
-        pass
+    def __init__(self,baseParameter,allOutdoorTemperature,allUserSetTemperature) :
+        self.BaseParameter = baseParameter
+        self.outdoorTemperature = allOutdoorTemperature
+        self.allUserSetTemperature = allUserSetTemperature
+        self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
+        self.epsilon = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='epsilon']['value'])[0])
+        self.eta = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='eta_HVAC']['value'])[0])
+        self.A = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='A(KW/F)']['value'])[0])
+        self.initIndoorTemperature= float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='init_indoor_temperature(F)']['value'])[0])
+        self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 
     def states(self):
         return super().states()
@@ -11,14 +19,14 @@ class VoidHvacTest(HvacEnv):
     def actions(self):
         return super().actions()
         
-    def execute(self,actions,states):
+    def execute(self,actions):
         '''
         interaction of each state(changes while taking action)
         Rewards
         Episode Termination condition
         '''
     #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,indoor temperature ,outdoor temperature )
-        sampleTime,load,pv,pricePerHour,deltaSoc,indoorTemperature,outdoorTemperature,userSetTemperature = states
+        sampleTime,load,pv,pricePerHour,deltaSoc,indoorTemperature,outdoorTemperature,userSetTemperature = self.state
         Power_HVAC = float(actions)
 
 
@@ -56,12 +64,10 @@ class VoidHvacTest(HvacEnv):
         sampleTime = int(sampleTime+1)
 
         #check if all day has done
-        self.done = bool(
-            sampleTime == 95
-        )
+        self.done = False
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
+        self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,nextIndoorTemperature,outdoorTemperature,userSetTemperature])
         states = dict(state=self.state)
 
 
@@ -71,9 +77,11 @@ class VoidHvacTest(HvacEnv):
         return states,self.done,self.reward
     
     def reset(self):
-        pass
+        return  np.array([0,0.0,0.0,0.0,0.0,0.0,0.0,0.0])
 
 
+    def updateState(self,states):
+        self.state =  states
 
 
 

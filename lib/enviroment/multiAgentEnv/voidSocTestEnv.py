@@ -53,7 +53,7 @@ class VoidSocTest(SocEnv):
         self.state=np.array([sampleTime,load,pv,soc,pricePerHour])
 
         #check if all day has done
-        self.done = bool(sampleTime == 95)
+        self.done = False
 
 
         states = dict(state = self.state)

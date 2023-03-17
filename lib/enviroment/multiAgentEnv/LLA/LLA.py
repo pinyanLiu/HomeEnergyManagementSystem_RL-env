@@ -6,7 +6,7 @@ from lib.enviroment.multiAgentEnv.voidUnInterruptibleLoadTestEnv import VoidUnIn
 import numpy as np
 
 class LLA():
-    def __init__(self,mean,std) -> None:
+    def __init__(self,mean,std,baseParameter) -> None:
         self.mean = mean 
         self.std = std
         self.states = []
@@ -33,18 +33,18 @@ class LLA():
 
 class socLLA(LLA):
     def __init__(self, mean, std ,baseParameter) -> None:
-        super().__init__(mean, std)
+        super().__init__(mean, std, baseParameter)
         self.environment = Environment.create(environment=VoidSocTest(baseParameter),max_episode_timesteps=96)
         self.agent = Agent.load(directory='Soc/saver_dir',environment=self.environment)
+        self.internals = self.agent.initial_internals()
 
     def getState(self, allStates) -> None:
         ##timeblock load PV SOC pricePerHour
-        self.states = np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['SOC'],allStates['pricePerHour']])
+        self.states = np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['SOC'],allStates['pricePerHour']],dtype=np.float32)
 
     def execute(self) -> None:
-        internals = self.agent.initial_internals()
-        self.actions, internals = self.agent.act(
-                    states=self.states, internals=internals, independent=True, deterministic=True
+        self.actions, self.internals = self.agent.act(
+                    states=self.states, internals=self.internals, independent=True, deterministic=True
                 )
         self.states, terminal, self.reward = self.environment.execute(actions=self.actions) 
 
@@ -56,28 +56,20 @@ class socLLA(LLA):
         return super().__del__()
 
 class hvacLLA(LLA):
-    def __init__(self, mean, std) -> None:
-        super().__init__( mean, std)
-        self.environment = Environment.create(environment=VoidHvacTest,max_episode_timesteps=96)
+    def __init__(self, mean, std , baseParameter , allOutdoorTemperature,allUserSetTemperature) -> None:
+        super().__init__( mean, std ,baseParameter)
+        self.environment = Environment.create(environment=VoidHvacTest(baseParameter, allOutdoorTemperature,allUserSetTemperature),max_episode_timesteps=96)
         self.agent = Agent.load(directory='HVAC/saver_dir',environment=self.environment)
+        self.internals = self.agent.initial_internals()
 
     def getState(self, allStates) -> None:
         #[timeblock,load,PV,pricePerHour,deltaSoc,indoor Temperature,outdoor temperature,user set temperature]
-        super().getState(allStates)
+        self.states = np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['indoorTemperature'],allStates['outdoorTemperature'],allStates['userSetTemperature']],dtype=np.float32)
 
-        self.states.append(allStates['sampleTime'])
-        self.states.append(allStates['fixLoad'])
-        self.states.append(allStates['PV'])
-        self.states.append(allStates['pricePerHour'])
-        self.states.append(allStates['deltaSoc'])
-        self.states.append(allStates['indoorTemperature'])
-        self.states.append(allStates['outdoorTemperature'])
-        self.states.append(allStates['userSetTemperature'])
 
     def execute(self) -> None:
-        internals = self.agent.initial_internals()
-        self.actions, internals = self.agent.act(
-                    states=self.states, internals=internals, independent=True, deterministic=True
+        self.actions, self.internals = self.agent.act(
+                    states=self.states, internals=self.internals, independent=True, deterministic=True
                 )
         self.states, terminal, self.reward = self.environment.execute(actions=self.actions) 
 
@@ -88,28 +80,22 @@ class hvacLLA(LLA):
         return super().__del__()
 
 class intLLA(LLA):
-    def __init__(self, mean, std ,Int) -> None:
-        super().__init__( mean, std )
+    def __init__(self, mean, std,baseParameter,Int) -> None:
+        super().__init__( mean, std ,baseParameter )
         self.interruptibleLoad = Int
-        self.environment = Environment.create(environment=VoidIntTest,max_episode_timesteps=96)
+        self.environment = Environment.create(environment=VoidIntTest(baseParameter,Int),max_episode_timesteps=96)
         self.agent = Agent.load(directory='Load/Interruptible/saver_dir',environment=self.environment)
+        self.internals = self.agent.initial_internals()
 
     def getState(self, allStates) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , interruptible Remain]
-        super().getState(allStates)
-        self.states.append(allStates['sampleTime'])
-        self.states.append(allStates['fixLoad'])
-        self.states.append(allStates['PV'])
-        self.states.append(allStates['pricePerHour'])
-        self.states.append(allStates['deltaSoc'])
-        self.states.append(allStates['intRemain'])
+        self.states = np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['intRemain']],dtype=np.float32)
 
     def execute(self) -> None:
-        internals = self.agent.initial_internals()
-        self.actions, internals = self.agent.act(
-                    states=self.states, internals=internals, independent=True, deterministic=True
+        self.actions, self.internals = self.agent.act(
+                    states=self.states, internals=self.internals, independent=True, deterministic=True
                 )
-        self.states, terminal, self.reward = self.environment.execute(actions=self.actions , interruptiblLoad=self.interruptibleLoad) 
+        self.states, terminal, self.reward = self.environment.execute(actions=self.actions) 
 
     def rewardStandardization(self):
         return super().rewardStandardization()
@@ -118,29 +104,24 @@ class intLLA(LLA):
         return super().__del__()
 
 class unintLLA(LLA):
-    def __init__(self, mean, std ,unInt) -> None:
-        super().__init__( mean, std)
+    def __init__(self, mean, std,baseParameter ,unInt) -> None:
+        super().__init__( mean, std ,baseParameter)
         self.uninterruptibleLoad = unInt
-        self.environment = Environment.create(environment=VoidUnIntTest,max_episode_timesteps=96)
+        self.environment = Environment.create(environment=VoidUnIntTest(baseParameter,unInt),max_episode_timesteps=96)
         self.agent = Agent.load(directory='Load/UnInterruptible/saver_dir',environment=self.environment)
+        self.internals = self.agent.initial_internals()
+
 
     def getState(self, allStates) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , Uninterruptible Remain , Uninterruptible Switch]
-        super().getState(allStates)
-        self.states.append(allStates['sampleTime'])
-        self.states.append(allStates['fixLoad'])
-        self.states.append(allStates['PV'])
-        self.states.append(allStates['pricePerHour'])
-        self.states.append(allStates['deltaSoc'])
-        self.states.append(allStates['unintRemain'])
-        self.states.append(allStates['unintSwitch'])
+        self.states = np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['unintRemain'],allStates['unintSwitch']],dtype=np.float32)
+
 
     def execute(self) -> None:
-        internals = self.agent.initial_internals()
-        self.actions, internals = self.agent.act(
-                    states=self.states, internals=internals, independent=True, deterministic=True
+        self.actions, self.internals = self.agent.act(
+                    states=self.states, internals=self.internals, independent=True, deterministic=True
                 )
-        self.states, terminal, self.reward = self.environment.execute(actions=self.actions , uninterruptibleLoad=self.uninterruptibleLoad) 
+        self.states, terminal, self.reward = self.environment.execute(actions=self.actions) 
 
     def rewardStandardization(self):
         return super().rewardStandardization()
