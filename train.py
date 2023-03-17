@@ -21,15 +21,22 @@ def main(argv):
         environment = dict(environment=UnIntEnv)
     elif argv[1] == 'hla':
         environment = dict(environment = multiAgentTrainEnv)
+        
     else :
         print('please give parameters 1.Training mode: "soc"/"intload"/"HVAC"/"unintload 2.Agent 3. training episode ')
         return
-    
-    runner = Runner(
-        environment=environment,
-        agent= agent,
-        max_episode_timesteps=96,
-    )
+    if argv[1]== 'hla':
+        runner = Runner(
+            environment=environment,
+            agent= agent,
+            max_episode_timesteps=384,
+        )
+    else:
+        runner = Runner(
+            environment=environment,
+            agent= agent,
+            max_episode_timesteps=96,
+        )
 
 
     

@@ -60,9 +60,9 @@ class VoidUnIntTest(UnIntEnv):
         #actions mask
         PgridMaxExceed = (load+deltaSoc+self.uninterruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
 
-        self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False and not PgridMaxExceed])
+        self.action_mask = np.asarray([True,self.uninterruptibleLoad.getRemainDemand()>0 and self.uninterruptibleLoad.switch==False and not PgridMaxExceed])
         #check if all day is done
-        self.done =  bool(sampleTime == 95)
+        self.done =  False
         #REWARD
         self.reward = sum(reward)
         states = dict(state=self.state,action_mask=self.action_mask)

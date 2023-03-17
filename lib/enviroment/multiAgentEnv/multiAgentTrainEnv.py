@@ -68,19 +68,15 @@ class multiAgentTrainEnv(Environment):
         #construct all LLAs
         
         self.socAgent = socLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='SOC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='SOC']['std'])[0]),baseParameter=self.BaseParameter)
-        self.socAgent.environment.reset()
 
         
         self.hvacAgent = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]),baseParameter=self.BaseParameter,allOutdoorTemperature=self.allOutdoorTemperature,allUserSetTemperature=self.allUserSetTemperature)
-        self.hvacAgent.environment.reset()
         
         
         self.intAgent = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad)
-        self.intAgent.environment.reset()
         
         
         self.unIntAgent = unintLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['std'])[0]),baseParameter=self.BaseParameter,unInt=self.uninterruptibleLoad)
-        self.unIntAgent.environment.reset()
 
 
         self.state = None
@@ -101,6 +97,7 @@ class multiAgentTrainEnv(Environment):
         }
         self.reward = 0
         self.done = False
+        self.action_mask = [True,True,True,True]
 
     def states(self):
         #observation space 
@@ -247,12 +244,16 @@ class multiAgentTrainEnv(Environment):
             "unintSwitch":self.uninterruptibleLoad.switch,
             "order":0
         }
-
+        self.action_mask = [True,True,True,True]
         self.state = self.stateAbstraction(self.totalState)
         self.socAgent.agent.internals = self.socAgent.agent.initial_internals()
         self.hvacAgent.agent.internals = self.hvacAgent.agent.initial_internals()
         self.intAgent.agent.internals = self.intAgent.agent.initial_internals()
         self.unIntAgent.agent.internals = self.unIntAgent.agent.initial_internals()
+        self.socAgent.environment.reset()
+        self.hvacAgent.environment.reset()
+        self.intAgent.environment.reset()
+        self.unIntAgent.environment.reset()
 
 
         return self.state
@@ -266,9 +267,11 @@ class multiAgentTrainEnv(Environment):
         '''
         reward = []
         sampleTime,soc,remain,pricePreHour,hvacState,intState,unIntState,order = self.state
+        print(self.state)
 
-        if order == 0 :
-            self.action_mask = [True,True,True,True]
+        # print("total states: ",self.state)
+        # print(self.interruptibleLoad.getRemainDemand())
+        # print("sampleTime order: ",self.state[0] ,self.state[7],self.action_mask)
 
         #choose one load executing in this sampleTime order .Load which has been execute in the same sampleTime would be auto block by action mask
         
@@ -296,6 +299,7 @@ class multiAgentTrainEnv(Environment):
             self.intAgent.getState(self.totalState)
             self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
             self.intAgent.execute()
+
             self.updateTotalState("int")
             self.intAgent.rewardStandardization()
             reward.append(self.intAgent.reward)
@@ -310,17 +314,21 @@ class multiAgentTrainEnv(Environment):
             reward.append(self.unIntAgent.reward)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False])]
 
+        if self.action_mask == [False,False,False,False]:
+            self.action_mask = [True,True,True,True]
+
 
         reward = sum(reward)
         self.state = self.stateAbstraction(self.totalState)
 
         #check if all day is done
         done =  bool(sampleTime == 95 and order == 3)
-
+        if done:
+            print("done")
+            print(self.state)
         states = dict(state=self.state,action_mask = self.action_mask)
-       # print("states: ",states)
-        print("total states: ",states)
-
+        # print("reward",reward)
+        # print("actions",actions)
         return states, done ,reward
 
     def stateAbstraction(self,totalState) -> np.array:
@@ -336,15 +344,15 @@ class multiAgentTrainEnv(Environment):
         elif mode == "int":
             if self.intAgent.actions==1:
                 self.totalState["fixLoad"]+=self.interruptibleLoad.AvgPowerConsume
-                self.interruptibleLoad = self.intAgent.interruptibleLoad
+                self.interruptibleLoad = self.intAgent.environment.interruptibleLoad
         elif mode == "unint":
             if self.unIntAgent.states["state"][6]==1:
                 self.totalState["fixLoad"]+=self.uninterruptibleLoad.AvgPowerConsume
-                self.uninterruptibleLoad = self.unIntAgent.uninterruptibleLoad
+                self.uninterruptibleLoad = self.unIntAgent.environment.uninterruptibleLoad
         #Order = 0,1,2,3
         self.totalState["order"] = (self.totalState["order"]+1 if self.totalState["order"]<3 else 0 )
         #SampleTime
-        if self.totalState["order"] == 0:
+        if self.totalState["order"] == 0 and self.totalState["sampleTime"]!=95:
             self.totalState["sampleTime"]+=1
             self.totalState["fixLoad"]=self.Load[self.totalState["sampleTime"]]
             self.totalState["PV"]=self.PV[self.totalState["sampleTime"]]

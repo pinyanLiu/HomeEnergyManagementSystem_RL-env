@@ -59,10 +59,10 @@ class VoidIntTest(IntEnv):
         #actions mask
         PgridMaxExceed = (load+deltaSoc+self.interruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
         
-        self.action_mask = np.asarray([True,self.state[5]>0 and not PgridMaxExceed])
+        self.action_mask = np.asarray([True,self.interruptibleLoad.getRemainDemand()>0 and not PgridMaxExceed])
 
         #check if all day is done
-        self.done =  bool(sampleTime == 95)
+        self.done =  False
         
         #REWARD
         self.reward = sum(reward)

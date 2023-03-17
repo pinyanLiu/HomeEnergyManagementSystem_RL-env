@@ -31,7 +31,7 @@
         "shape": [],
         "num_values": 4
     },
-    "max_episode_timesteps": 96,
+    "max_episode_timesteps": 384,
     "batch_size": 240,
     "network": [
         {
@@ -46,7 +46,7 @@
         }
     ],
     "use_beta_distribution": true,
-    "memory": 24000,
+    "memory": 100000,
     "update_frequency": 0.5,
     "learning_rate": 1e-4,
     "discount": 0.995,
