@@ -29,7 +29,7 @@
     "actions": {
         "type": "int",
         "shape": [],
-        "num_values": 4
+        "num_values": 5
     },
     "max_episode_timesteps": 384,
     "batch_size": 300,

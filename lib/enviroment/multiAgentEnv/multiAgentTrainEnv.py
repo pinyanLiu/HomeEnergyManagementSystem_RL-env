@@ -105,7 +105,7 @@ class multiAgentTrainEnv(Environment):
         }
         self.reward = 0
         self.done = False
-        self.action_mask = [True,True,True,True]
+        self.action_mask = [True,True,True,True,True]
         self.interruptibleLoadActionMask = [True,True]
         self.uninterruptibleLoadActionMask = [True,True]
 
@@ -158,7 +158,7 @@ class multiAgentTrainEnv(Environment):
         return dict(type='float',shape=self.observation_space.shape,min_value=lowerLimit,max_value=upperLimit)
 
     def actions(self):
-        return dict(type='int',num_values=4)
+        return dict(type='int',num_values=5)
 
     def close(self):
         return super().close()
@@ -256,7 +256,7 @@ class multiAgentTrainEnv(Environment):
         }
         self.interruptibleLoadActionMask = [True,True]
         self.uninterruptibleLoadActionMask = [True,True]
-        self.action_mask = [True,True,True,True]
+        self.action_mask = [True,True,True,True,True]
         self.state = self.stateAbstraction(self.totalState)
         self.socAgent.agent.internals = self.socAgent.agent.initial_internals()
         self.hvacAgent.agent.internals = self.hvacAgent.agent.initial_internals()
@@ -291,8 +291,8 @@ class multiAgentTrainEnv(Environment):
             self.socAgent.execute()
             self.updateTotalState("soc")
             self.socAgent.rewardStandardization()
-            # reward.append(self.socAgent.reward)
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True])]
+            reward.append(self.socAgent.reward)
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True])]
 
         elif actions == 1:
             self.hvacAgent.getState(self.totalState)
@@ -300,8 +300,8 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent.execute()
             self.updateTotalState("hvac")
             self.hvacAgent.rewardStandardization()            
-            # reward.append(self.hvacAgent.reward)
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True])]
+            reward.append(self.hvacAgent.reward)
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True])]
             if(hvacState!=1):
                 reward.append(-1)
 
@@ -311,8 +311,8 @@ class multiAgentTrainEnv(Environment):
             self.intAgent.execute()
             self.updateTotalState("int")
             self.intAgent.rewardStandardization()
-            # reward.append(self.intAgent.reward)
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True])]
+            reward.append(self.intAgent.reward)
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True])]
 
         elif actions == 3:
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
@@ -320,26 +320,22 @@ class multiAgentTrainEnv(Environment):
             self.unIntAgent.execute()
             self.updateTotalState("unint")
             self.unIntAgent.rewardStandardization()
-            # reward.append(self.unIntAgent.reward)
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False])]
+            reward.append(self.unIntAgent.reward)
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True])]
 
-        if self.action_mask == [False,False,False,False]:
-            self.action_mask = [True,True,True,True]
+        else:
+            reward.append(-0.1)
+
+        if self.action_mask == [False,False,False,False,True]:
+            self.action_mask = [True,True,True,True,True]
 
 
         #reward = sum(reward)/4
         self.state = self.stateAbstraction(self.totalState)
 
-
-        if(order==3):
-            reward.append(float(-remain*pricePreHour))
-
         #check if all day is done
         done =  bool(sampleTime == 95 and order == 3)
-        if(done and intState!=1):
-            reward.append(-5)
-        if(done and unIntState!=1):
-            reward.append(-5)
+
         reward = 0.2+sum(reward)/4
         states = dict(state=self.state,action_mask = self.action_mask)
 

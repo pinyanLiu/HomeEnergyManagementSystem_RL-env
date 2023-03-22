@@ -152,7 +152,7 @@ class UnIntEnv(HemsEnv):
         cost = 0
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,Uninterruptible load remain ,uninterruptible load remain)
         sampleTime,load,pv,pricePerHour,deltaSoc,UnRemain,UnSwitch = self.state
-        
+    
         #  do nothing
         if actions == 0:
             pass
