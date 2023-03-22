@@ -35,7 +35,7 @@ class HvacEnv(HemsEnv):
                 #pricePerHour
                 6.2,
                 #deltaSoc
-                0.15,
+                0.25,
                 #indoor temperature
                 104,
                 #outdoor temperature
@@ -56,7 +56,7 @@ class HvacEnv(HemsEnv):
                 #pricePerHour
                 1,
                 #deltaSoc
-                -0.15,
+                -0.25,
                 #indoor temperature
                 20,
                 #outdoor temperature
@@ -130,8 +130,7 @@ class HvacEnv(HemsEnv):
         states = dict(state=self.state)
 
 
-        #set placeholder for infomation
-        self.reward = sum(reward)
+        self.reward = sum(reward)+0.12
 
         return states,self.done,self.reward
 

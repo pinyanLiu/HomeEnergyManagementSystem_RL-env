@@ -10,7 +10,7 @@
             0.0,
             0.0,
             0.0,
-            -0.15,
+            -0.25,
             20,
             35,
             35
@@ -20,7 +20,7 @@
             10,
             10,
             6.2,
-            0.15,
+            0.25,
             104,
             104,
             104
@@ -50,7 +50,7 @@
     "memory": 24000,
     "update_frequency": 0.5,
     "learning_rate": 1e-4,
-    "discount": 0.995,
+    "discount": 1.0,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,

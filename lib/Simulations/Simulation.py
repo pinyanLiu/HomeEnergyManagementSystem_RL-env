@@ -22,5 +22,4 @@ class Simulation():
         
     def __del__(self):
         # Close agent and environment
-        self.agent.close()
-        self.environment.close()
+        pass

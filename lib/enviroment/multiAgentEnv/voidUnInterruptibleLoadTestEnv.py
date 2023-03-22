@@ -26,8 +26,7 @@ class VoidUnIntTest(UnIntEnv):
         reward = []
         cost = 0
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,Uninterruptible load remain ,uninterruptible load remain)
-        sampleTime,load,pv,pricePerHour,deltaSoc,UnRemain,UnSwitch = self.state
-
+        sampleTime,load,pv,pricePerHour,deltaSoc,UnRemain,UnSwitch = self.state["state"]
         #  do nothing
         if actions == 0:
             pass
@@ -61,6 +60,7 @@ class VoidUnIntTest(UnIntEnv):
         PgridMaxExceed = (load+deltaSoc+self.uninterruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
 
         self.action_mask = np.asarray([True,self.uninterruptibleLoad.getRemainDemand()>0 and self.uninterruptibleLoad.switch==False and not PgridMaxExceed])
+
         #check if all day is done
         self.done =  False
         #REWARD

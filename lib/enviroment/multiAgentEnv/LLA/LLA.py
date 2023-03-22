@@ -14,8 +14,7 @@ class LLA():
 
 
     def getState(self,allStates) -> None:
-        self.states.clear()
-
+        pass
 
     def execute(self) -> None:
         pass 
@@ -25,11 +24,7 @@ class LLA():
         self.reward =  (self.reward - self.mean)/self.std
 
     def __del__(self):
-        # Close agent and environment
-        if self.agent:
-            self.agent.close()
-        if self.environment:
-            self.environment.close()
+        pass
 
 class socLLA(LLA):
     def __init__(self, mean, std ,baseParameter) -> None:
@@ -87,9 +82,9 @@ class intLLA(LLA):
         self.agent = Agent.load(directory='Load/Interruptible/saver_dir',environment=self.environment)
         self.internals = self.agent.initial_internals()
 
-    def getState(self, allStates) -> None:
+    def getState(self, allStates,actionMask) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , interruptible Remain]
-        self.states = np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['intRemain']],dtype=np.float32)
+        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['intRemain']],dtype=np.float32),action_mask=actionMask)
 
     def execute(self) -> None:
         self.actions, self.internals = self.agent.act(
@@ -112,9 +107,9 @@ class unintLLA(LLA):
         self.internals = self.agent.initial_internals()
 
 
-    def getState(self, allStates) -> None:
+    def getState(self, allStates , actionMask) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , Uninterruptible Remain , Uninterruptible Switch]
-        self.states = np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['unintRemain'],allStates['unintSwitch']],dtype=np.float32)
+        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['unintRemain'],allStates['unintSwitch']],dtype=np.float32),action_mask=actionMask)
 
 
     def execute(self) -> None:

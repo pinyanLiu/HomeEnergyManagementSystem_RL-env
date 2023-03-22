@@ -26,7 +26,7 @@ class VoidIntTest(IntEnv):
         reward = []
         cost = 0
         #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,interruptible load remain)
-        sampleTime,load,pv,pricePerHour,deltaSoc,intRemain = self.state
+        sampleTime,load,pv,pricePerHour,deltaSoc,intRemain = self.state["state"]
         # Turn off switch
         if actions == 0:
             self.interruptibleLoad.turn_off()
