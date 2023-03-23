@@ -102,12 +102,12 @@
     "parallel_interactions": 1,
     "config": null,
     "saver": {
-        "directory": "HLA/saver_dir",
+        "directory": "HLA/4action/saver_dir",
         "frequency": 1000,
         "unit": "episodes"
     },
     "summarizer": {
-        "directory": "HLA/summaries",
+        "directory": "HLA/4action/summaries",
         "summaries": "all"
     },
     "tracking": null,
