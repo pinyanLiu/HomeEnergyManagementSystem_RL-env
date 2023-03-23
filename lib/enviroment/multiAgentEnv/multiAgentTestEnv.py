@@ -133,4 +133,8 @@ class multiAgentTestEnv(multiAgentTrainEnv):
         return self.state
 
 
-        
+    def stateAbstraction(self, totalState) -> np.array:
+        return super().stateAbstraction(totalState)
+    
+    def updateTotalState(self, mode):
+        return super().updateTotalState(mode)

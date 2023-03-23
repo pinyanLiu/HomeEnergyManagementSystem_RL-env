@@ -36,6 +36,7 @@ class IntSimulation(Simulation):
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
+
                 #1. switch on 
                 if actions == 1: # washing machine's switch
                     switch.append(acObject.AvgPowerConsume)#power

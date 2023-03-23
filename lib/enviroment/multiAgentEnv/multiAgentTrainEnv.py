@@ -302,8 +302,7 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent.rewardStandardization()            
             reward.append(self.hvacAgent.reward)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True])]
-            if(hvacState!=1):
-                reward.append(-1)
+
 
         elif actions == 2:
             self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
