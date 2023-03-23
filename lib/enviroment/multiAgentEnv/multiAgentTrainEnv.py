@@ -283,6 +283,7 @@ class multiAgentTrainEnv(Environment):
         #print(self.totalState)
 
         #choose one load executing in this sampleTime order .Load which has been execute in the same sampleTime would be auto block by action mask
+        #print(self.state)
 
         #soc
         if actions == 0 :
@@ -323,7 +324,8 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True])]
 
         else:
-            reward.append(-0.1)
+            self.updateTotalState("None")
+            reward.append(-0.2)
 
         if self.action_mask == [False,False,False,False,True]:
             self.action_mask = [True,True,True,True,True]

@@ -19,8 +19,8 @@ class multiSimulation(Simulation):
         indoorTemperature = []
         outdoorTemperature = []
         userSetTemperature = []
-        intLoadRemain = []
-        unLoadRemain = []        
+        # intLoadRemain = []
+        # unLoadRemain = []        
         unLoadSwitch = []
         order = []
         Reward = []
@@ -29,19 +29,19 @@ class multiSimulation(Simulation):
         for month in range(12):
             states = self.environment.reset()
             totalState = self.environment.totalState
-            sampletime.append(totalState["sampleTime"])
-            load.append(totalState["fixLoad"])
-            pv.append(totalState["PV"])
-            soc.append(totalState["SOC"])
-            price.append(totalState["pricePerHour"])
-            deltaSoc.append(totalState["deltaSoc"])
-            indoorTemperature.append(totalState["indoorTemperature"])
-            outdoorTemperature.append(totalState["outdoorTemperature"])
-            userSetTemperature.append(totalState["userSetTemperature"])
-            intLoadRemain.append(totalState["intRemain"])
-            unLoadRemain.append(totalState["unintRemain"])
-            unLoadSwitch.append(totalState["unintSwitch"])
-            order.append(totalState["order"])
+            # sampletime.append(totalState["sampleTime"])
+            # load.append(totalState["fixLoad"])
+            # pv.append(totalState["PV"])
+            # soc.append(totalState["SOC"])
+            # price.append(totalState["pricePerHour"])
+            # deltaSoc.append(totalState["deltaSoc"])
+            # indoorTemperature.append(totalState["indoorTemperature"])
+            # outdoorTemperature.append(totalState["outdoorTemperature"])
+            # userSetTemperature.append(totalState["userSetTemperature"])
+            # intLoadRemain.append(totalState["intRemain"])
+            # unLoadRemain.append(totalState["unintRemain"])
+            # unLoadSwitch.append(totalState["unintSwitch"])
+            # order.append(totalState["order"])
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -62,24 +62,27 @@ class multiSimulation(Simulation):
                     indoorTemperature.append(totalState["indoorTemperature"])
                     outdoorTemperature.append(totalState["outdoorTemperature"])
                     userSetTemperature.append(totalState["userSetTemperature"])
-                    intLoadRemain.append(totalState["intRemain"])
-                    unLoadRemain.append(totalState["unintRemain"])
+                    # intLoadRemain.append(totalState["intRemain"])
+                    # unLoadRemain.append(totalState["unintRemain"])
                     unLoadSwitch.append(totalState["unintSwitch"])
                     order.append(totalState["order"])
-                self.totalReward.append(reward)
-                Reward.append(reward)
+                    self.totalReward.append(reward)
+                    Reward.append(reward)
                 totalReward += reward
                 Reward.append(0)
-            print(len(load),len(pv),len(deltaSoc))
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
             self.testResult[month]['price'] = price
+            self.testResult[month]['soc'] = soc
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['indoorTemperature'] = indoorTemperature
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
             self.testResult[month]['userSetTemperature'] = userSetTemperature
-            self.testResult[month]['reward'] = Reward
+            # self.testResult[month]['intRemain'] = intLoadRemain
+            # self.testResult[month]['unloadRemain'] = unLoadRemain
+            self.testResult[month]['unintSwitch'] = unLoadSwitch
+            #self.testResult[month]['reward'] = Reward
             TotalReward.append(totalReward)
             totalReward=0
             sampletime.clear()
@@ -91,8 +94,8 @@ class multiSimulation(Simulation):
             indoorTemperature.clear()
             outdoorTemperature.clear()
             userSetTemperature.clear()
-            intLoadRemain.clear()
-            unLoadRemain.clear()
+            # intLoadRemain.clear()
+            # unLoadRemain.clear()
             unLoadSwitch.clear()
             order.clear()
             Reward.clear()
@@ -108,7 +111,7 @@ class multiSimulation(Simulation):
         output.userSetTemperature()
         output.plotLoadPower()
         output.price()
-        output.plotReward()
+        #output.plotReward()
         output.plotResult('lib/plot/HRL')
 
     def getMean(self):

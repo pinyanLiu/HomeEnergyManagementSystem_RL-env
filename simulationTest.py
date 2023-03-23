@@ -20,6 +20,9 @@ def __main__(argv):
         simulation = HvacSimulation()
     elif mode == "hrl":
         simulation = multiSimulation()
+    else:
+        print('please give parameters Testing mode: "soc"/"int"/"hvac"/"unint"/"hrl"')
+        return 
     
     simulation.simulation()
     simulation.outputResult()

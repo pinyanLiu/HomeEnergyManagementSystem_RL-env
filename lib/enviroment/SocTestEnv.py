@@ -31,7 +31,7 @@ class SocTest(SocEnv):
         
         self.i += 1
         self.Load = self.allLoad.iloc[:,self.i].tolist()
-        self.randomDeltaPrice  = [uniform(-1,1) for _ in range(96)]
+
 
         #import PV
         if self.i  == 0:
