@@ -21,7 +21,6 @@ class HvacEnv(HemsEnv):
         self.allUserSetTemperature = self.info.importUserSetTemperatureF()
         self.allOutdoorTemperature = self.info.importTemperatureF()
         self.allOccupancy = self.info.importOccupancy()
-        self.deltaSoc = self.allDeltaSOC['Jan']
 
   
     def states(self):
@@ -129,7 +128,7 @@ class HvacEnv(HemsEnv):
         )
 
 
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSoc[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime],self.Occupancy[sampleTime]])
+        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime],self.Occupancy[sampleTime]])
         states = dict(state=self.state)
 
 
@@ -237,7 +236,7 @@ class HvacEnv(HemsEnv):
             self.Occupancy = [min(max(x+y,0),5) for x,y in zip(self.allOccupancy['7'],self.randomOccupancy) ]
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSoc[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0],self.Occupancy[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0],self.Occupancy[0]])
         return self.state
 
 
