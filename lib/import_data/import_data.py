@@ -93,12 +93,12 @@ class ImportData:
     
     def importOccupancy(self):
         self.cursor.execute("SELECT * FROM occupancy")
-        statisticalData = pd.DataFrame(self.cursor.fetchall())
-        statisticalData.columns = [column[0]for column in self.cursor.description]
-        return statisticalData
+        Occupancy = pd.DataFrame(self.cursor.fetchall())
+        Occupancy.columns = [column[0]for column in self.cursor.description]
+        return Occupancy
     
     def importOccupancyTest(self):
         self.cursor.execute("SELECT * FROM occupancyTest")
-        statisticalData = pd.DataFrame(self.cursor.fetchall())
-        statisticalData.columns = [column[0]for column in self.cursor.description]
-        return statisticalData
+        OccupancyTest = pd.DataFrame(self.cursor.fetchall())
+        OccupancyTest.columns = [column[0]for column in self.cursor.description]
+        return OccupancyTest
