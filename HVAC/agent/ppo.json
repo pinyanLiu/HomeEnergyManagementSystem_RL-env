@@ -3,7 +3,7 @@
     "states": {
         "type": "float",
         "shape": [
-            8
+            9
         ],
         "min_value": [
             0.0,

@@ -107,11 +107,12 @@ class HvacEnv(HemsEnv):
         if outdoorTemperature < userSetTemperature :
             r1 = 0
         else :
-            r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/5*occupancy
+            r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/300*occupancy
         #cost reward
-        r2 = -cost/2
+        r2 = -cost/2+0.2
 
         #REWARD
+
         reward = []
         reward.append(r1)
         reward.append(r2)
