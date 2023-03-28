@@ -34,7 +34,7 @@ class SocSimulation(Simulation):
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
-                deltaSoc.append(actions[0])
+                deltaSoc.append(actions[0]*10)
                 sampletime.append(states['state'][0])
                 load.append(states['state'][1])
                 pv.append(states['state'][2])

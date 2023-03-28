@@ -23,8 +23,8 @@ def __main__(argv):
     else:
         print('please give parameters Testing mode: "soc"/"int"/"hvac"/"unint"/"hrl"')
         return 
-    
     simulation.simulation()
+    print(simulation.testResult)
     simulation.outputResult()
 
 

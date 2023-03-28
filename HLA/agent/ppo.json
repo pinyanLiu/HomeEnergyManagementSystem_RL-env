@@ -103,7 +103,7 @@
     "config": null,
     "saver": {
         "directory": "HLA/saver_dir",
-        "frequency": 1000,
+        "frequency": 100,
         "unit": "episodes"
     },
     "summarizer": {

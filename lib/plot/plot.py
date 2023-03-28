@@ -23,6 +23,14 @@ class Plot():
         for month in range(0,12):
             self.ax[month].bar(range(96) ,self.testResult[month]['switch'] ,label = 'switch', color ='green')    
 
+    def plotUnIntLoadPower(self):
+        for month in range(0,12):
+            self.ax[month].bar(range(96) ,self.testResult[month]['unintSwitch'] ,label = 'unintSwitch', color ='green')    
+
+    def plotIntLoadPower(self):
+        for month in range(0,12):
+            self.ax[month].bar(range(96) ,self.testResult[month]['switch'] ,label = 'switch', color ='green')    
+
 
 
     
@@ -40,6 +48,9 @@ class Plot():
         self.sub2 = [sub2.twinx() for sub2 in self.ax]
         for month in range(0,12):
             self.sub2[month].set_ylim(0,1)
+            self.sub2[month].set_ylabel('soc',color='red')
+            self.sub2[month].spines['right'].set_position(("axes",1.3))
+            self.sub2[month].tick_params(axis='y',colors = 'red')
             self.sub2[month].plot(range(96) ,self.testResult[month]['soc'] ,label = 'soc', color ='red')    
                        
     def __pv__(self):
@@ -48,11 +59,15 @@ class Plot():
     def indoorTemperature(self):
         self.sub2 = [sub2.twinx() for sub2 in self.ax]
         for month in range(0,12):
-            self.sub2[month].plot(range(96) ,self.testResult[month]['indoorTemperature'] ,label = 'indoorTemperature', color ='red') 
+            self.sub2[month].set_ylim(35,104)
+            self.sub2[month].set_ylabel('Tmp',color='orange')
+            self.sub2[month].spines['right'].set_position(("axes",1.3))
+            self.sub2[month].tick_params(axis='y',colors = 'orange')
+            self.sub2[month].plot(range(96) ,self.testResult[month]['indoorTemperature'] ,label = 'indoorTemperature', color ='orange') 
 
     def outdoorTemperature(self):
         for month in range(0,12):
-            self.sub2[month].plot(range(96) ,self.testResult[month]['outdoorTemperature'] ,label = 'outdoorTemperature', color ='orange')
+            self.sub2[month].plot(range(96) ,self.testResult[month]['outdoorTemperature'] ,label = 'outdoorTemperature', color ='yellow')
 
     def userSetTemperature(self):
         for month in range(0,12):
