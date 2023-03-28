@@ -77,10 +77,10 @@ class IntEnv(HemsEnv):
         self.i = randint(1,359)
         self.Load = self.allLoad.iloc[:,self.i].tolist()
 
-        self.randomDeltaPrice  = [uniform(-1,1) for _ in range(96)]
+        self.randomDeltaPrice  = [randint(-1,1) for _ in range(96)]
         self.randomDeltaPV = [uniform(-0.5,0.5) for _ in range(96)]
         self.randomDeltaSOC = [uniform(-0.05,0.05) for _ in range(96)]
-        self.randomDeltaPreference = [uniform(-3,3) for _ in range(96)]
+        self.randomDeltaPreference = [randint(-3,3) for _ in range(96)]
         if int( self.i / 30) == 0:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Jan'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
@@ -181,7 +181,7 @@ class IntEnv(HemsEnv):
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv+Pess))/self.interruptibleLoad.demand
             else:
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv))/self.interruptibleLoad.demand
-            preferenceReward = userPreference/20
+            reward.append(userPreference/20)#preference reward
         if cost<0:
             cost = 0 
 
@@ -189,8 +189,6 @@ class IntEnv(HemsEnv):
         reward.append(0.08-10*cost)
         if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):
             reward.append(-10*self.interruptibleLoad.getRemainProcessPercentage())
-        reward.append(preferenceReward)
-
         #change to next state
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],self.interruptibleLoad.getRemainDemand(),self.userPreference[sampleTime]])

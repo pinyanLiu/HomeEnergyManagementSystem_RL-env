@@ -146,7 +146,7 @@ class HvacEnv(HemsEnv):
         self.randomDeltaPrice  = [uniform(-0.25,0.25) for _ in range(96)]
         self.randomDeltaPV = [uniform(-0.5,0.5) for _ in range(96)]
         self.randomDeltaSOC = [uniform(-0.05,0.05) for _ in range(96)]
-        self.randomOccupancy = [uniform(-2,2)for _ in range(96)]
+        self.randomOccupancy = [randint(-2,2)for _ in range(96)]
         self.i = randint(1,359)
         self.Load = self.allLoad.iloc[:,self.i].tolist()
         #import PV,outTmp,userTmp,GridPrice
