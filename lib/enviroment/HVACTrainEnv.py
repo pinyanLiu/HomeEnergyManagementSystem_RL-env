@@ -104,12 +104,10 @@ class HvacEnv(HemsEnv):
             cost = Power_HVAC*pricePerHour*0.25
 
         #temperature reward
-        if indoorTemperature > userSetTemperature :
-            r1 = -pow(indoorTemperature-userSetTemperature,2)/5*occupancy
-        else :
-            if indoorTemperature >= outdoorTemperature:
-                r1 = 0.01
+        if outdoorTemperature < userSetTemperature :
             r1 = 0
+        else :
+            r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/5*occupancy
         #cost reward
         r2 = -cost/2
 
@@ -119,7 +117,7 @@ class HvacEnv(HemsEnv):
         reward.append(r2)
         #Pgrid max reward
         if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity)>self.PgridMax:
-            reward.append(-1)
+            reward.append(-10)
             
         #change to next state
         sampleTime = int(sampleTime+1)
