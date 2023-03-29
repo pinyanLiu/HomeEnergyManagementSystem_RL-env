@@ -17,7 +17,7 @@ class IntEnv(HemsEnv):
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
         
         self.interruptibleLoad = AC(demand=randint(1,30),AvgPowerConsume=1.5)
-        self.allUserPreference = self.info.importUserPreference()
+        self.allUserPreference = self.info.importIntPreference()
 
     def states(self):
         #observation space 

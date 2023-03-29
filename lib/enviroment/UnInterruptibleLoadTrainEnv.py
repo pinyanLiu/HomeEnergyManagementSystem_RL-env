@@ -17,7 +17,7 @@ class UnIntEnv(HemsEnv):
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.7)
         self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=uniform(0.5,1))
-        self.allUserPreference = self.info.importUserPreference()
+        self.allUserPreference = self.info.importUnIntPreference()
 
 
 
