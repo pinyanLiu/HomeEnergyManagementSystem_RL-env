@@ -82,3 +82,20 @@ class Plot():
         self.fig.tight_layout()
         self.fig.savefig(dir+str(asctime(localtime(time())))+'.png')
 
+    def plotOccupancy(self):
+        self.sub4= [sub4.twinx() for sub4 in self.ax]
+        for month in range(0,12):
+            self.sub4[month].set_ylim(0,6)
+            self.sub4[month].set_ylabel('OCP',color='pink')
+            self.sub4[month].spines['right'].set_position(("axes",1.2))
+            self.sub4[month].tick_params(axis='y',colors = 'pink')
+            self.sub4[month].plot(range(96) ,self.testResult[month]['Occupancy'] ,label = 'Occupancy', color ='pink')            
+
+    def plotPreference(self):
+        self.sub4= [sub4.twinx() for sub4 in self.ax]
+        for month in range(0,12):
+            self.sub4[month].set_ylim(-3,3)
+            self.sub4[month].set_ylabel('pfr',color='pink')
+            self.sub4[month].spines['right'].set_position(("axes",1.2))
+            self.sub4[month].tick_params(axis='y',colors = 'pink')
+            self.sub4[month].plot(range(96) ,self.testResult[month]['userPreference'] ,label = 'userPreference', color ='pink')            
