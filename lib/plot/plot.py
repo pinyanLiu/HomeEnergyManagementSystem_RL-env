@@ -17,7 +17,7 @@ class Plot():
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')
             self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',bottom = self.testResult[month]['deltaSoc'] ,color ='gray') 
-            self.ax[month].bar(range(96) ,self.testResult[month]['deltaSoc'],label = 'fixLoad',color ='black') 
+            self.ax[month].bar(range(96) ,self.testResult[month]['deltaSoc']*10,label = 'fixLoad',color ='black') 
 
     def plotLoadPower(self):
         for month in range(0,12):
