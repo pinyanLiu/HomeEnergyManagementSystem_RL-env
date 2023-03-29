@@ -107,6 +107,7 @@ class HvacTest(HvacEnv):
             self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
             self.PV = self.allPV['Nov'].tolist()
             self.GridPrice = self.notSummerGridPrice
+            self.deltaSOC = self.allDeltaSOC['Nov'].tolist()
             self.Occupancy = self.allOccupancy['1']
         elif self.i == 11:
             self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
