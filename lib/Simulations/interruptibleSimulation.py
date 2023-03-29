@@ -30,6 +30,7 @@ class IntSimulation(Simulation):
             price.append(states[3])
             deltaSoc.append(states[4])
             intloadRemain.append(states[5])
+            userPreference.append(states[6])
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:

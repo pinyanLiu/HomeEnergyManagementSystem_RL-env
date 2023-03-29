@@ -98,13 +98,13 @@ class IntTest(IntEnv):
             self.PV = self.allPV['Nov'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Nov'].tolist()
-            self.userPreference = self.allUserPreference['1'].tolist()
+            self.userPreference = self.allUserPreference['11'].tolist()
 
         elif self.i  == 11:
             self.PV = self.allPV['Dec'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Dcb'].tolist()
-            self.userPreference = self.allUserPreference['2'].tolist()
+            self.userPreference = self.allUserPreference['12'].tolist()
 
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.interruptibleLoad.demand,self.userPreference[0]])
