@@ -102,3 +102,10 @@ class ImportData:
         OccupancyTest = pd.DataFrame(self.cursor.fetchall())
         OccupancyTest.columns = [column[0]for column in self.cursor.description]
         return OccupancyTest
+
+    def importUserPreference(self):
+        self.cursor.execute("SELECT * FROM userPreference")
+        userPreference = pd.DataFrame(self.cursor.fetchall())
+        userPreference.columns = [column[0]for column in self.cursor.description]
+        return userPreference
+    

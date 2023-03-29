@@ -94,7 +94,7 @@ class Plot():
     def plotPreference(self):
         self.sub4= [sub4.twinx() for sub4 in self.ax]
         for month in range(0,12):
-            self.sub4[month].set_ylim(-3,3)
+            self.sub4[month].set_ylim(-1,4)
             self.sub4[month].set_ylabel('pfr',color='pink')
             self.sub4[month].spines['right'].set_position(("axes",1.2))
             self.sub4[month].tick_params(axis='y',colors = 'pink')
