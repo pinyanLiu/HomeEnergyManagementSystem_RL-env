@@ -13,7 +13,7 @@
             -0.25,
             0.0,
             0.0,
-            -3
+            -1
         ],
         "max_value": [
             95.0,
@@ -23,7 +23,7 @@
             0.25,
             75.0,
             1.0,
-            3
+            4
         ]
     },
     "actions": {
@@ -84,7 +84,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 5000,
+        "num_steps": 7000,
         "initial_value": 0.25,
         "final_value": 1e-5
     },

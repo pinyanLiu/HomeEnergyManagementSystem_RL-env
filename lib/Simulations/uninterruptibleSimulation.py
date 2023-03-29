@@ -19,6 +19,7 @@ class UnIntSimulation(Simulation):
         deltaSoc = []
         switch = []
         unloadRemain = []
+        userPreference = []
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -30,6 +31,7 @@ class UnIntSimulation(Simulation):
             price.append(states[3])
             deltaSoc.append(states[4])
             unloadRemain.append(states[5])
+            userPreference.append(states[7])
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -50,6 +52,7 @@ class UnIntSimulation(Simulation):
                 price.append(states['state'][3])
                 deltaSoc.append(states['state'][4])
                 unloadRemain.append(states['state'][5])
+                userPreference.append(states['state'][7])
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
@@ -63,6 +66,8 @@ class UnIntSimulation(Simulation):
             self.testResult[month]['unloadRemain'] = unloadRemain
             self.testResult[month]['switch'] = switch
             self.testResult[month]['reward'] = Reward
+            self.testResult[month]['userPreference'] = userPreference
+
             TotalReward.append(totalReward)
             totalReward=0
             sampletime.clear()
@@ -72,6 +77,7 @@ class UnIntSimulation(Simulation):
             deltaSoc.clear()
             switch.clear()
             unloadRemain.clear()
+            userPreference.clear()
             Reward.clear()
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
@@ -82,6 +88,7 @@ class UnIntSimulation(Simulation):
         output.plotLoadPower()
         output.price()
         output.plotReward()
+        output.plotPreference()
         output.plotResult('lib/plot/uninterruptible/')
 
 
