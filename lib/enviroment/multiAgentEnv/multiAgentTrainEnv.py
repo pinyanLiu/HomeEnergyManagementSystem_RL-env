@@ -102,6 +102,7 @@ class multiAgentTrainEnv(Environment):
             "indoorTemperature":0,
             "outdoorTemperature":0,
             "userSetTemperature":0,
+            "intSwitch":0,
             "intRemain":0,
             "intPreference":0,
             "unintRemain":0,
@@ -304,6 +305,7 @@ class multiAgentTrainEnv(Environment):
             "outdoorTemperature":self.outdoorTemperature[0],
             "userSetTemperature":self.userSetTemperature[0],
             "intRemain":self.interruptibleLoad.demand,
+            "intSwitch":self.interruptibleLoad.switch,
             "intPreference":self.intUserPreference[0],
             "unintRemain":self.uninterruptibleLoad.demand,
             "unintSwitch":self.uninterruptibleLoad.switch,
@@ -378,12 +380,15 @@ class multiAgentTrainEnv(Environment):
         if self.action_mask == [False,False,False,False,True]:
             self.action_mask = [True,True,True,True,True]
 
-
-        reward.append(hvacState)
-        reward.append(intState*intPreference)
-        reward.append(unIntState*unintPreference)
-        #reward = sum(reward)/4
         self.state = self.stateAbstraction(self.totalState)
+        if order== 3:
+            print("order == 3")
+            reward.append(hvacState)
+            reward.append(intState*intPreference)
+            reward.append(unIntState*unintPreference)
+        #reward = sum(reward)/4
+        if(self.state[2]<self.PgridMax):
+            reward.append(self.state[2]-self.PgridMax)
 
         #check if all day is done
         done =  bool(sampleTime == 95 and order == 3)
@@ -411,6 +416,7 @@ class multiAgentTrainEnv(Environment):
             self.interruptibleLoad = self.intAgent.environment.interruptibleLoad
             self.interruptibleLoadActionMask = self.intAgent.states["action_mask"]
             self.totalState["intRemain"] = self.intAgent.states["state"][5]
+            self.totalState["intSwitch"] = self.intAgent.actions
             if self.intAgent.actions==1:
                 self.totalState["fixLoad"]+=self.interruptibleLoad.AvgPowerConsume
             
@@ -438,5 +444,5 @@ class multiAgentTrainEnv(Environment):
             
 
     def stateAbstraction(self,totalState) -> np.array:
-        return np.array([totalState['sampleTime'],totalState['SOC'],totalState['fixLoad']+totalState['PV']+totalState['deltaSoc']*self.batteryCapacity,totalState['pricePerHour'],True if totalState['userSetTemperature']>totalState['indoorTemperature']or totalState['outdoorTemperature']<totalState['userSetTemperature'] else False,True if self.intAgent.actions==1 else False,True if totalState['unintSwitch']==1 else False,totalState['intPreference'],totalState['unintPreference'],totalState['order']],dtype=np.float32)
+        return np.array([totalState['sampleTime'],totalState['SOC'],totalState['fixLoad']+totalState['PV']+totalState['deltaSoc']*self.batteryCapacity,totalState['pricePerHour'],True if totalState['userSetTemperature']>totalState['indoorTemperature']or totalState['outdoorTemperature']<totalState['userSetTemperature'] else False,totalState['intSwitch'],totalState['unintSwitch'],totalState['intPreference'],totalState['unintPreference'],totalState['order']],dtype=np.float32)
         

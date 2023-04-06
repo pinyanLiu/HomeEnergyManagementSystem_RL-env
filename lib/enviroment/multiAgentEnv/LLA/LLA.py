@@ -84,7 +84,7 @@ class intLLA(LLA):
 
     def getState(self, allStates,actionMask) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , interruptible Remain]
-        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['intRemain']],dtype=np.float32),action_mask=actionMask)
+        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['intRemain'],allStates['intPreference']],dtype=np.float32),action_mask=actionMask)
 
     def execute(self) -> None:
         self.actions, self.internals = self.agent.act(
@@ -109,7 +109,7 @@ class unintLLA(LLA):
 
     def getState(self, allStates , actionMask) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , Uninterruptible Remain , Uninterruptible Switch]
-        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['unintRemain'],allStates['unintSwitch']],dtype=np.float32),action_mask=actionMask)
+        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['unintRemain'],allStates['unintSwitch'],allStates['unintPreference']],dtype=np.float32),action_mask=actionMask)
 
 
     def execute(self) -> None:
