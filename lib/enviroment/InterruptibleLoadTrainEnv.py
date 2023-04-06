@@ -185,6 +185,9 @@ class IntEnv(HemsEnv):
         if cost<0:
             cost = 0 
 
+        if(intUserPreference==4 and self.interruptibleLoad.switch==False):
+            reward.append(-intUserPreference)
+
         #reward
         reward.append(0.07-9*cost)
         if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):

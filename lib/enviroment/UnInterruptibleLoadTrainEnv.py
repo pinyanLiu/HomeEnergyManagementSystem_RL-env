@@ -196,6 +196,9 @@ class UnIntEnv(HemsEnv):
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
             reward.append(-5*self.uninterruptibleLoad.getRemainProcessPercentage())
 
+        if(unintPreference==4 and self.uninterruptibleLoad.switch==False):
+            reward.append(-unintPreference)
+
         #change to next state
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch,self.unintPreference[sampleTime]])

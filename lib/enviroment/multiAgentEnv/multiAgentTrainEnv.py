@@ -354,7 +354,6 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent.environment.updateState(self.hvacAgent.states)
             self.hvacAgent.execute()
             self.updateTotalState("hvac")
-            reward.append(hvacState)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True])]
 
 
@@ -363,7 +362,6 @@ class multiAgentTrainEnv(Environment):
             self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
             self.intAgent.execute()
             self.updateTotalState("int")
-            reward.append(intState*intPreference)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True])]
 
         elif actions == 3:
@@ -371,7 +369,6 @@ class multiAgentTrainEnv(Environment):
             self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
             self.unIntAgent.execute()
             self.updateTotalState("unint")
-            reward.append(unIntState*unintPreference)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True])]
 
         else:
@@ -382,6 +379,9 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [True,True,True,True,True]
 
 
+        reward.append(hvacState)
+        reward.append(intState*intPreference)
+        reward.append(unIntState*unintPreference)
         #reward = sum(reward)/4
         self.state = self.stateAbstraction(self.totalState)
 
