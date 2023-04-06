@@ -89,7 +89,7 @@ class Plot():
             self.sub4[month].set_ylabel('OCP',color='pink')
             self.sub4[month].spines['right'].set_position(("axes",1.2))
             self.sub4[month].tick_params(axis='y',colors = 'pink')
-            self.sub4[month].plot(range(96) ,self.testResult[month]['Occupancy'] ,label = 'Occupancy', color ='pink')            
+            self.sub4[month].plot(range(96) ,self.testResult[month]['occupancy'] ,label = 'Occupancy', color ='pink')            
 
     def plotPreference(self):
         self.sub4= [sub4.twinx() for sub4 in self.ax]

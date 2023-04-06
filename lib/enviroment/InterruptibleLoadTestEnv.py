@@ -45,69 +45,69 @@ class IntTest(IntEnv):
             self.PV = self.allPV['Jan'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Jan'].tolist()
-            self.userPreference = self.allUserPreference['1'].tolist()
+            self.intUserPreference = self.allIntPreference['1'].tolist()
         elif self.i  == 1:
             self.PV = self.allPV['Feb'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Feb'].tolist()
-            self.userPreference = self.allUserPreference['2'].tolist()
+            self.intUserPreference = self.allIntPreference['2'].tolist()
 
         elif self.i  == 2:
             self.PV = self.allPV['Mar'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Mar'].tolist()
-            self.userPreference = self.allUserPreference['3'].tolist()
+            self.intUserPreference = self.allIntPreference['3'].tolist()
         elif self.i  == 3:
             self.PV = self.allPV['Apr'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Apr'].tolist()
-            self.userPreference = self.allUserPreference['4'].tolist()
+            self.intUserPreference = self.allIntPreference['4'].tolist()
 
         elif self.i  == 4:
             self.PV = self.allPV['May'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['May'].tolist()
-            self.userPreference = self.allUserPreference['5'].tolist()
+            self.intUserPreference = self.allIntPreference['5'].tolist()
         elif self.i  == 5:
             self.PV = self.allPV['Jun'].tolist()
             self.GridPrice = self.summerGridPrice
             self.deltaSOC = self.allDeltaSOC['Jun'].tolist()
-            self.userPreference = self.allUserPreference['6'].tolist()
+            self.intUserPreference = self.allIntPreference['6'].tolist()
 
         elif self.i  == 6:
             self.PV = self.allPV['July'].tolist()
             self.GridPrice = self.summerGridPrice
             self.deltaSOC = self.allDeltaSOC['July'].tolist()
-            self.userPreference = self.allUserPreference['7'].tolist()
+            self.intUserPreference = self.allIntPreference['7'].tolist()
         elif self.i  == 7:
             self.PV = self.allPV['Aug'].tolist()
             self.GridPrice = self.summerGridPrice
             self.deltaSOC = self.allDeltaSOC['Aug'].tolist()
-            self.userPreference = self.allUserPreference['8'].tolist()
+            self.intUserPreference = self.allIntPreference['8'].tolist()
         elif self.i  == 8:
             self.PV = self.allPV['Sep'].tolist()
             self.GridPrice = self.summerGridPrice
             self.deltaSOC = self.allDeltaSOC['Sep'].tolist()
-            self.userPreference = self.allUserPreference['9'].tolist()
+            self.intUserPreference = self.allIntPreference['9'].tolist()
         elif self.i  == 9:
             self.PV = self.allPV['Oct'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Oct'].tolist()
-            self.userPreference = self.allUserPreference['10'].tolist()
+            self.intUserPreference = self.allIntPreference['10'].tolist()
         elif self.i  == 10:
             self.PV = self.allPV['Nov'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Nov'].tolist()
-            self.userPreference = self.allUserPreference['11'].tolist()
+            self.intUserPreference = self.allIntPreference['11'].tolist()
 
         elif self.i  == 11:
             self.PV = self.allPV['Dec'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Dcb'].tolist()
-            self.userPreference = self.allUserPreference['12'].tolist()
+            self.intUserPreference = self.allIntPreference['12'].tolist()
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.interruptibleLoad.demand,self.userPreference[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.interruptibleLoad.demand,self.intUserPreference[0]])
         #action mask
         PgridMaxExceed = (self.Load[0]+self.deltaSOC[0]+self.interruptibleLoad.AvgPowerConsume-self.PV[0]) >= self.PgridMax
 
