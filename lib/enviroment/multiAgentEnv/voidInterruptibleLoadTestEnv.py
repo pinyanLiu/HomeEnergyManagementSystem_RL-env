@@ -26,7 +26,7 @@ class VoidIntTest(IntEnv):
         reward = []
         cost = 0
         #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,interruptible load remain)
-        sampleTime,load,pv,pricePerHour,deltaSoc,intRemain = self.state["state"]
+        sampleTime,load,pv,pricePerHour,deltaSoc,intRemain,intUserPreference = self.state["state"]
         # Turn off switch
         if actions == 0:
             self.interruptibleLoad.turn_off()
@@ -54,7 +54,7 @@ class VoidIntTest(IntEnv):
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,self.interruptibleLoad.getRemainDemand()])
+        self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,self.interruptibleLoad.getRemainDemand(),intUserPreference])
 
         #actions mask
         PgridMaxExceed = (load+deltaSoc+self.interruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
@@ -74,7 +74,7 @@ class VoidIntTest(IntEnv):
 
 
     def reset(self):
-        return  np.array([0,0.0,0.0,0.0,0.0,0.0])
+        return  np.array([0,0.0,0.0,0.0,0.0,0.0,0.0])
     
 
     def updateState(self,states,interruptibleLoad):

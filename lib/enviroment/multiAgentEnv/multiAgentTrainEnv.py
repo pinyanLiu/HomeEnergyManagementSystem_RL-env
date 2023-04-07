@@ -185,8 +185,8 @@ class multiAgentTrainEnv(Environment):
         #pick one day from 360 days
         self.i = randint(1,359)
         #AC/WM object
-        self.interruptibleLoad = AC(demand=randint(1,30),AvgPowerConsume=1.5)
-        self.uninterruptibleLoad = WM(demand=randint(3,12),executePeriod=3,AvgPowerConsume=uniform(0.5,1.5))
+        self.interruptibleLoad = AC(demand=self.intload_demand,AvgPowerConsume=self.intload_power)
+        self.uninterruptibleLoad = WM(demand=self.unload_demand,executePeriod=self.unload_period,AvgPowerConsume=self.unload_power)
         self.randomDeltaPrice  = [uniform(-1,1) for _ in range(96)]
         self.randomDeltaPV = [uniform(-0.5,0.5) for _ in range(96)]        
         self.randomTemperature = [uniform(-2,2)for _ in range(96)]
@@ -337,14 +337,13 @@ class multiAgentTrainEnv(Environment):
         '''
         reward = []
         sampleTime,soc,remain,pricePreHour,hvacState,intState,unIntState,intPreference,unintPreference,order = self.state
-        # print(self.state)
-        #print(self.totalState)
+#         #print(self.totalState)
 
         #choose one load executing in this sampleTime order .Load which has been execute in the same sampleTime would be auto block by action mask
-        #print(self.state)
 
         #soc
         if actions == 0 :
+            # print('soc')
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()
@@ -352,6 +351,7 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True])]
 
         elif actions == 1:
+            # print('hvac')
             self.hvacAgent.getState(self.totalState)
             self.hvacAgent.environment.updateState(self.hvacAgent.states)
             self.hvacAgent.execute()
@@ -360,6 +360,7 @@ class multiAgentTrainEnv(Environment):
 
 
         elif actions == 2:
+            # print('int')
             self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
             self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
             self.intAgent.execute()
@@ -367,6 +368,7 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True])]
 
         elif actions == 3:
+            # print('unint')
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
             self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
             self.unIntAgent.execute()
@@ -374,27 +376,29 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True])]
 
         else:
+            # print('none')
             self.updateTotalState("None")
             reward.append(-0.2)
-
-        if self.action_mask == [False,False,False,False,True]:
-            self.action_mask = [True,True,True,True,True]
+        # print(self.action_mask,order)
 
         self.state = self.stateAbstraction(self.totalState)
         if order== 3:
-            print("order == 3")
+            self.action_mask = [True,True,True,True,True]
             reward.append(hvacState)
             reward.append(intState*intPreference)
             reward.append(unIntState*unintPreference)
         #reward = sum(reward)/4
-        if(self.state[2]<self.PgridMax):
-            reward.append(self.state[2]-self.PgridMax)
+            if(self.state[2]>self.PgridMax):
+                # print("PGRID MAX OVER!!!")
+                reward.append(20*(self.PgridMax-self.state[2]))
 
         #check if all day is done
         done =  bool(sampleTime == 95 and order == 3)
 
         reward = 0.2+sum(reward)/4
         states = dict(state=self.state,action_mask = self.action_mask)
+
+        # Use the to_excel() method to output the DataFrame to an Excel file
 
         return states, done ,reward
 

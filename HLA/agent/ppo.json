@@ -40,30 +40,23 @@
     "network": [
         {
             "type": "dense",
-            "size": 319,
+            "size": 600,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 319,
+            "size": 600,
             "activation": "relu"
         }
     ],
     "use_beta_distribution": true,
     "memory": "minimum",
     "update_frequency": 0.1,
-    "learning_rate": {
-        "type": "decaying",
-        "decay": "linear",
-        "unit": "episodes",
-        "num_steps": 4000,
-        "initial_value": 1e-3,
-        "final_value": 5e-5
-    },
+    "learning_rate": 1e-4,
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.2,
-    "discount": 0.985,
+    "discount": 1.0,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
@@ -77,31 +70,33 @@
             "type": "dense",
             "size": 319,
             "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
+            "activation": "relu"
         }
     ],
     "baseline_optimizer": {
         "optimizer": "adam",
-        "learning_rate": {
-            "type": "decaying",
-            "decay": "linear",
-            "unit": "episodes",
-            "num_steps": 4000,
-            "initial_value": 1e-3,
-            "final_value": 5e-5
-        },
-        "multi_step": 10
+        "learning_rate": 1e-3
     },
     "state_preprocessing": "linear_normalization",
     "exploration": {
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 4000,
+        "num_steps": 3000,
         "initial_value": 0.9,
         "final_value": 1e-5
     },
     "variable_noise": 0.0,
-    "l2_regularization": 0.1,
+    "l2_regularization": 0.0,
     "entropy_regularization": 0.0,
     "parallel_interactions": 1,
     "config": null,
