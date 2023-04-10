@@ -39,55 +39,47 @@ class HvacTest(HvacEnv):
             self.PV = self.allPV['Jan'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Jan'].tolist()
-            self.Occupancy = self.allOccupancy['1']
         elif self.i == 1:
             self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Feb'].tolist()
             self.PV = self.allPV['Feb'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Feb'].tolist()
-            self.Occupancy = self.allOccupancy['2']
         elif self.i == 2:
             self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Mar'].tolist()
             self.PV = self.allPV['Mar'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Mar'].tolist()
-            self.Occupancy = self.allOccupancy['3']
         elif self.i == 3:
             self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
             self.PV = self.allPV['Apr'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Apr'].tolist()
-            self.Occupancy = self.allOccupancy['4']
         elif self.i == 4:
             self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['May'].tolist()
             self.PV = self.allPV['May'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['May'].tolist()
-            self.Occupancy = self.allOccupancy['5']
         elif self.i == 5:
             self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Jun'].tolist()
             self.PV = self.allPV['Jun'].tolist()
             self.deltaSOC = self.allDeltaSOC['Jun'].tolist()
-            self.Occupancy = self.allOccupancy['6']
             self.GridPrice = self.summerGridPrice
         elif self.i == 6:
             self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['July'].tolist()
             self.PV = self.allPV['July'].tolist()
             self.deltaSOC = self.allDeltaSOC['July'].tolist()
-            self.Occupancy = self.allOccupancy['7']
             self.GridPrice = self.summerGridPrice
         elif self.i == 7:
             self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Aug'].tolist()
             self.PV = self.allPV['Aug'].tolist()
             self.deltaSOC = self.allDeltaSOC['Aug'].tolist()
-            self.Occupancy = self.allOccupancy['8']
             self.GridPrice = self.summerGridPrice
         elif self.i == 8:
             self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
@@ -101,23 +93,20 @@ class HvacTest(HvacEnv):
             self.PV = self.allPV['Oct'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Oct'].tolist()
-            self.Occupancy = self.allOccupancy['10']
         elif self.i == 10:
             self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
             self.PV = self.allPV['Nov'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.deltaSOC = self.allDeltaSOC['Nov'].tolist()
-            self.Occupancy = self.allOccupancy['1']
         elif self.i == 11:
             self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
             self.PV = self.allPV['Dec'].tolist()
             self.deltaSOC = self.allDeltaSOC['Dcb'].tolist()
             self.GridPrice = self.notSummerGridPrice
-            self.Occupancy = self.allOccupancy['2']
 
         #reset state
-        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0],self.Occupancy[0]])
+        self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0]])
         return self.state
 
