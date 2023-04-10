@@ -19,7 +19,6 @@ class HvacSimulation(Simulation):
         outdoorTemperature = []
         userSetTemperature = []
         hvac = []
-        occupancy = []
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -33,7 +32,6 @@ class HvacSimulation(Simulation):
             indoorTemperature.append(states[5])
             outdoorTemperature.append(states[6])
             userSetTemperature.append(states[7])
-            occupancy.append(states[8])
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -50,7 +48,6 @@ class HvacSimulation(Simulation):
                 indoorTemperature.append(states['state'][5])
                 outdoorTemperature.append(states['state'][6])
                 userSetTemperature.append(states['state'][7])
-                occupancy.append(states['state'][8])
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
@@ -64,7 +61,6 @@ class HvacSimulation(Simulation):
             self.testResult[month]['indoorTemperature'] = indoorTemperature
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
             self.testResult[month]['userSetTemperature'] = userSetTemperature
-            self.testResult[month]['occupancy'] = occupancy
             self.testResult[month]['reward'] = Reward
             TotalReward.append(totalReward)
             totalReward=0
@@ -76,7 +72,6 @@ class HvacSimulation(Simulation):
             indoorTemperature.clear()
             outdoorTemperature.clear()
             userSetTemperature.clear()
-            occupancy.clear()
             Reward.clear()
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 

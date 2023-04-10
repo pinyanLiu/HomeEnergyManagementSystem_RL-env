@@ -18,7 +18,7 @@ class IntSimulation(Simulation):
         deltaSoc = []
         switch = []
         intloadRemain = []
-        userPreference = []
+        intUserPreference = []
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -30,7 +30,7 @@ class IntSimulation(Simulation):
             price.append(states[3])
             deltaSoc.append(states[4])
             intloadRemain.append(states[5])
-            userPreference.append(states[6])
+            intUserPreference.append(states[6])
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -52,7 +52,7 @@ class IntSimulation(Simulation):
                 price.append(states['state'][3])
                 deltaSoc.append(states['state'][4])
                 intloadRemain.append(states['state'][5])
-                userPreference.append(states['state'][6])
+                intUserPreference.append(states['state'][6])
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
@@ -66,7 +66,7 @@ class IntSimulation(Simulation):
             self.testResult[month]['intloadRemain'] = intloadRemain
             self.testResult[month]['switch'] = switch
             self.testResult[month]['reward'] = Reward
-            self.testResult[month]['userPreference'] = userPreference
+            self.testResult[month]['intUserPreference'] = intUserPreference
 
             TotalReward.append(totalReward)
             totalReward=0
@@ -78,7 +78,7 @@ class IntSimulation(Simulation):
             switch.clear()
             intloadRemain.clear()
             Reward.clear()
-            userPreference.clear()
+            intUserPreference.clear()
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     
@@ -88,7 +88,7 @@ class IntSimulation(Simulation):
         output.plotLoadPower()
         output.price()
         output.plotReward()
-        output.plotPreference()
+        output.plotIntPreference()
         output.plotResult('lib/plot/interruptible/')
 
     def getMean(self):
