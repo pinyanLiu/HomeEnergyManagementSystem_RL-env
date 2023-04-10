@@ -46,61 +46,97 @@ class multiAgentTestEnv(multiAgentTrainEnv):
             self.GridPrice = self.notSummerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Jan'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Jan'].tolist()
+            self.intUserPreference = self.allIntPreference['1'].tolist()
+            self.unintPreference = self.allUnintPreference['1'].tolist()
+
         elif self.i  == 1:
             self.PV = self.allPV['Feb'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Feb'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Feb'].tolist()
+            self.intUserPreference = self.allIntPreference['2'].tolist()
+            self.unintPreference = self.allUnintPreference['2'].tolist()
+
         elif self.i  == 2:
             self.PV = self.allPV['Mar'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Mar'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Mar'].tolist()
+            self.intUserPreference = self.allIntPreference['3'].tolist()
+            self.unintPreference = self.allUnintPreference['3'].tolist()
+
         elif self.i  == 3:
             self.PV = self.allPV['Apr'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Apr'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Apr'].tolist()
+            self.intUserPreference = self.allIntPreference['4'].tolist()
+            self.unintPreference = self.allUnintPreference['4'].tolist()
+
         elif self.i  == 4:
             self.PV = self.allPV['May'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['May'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['May'].tolist()
+            self.intUserPreference = self.allIntPreference['5'].tolist()
+            self.unintPreference = self.allUnintPreference['5'].tolist()
+
         elif self.i  == 5:
             self.PV = self.allPV['Jun'].tolist()
             self.GridPrice = self.summerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Jun'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Jun'].tolist()
+            self.intUserPreference = self.allIntPreference['6'].tolist()
+            self.unintPreference = self.allUnintPreference['6'].tolist()
+
         elif self.i  == 6:
             self.PV = self.allPV['July'].tolist()
             self.GridPrice = self.summerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['July'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['July'].tolist()
+            self.intUserPreference = self.allIntPreference['7'].tolist()
+            self.unintPreference = self.allUnintPreference['7'].tolist()
+
         elif self.i  == 7:
             self.PV = self.allPV['Aug'].tolist()
             self.GridPrice = self.summerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Aug'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Aug'].tolist()
+            self.intUserPreference = self.allIntPreference['8'].tolist()
+            self.unintPreference = self.allUnintPreference['8'].tolist()
+
         elif self.i  == 8:
             self.PV = self.allPV['Sep'].tolist()
             self.GridPrice = self.summerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Sep'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Sep'].tolist()
+            self.intUserPreference = self.allIntPreference['9'].tolist()
+            self.unintPreference = self.allUnintPreference['9'].tolist()
+
         elif self.i  == 9:
             self.PV = self.allPV['Oct'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Oct'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Oct'].tolist()
+            self.intUserPreference = self.allIntPreference['10'].tolist()
+            self.unintPreference = self.allUnintPreference['10'].tolist()
+
         elif self.i  == 10:
             self.PV = self.allPV['Nov'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Nov'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Nov'].tolist()
+            self.intUserPreference = self.allIntPreference['11'].tolist()
+            self.unintPreference = self.allUnintPreference['11'].tolist()
+
         elif self.i  == 11:
             self.PV = self.allPV['Dec'].tolist()
             self.GridPrice = self.notSummerGridPrice
             self.outdoorTemperature = self.allOutdoorTemperature['Dcb'].tolist()
             self.userSetTemperature = self.allUserSetTemperature['Dcb'].tolist()
+            self.intUserPreference = self.allIntPreference['12'].tolist()
+            self.unintPreference = self.allUnintPreference['12'].tolist()
+
         #reset state
         self.totalState = {
             "sampleTime":0,
@@ -113,8 +149,11 @@ class multiAgentTestEnv(multiAgentTrainEnv):
             "outdoorTemperature":self.outdoorTemperature[0],
             "userSetTemperature":self.userSetTemperature[0],
             "intRemain":self.interruptibleLoad.demand,
+            "intSwitch":self.interruptibleLoad.switch,
+            "intPreference":self.intUserPreference[0],
             "unintRemain":self.uninterruptibleLoad.demand,
             "unintSwitch":self.uninterruptibleLoad.switch,
+            "unintPreference":self.unintPreference[0],
             "order":0
         }
         self.interruptibleLoadActionMask = [True,True]
