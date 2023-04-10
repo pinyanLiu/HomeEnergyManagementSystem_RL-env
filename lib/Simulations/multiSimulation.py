@@ -68,7 +68,6 @@ class multiSimulation(Simulation):
                     soc.append(totalState["SOC"])
                     price.append(totalState["pricePerHour"])
                     deltaSoc.append(totalState["deltaSoc"])
-                    #print(totalState["deltaSoc"])
                     indoorTemperature.append(totalState["indoorTemperature"])
                     outdoorTemperature.append(totalState["outdoorTemperature"])
                     userSetTemperature.append(totalState["userSetTemperature"])
@@ -79,10 +78,8 @@ class multiSimulation(Simulation):
                     intSwitch.append(totalState["intSwitch"])
                     unintSwitch.append(totalState["unintSwitch"])
                     order.append(totalState["order"])
-                    self.totalReward.append(reward)
                     Reward.append(reward)
                 totalReward += reward
-                Reward.append(0)
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
             self.testResult[month]['price'] = price

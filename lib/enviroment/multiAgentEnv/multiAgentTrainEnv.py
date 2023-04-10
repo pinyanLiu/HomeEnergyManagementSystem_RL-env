@@ -45,8 +45,8 @@ class multiAgentTrainEnv(Environment):
         #import Grid price
         self.allGridPrice = self.info.importGridPrice()
         self.summerGridPrice = self.allGridPrice['summer_price'].tolist()
-        #self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
-        self.notSummerGridPrice = self.allGridPrice['test_price1'].tolist()
+        self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
+        #self.notSummerGridPrice = self.allGridPrice['summer_price'].tolist()
         self.intload_demand =  int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='intload_demand']['value'])[0])
         self.intload_power =  float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='intload_power']['value'])[0])
         self.unload_demand =  int(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='unload_demand']['value'])[0])
@@ -115,6 +115,8 @@ class multiAgentTrainEnv(Environment):
         self.action_mask = [True,True,True,True,True]
         self.interruptibleLoadActionMask = [True,True]
         self.uninterruptibleLoadActionMask = [True,True]
+        self.tempActionMaskFlag = False # use for recording whether remain>pgridmax in last step
+
 
     def states(self):
         #observation space 
@@ -155,7 +157,7 @@ class multiAgentTrainEnv(Environment):
                 #pricePerHour
                 0.0,
                 #HVAC state
-                0,
+                -1,
                 #Int state
                 0,
                 #Unint state
@@ -349,7 +351,7 @@ class multiAgentTrainEnv(Environment):
             self.socAgent.execute()
             self.updateTotalState("soc")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True])]
-
+        #hvac
         elif actions == 1:
             # print('hvac')
             self.hvacAgent.getState(self.totalState)
@@ -358,7 +360,7 @@ class multiAgentTrainEnv(Environment):
             self.updateTotalState("hvac")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True])]
 
-
+        #int
         elif actions == 2:
             # print('int')
             self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
@@ -366,7 +368,7 @@ class multiAgentTrainEnv(Environment):
             self.intAgent.execute()
             self.updateTotalState("int")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True])]
-
+        #unint
         elif actions == 3:
             # print('unint')
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
@@ -374,31 +376,49 @@ class multiAgentTrainEnv(Environment):
             self.unIntAgent.execute()
             self.updateTotalState("unint")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True])]
-
+        #none
         else:
             # print('none')
             self.updateTotalState("None")
             reward.append(-0.2)
         # print(self.action_mask,order)
 
+
+        # Pgrid Max action mask
+        # tempActionMask is used as a temp list to record the current action mask.
+        # tempActionMaskFlag is used for recording whether previous step exceeded Pgrid Max limit.
+        # if remain exceeded the Pgrid Max limit, Flag = True, and the HLA can only choose SOC or no-action
+        # if the Flag = True, current action mask have to restore the previous action mask (tempActionMask[1:])
         self.state = self.stateAbstraction(self.totalState)
+        if self.tempActionMaskFlag :
+            self.tempActionMaskFlag = False
+            self.action_mask[1:] = self.tempActionMask[1:]
+
+        if self.state[2]>self.PgridMax:
+            self.tempActionMask = self.action_mask
+            self.tempActionMaskFlag = True
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,False,False,True])]
+        
+
         if order== 3:
+            if self.action_mask[3]==True:
+                self.unIntAgent.environment.uninterruptibleLoad.step()
+            if self.action_mask[1] == True:
+                self.totalState["indoorTemperature"] = self.epsilon*self.totalState["indoorTemperature"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
             self.action_mask = [True,True,True,True,True]
             reward.append(hvacState)
             reward.append(intState*intPreference)
             reward.append(unIntState*unintPreference)
-        #reward = sum(reward)/4
-            if(self.state[2]>self.PgridMax):
-                # print("PGRID MAX OVER!!!")
-                reward.append(20*(self.PgridMax-self.state[2]))
-
+            # if(self.state[2]>self.PgridMax):  
+            #     # print("PGRID MAX OVER!!!")
+            #     reward.append(200*(self.PgridMax-self.state[2]))
+            #print(self.totalState["unintRemain"],self.totalState["unintSwitch"])
         #check if all day is done
         done =  bool(sampleTime == 95 and order == 3)
 
-        reward = 0.2+sum(reward)/4
+        reward = sum(reward)/4
         states = dict(state=self.state,action_mask = self.action_mask)
 
-        # Use the to_excel() method to output the DataFrame to an Excel file
 
         return states, done ,reward
 
@@ -435,18 +455,23 @@ class multiAgentTrainEnv(Environment):
 
         #Order = 0,1,2,3
         self.totalState["order"] = (self.totalState["order"]+1 if self.totalState["order"]<3 else 0 )
-        #SampleTime
+        #update to next step
         if self.totalState["order"] == 0 and self.totalState["sampleTime"]!=95:
             self.totalState["sampleTime"]+=1
             self.totalState["fixLoad"]=self.Load[self.totalState["sampleTime"]]
             self.totalState["PV"]=self.PV[self.totalState["sampleTime"]]
             self.totalState["pricePerHour"]=self.GridPrice[self.totalState["sampleTime"]]
+            self.totalState["deltaSoc"] = 0
             self.totalState["outdoorTemperature"]=self.outdoorTemperature[self.totalState["sampleTime"]]
             self.totalState["userSetTemperature"]=self.userSetTemperature[self.totalState["sampleTime"]]
+            self.totalState["unintRemain"]=self.unIntAgent.environment.uninterruptibleLoad.getRemainDemand()
+            self.totalState["unintSwitch"]=self.unIntAgent.environment.uninterruptibleLoad.switch
+            self.totalState["intSwitch"] = 0
             self.totalState["intPreference"] = self.intUserPreference[self.totalState["sampleTime"]]
             self.totalState["unintPreference"] = self.unintPreference[self.totalState["sampleTime"]]
+        
             
 
     def stateAbstraction(self,totalState) -> np.array:
-        return np.array([totalState['sampleTime'],totalState['SOC'],totalState['fixLoad']+totalState['PV']+totalState['deltaSoc']*self.batteryCapacity,totalState['pricePerHour'],True if totalState['userSetTemperature']>totalState['indoorTemperature']or totalState['outdoorTemperature']<totalState['userSetTemperature'] else False,totalState['intSwitch'],totalState['unintSwitch'],totalState['intPreference'],totalState['unintPreference'],totalState['order']],dtype=np.float32)
+        return np.array([totalState['sampleTime'],totalState['SOC'],totalState['fixLoad']+totalState['PV']+totalState['deltaSoc']*self.batteryCapacity,totalState['pricePerHour'],1 if totalState['userSetTemperature']>totalState['indoorTemperature']or totalState['outdoorTemperature']<totalState['userSetTemperature'] else 0,totalState['intSwitch'],totalState['unintSwitch'],totalState['intPreference'],totalState['unintPreference'],totalState['order']],dtype=np.float32)
         
