@@ -185,7 +185,7 @@ class UnIntEnv(HemsEnv):
             if Pess<0:
                 cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv+Pess))/self.uninterruptibleLoad.demand
             else:
-                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv))/self.uninterruptibleLoad.demand
+                cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv))/(self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod)
             reward.append(unintPreference/7)#preference reward
         if cost<0:
             cost = 0 
