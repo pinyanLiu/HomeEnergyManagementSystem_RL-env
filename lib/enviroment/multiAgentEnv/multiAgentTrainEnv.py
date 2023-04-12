@@ -349,6 +349,7 @@ class multiAgentTrainEnv(Environment):
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()
+            # reward.append(self.socAgent.reward)
             self.updateTotalState("soc")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True])]
         #hvac
@@ -357,6 +358,7 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent.getState(self.totalState)
             self.hvacAgent.environment.updateState(self.hvacAgent.states)
             self.hvacAgent.execute()
+            # reward.append(self.hvacAgent.reward)
             self.updateTotalState("hvac")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True])]
 
@@ -366,6 +368,7 @@ class multiAgentTrainEnv(Environment):
             self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
             self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
             self.intAgent.execute()
+            # reward.append(self.intAgent.reward)
             self.updateTotalState("int")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True])]
         #unint
@@ -374,13 +377,14 @@ class multiAgentTrainEnv(Environment):
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
             self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
             self.unIntAgent.execute()
+            # reward.append(self.unIntAgent.reward)
             self.updateTotalState("unint")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True])]
         #none
         else:
             # print('none')
             self.updateTotalState("None")
-            reward.append(-0.2)
+            reward.append(-1)
         # print(self.action_mask,order)
 
 
@@ -400,18 +404,18 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,False,False,True])]
         
 
-        if order== 3:
+        if order == 3:
             if self.action_mask[3]==True:
                 self.unIntAgent.environment.uninterruptibleLoad.step()
             if self.action_mask[1] == True:
                 self.totalState["indoorTemperature"] = self.epsilon*self.totalState["indoorTemperature"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
             self.action_mask = [True,True,True,True,True]
-            reward.append(hvacState)
-            reward.append(intState*intPreference)
-            reward.append(unIntState*unintPreference)
-            # if(self.state[2]>self.PgridMax):  
-            #     # print("PGRID MAX OVER!!!")
-            #     reward.append(200*(self.PgridMax-self.state[2]))
+            reward.append(2*hvacState)
+            reward.append(2*intState*intPreference/self.interruptibleLoad.demand)
+            reward.append(2*unIntState*unintPreference/self.uninterruptibleLoad.demand)
+            if(self.state[2]>self.PgridMax):  
+                # print("PGRID MAX OVER!!!")
+                reward.append(150*(self.PgridMax-self.state[2]))
             #print(self.totalState["unintRemain"],self.totalState["unintSwitch"])
         #check if all day is done
         done =  bool(sampleTime == 95 and order == 3)
@@ -473,5 +477,5 @@ class multiAgentTrainEnv(Environment):
             
 
     def stateAbstraction(self,totalState) -> np.array:
-        return np.array([totalState['sampleTime'],totalState['SOC'],totalState['fixLoad']+totalState['PV']+totalState['deltaSoc']*self.batteryCapacity,totalState['pricePerHour'],1 if totalState['userSetTemperature']>totalState['indoorTemperature']or totalState['outdoorTemperature']<totalState['userSetTemperature'] else 0,totalState['intSwitch'],totalState['unintSwitch'],totalState['intPreference'],totalState['unintPreference'],totalState['order']],dtype=np.float32)
+        return np.array([totalState['sampleTime'],totalState['SOC'],totalState['fixLoad']+totalState['PV']+totalState['deltaSoc']*self.batteryCapacity,totalState['pricePerHour'],1 if totalState['userSetTemperature']>totalState['indoorTemperature'] or totalState['outdoorTemperature']<totalState['userSetTemperature'] else -1,totalState['intSwitch'],totalState['unintSwitch'],totalState['intPreference'],totalState['unintPreference'],totalState['order']],dtype=np.float32)
         
