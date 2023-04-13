@@ -36,28 +36,35 @@
         "num_values": 5
     },
     "max_episode_timesteps": 384,
-    "batch_size": 300,
+    "batch_size": 128,
     "network": [
         {
             "type": "dense",
-            "size": 600,
+            "size": 314,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 600,
+            "size": 314,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 600,
+            "size": 314,
             "activation": "relu"
         }
     ],
     "use_beta_distribution": true,
     "memory": "minimum",
     "update_frequency": 0.1,
-    "learning_rate": 1e-4,
+    "learning_rate": {
+        "type": "decaying",
+        "decay": "linear",
+        "unit": "episodes",
+        "num_steps": 450,
+        "initial_value": 1e-3,
+        "final_value": 5e-5
+    },
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.2,
@@ -68,23 +75,30 @@
     "baseline": [
         {
             "type": "dense",
-            "size": 319,
+            "size": 200,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 319,
+            "size": 200,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 600,
+            "size": 314,
             "activation": "relu"
         }
     ],
     "baseline_optimizer": {
         "optimizer": "adam",
-        "learning_rate": 1e-4
+        "learning_rate": {
+            "type": "decaying",
+            "decay": "linear",
+            "unit": "episodes",
+            "num_steps": 450,
+            "initial_value": 1e-3,
+            "final_value": 5e-5
+        }
     },
     "state_preprocessing": "linear_normalization",
     "exploration": {
@@ -92,7 +106,7 @@
         "decay": "linear",
         "unit": "episodes",
         "num_steps": 450,
-        "initial_value": 0.8,
+        "initial_value": 1e-3,
         "final_value": 1e-5
     },
     "variable_noise": 0.0,
