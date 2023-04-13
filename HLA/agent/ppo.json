@@ -68,7 +68,7 @@
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.2,
-    "discount": 1.0,
+    "discount": 0.985,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,

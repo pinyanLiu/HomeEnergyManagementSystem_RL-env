@@ -384,7 +384,7 @@ class multiAgentTrainEnv(Environment):
         else:
             # print('none')
             self.updateTotalState("None")
-            reward.append(-5)
+            reward.append(-3)
         # print(self.action_mask,order)
 
 
@@ -416,7 +416,7 @@ class multiAgentTrainEnv(Environment):
 
             if(self.state[2]>self.PgridMax):  
                 # print("PGRID MAX OVER!!!")
-                reward.append(160*(self.PgridMax-self.state[2]))
+                reward.append(150*(self.PgridMax-self.state[2]))
                 #print(self.state[2])
             #print(self.totalState["unintRemain"],self.totalState["unintSwitch"])
         #check if all day is done
