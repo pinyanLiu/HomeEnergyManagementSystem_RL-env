@@ -9,6 +9,7 @@ class multiSimulation(Simulation):
         super().__init__()
         self.environment = Environment.create(environment = multiAgentTestEnv,max_episode_timesteps=384)
         self.agent = Agent.load(directory = 'HLA/saver_dir',environment=self.environment)
+
     def simulation(self):
         sampletime = []
         remain = []
@@ -67,7 +68,7 @@ class multiSimulation(Simulation):
                     pv.append(totalState["PV"])
                     soc.append(totalState["SOC"])
                     price.append(totalState["pricePerHour"])
-                    deltaSoc.append(totalState["deltaSoc"])
+                    deltaSoc.append(totalState["deltaSoc"]*10)
                     indoorTemperature.append(totalState["indoorTemperature"])
                     outdoorTemperature.append(totalState["outdoorTemperature"])
                     userSetTemperature.append(totalState["userSetTemperature"])

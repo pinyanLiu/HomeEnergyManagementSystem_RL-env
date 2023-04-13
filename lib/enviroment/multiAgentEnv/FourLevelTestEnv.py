@@ -18,7 +18,6 @@ class FourLevelTestEnv(multiAgentTestEnv):
         return super().reset()
     
     def execute(self, actions):
-
         sampleTime,soc,remain,pricePreHour,hvacState,intState,unIntState,intPreference,unintPreference,order = self.state
     #execute HVAC
         if order == 0:
@@ -29,7 +28,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("hvac")
         
     #execute interruptible load
-        if order == 1:
+        elif order == 1:
             self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
             self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
             self.intAgent.execute()
@@ -37,7 +36,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("int")   
         
     #execute uninterruptible load
-        if order == 2:
+        elif order == 2:
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
             self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
             self.unIntAgent.execute()
@@ -45,18 +44,19 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("unint")   
 
     #execute SOC
-        if order == 3:
+        elif order == 3:
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()
             # reward.append(self.socAgent.reward)
             self.updateTotalState("soc")  
+
             
-            self.state = self.stateAbstraction(self.totalState)
+        self.state = self.stateAbstraction(self.totalState)
         done =  bool(sampleTime == 95 and order == 3)
 
-        reward =0
-        states = dict(state=self.state,action_mask = self.action_mask)
+        reward = 0
+        states = dict(state=self.state)
         return states, done ,reward
 
     def stateAbstraction(self, totalState) -> np.array:

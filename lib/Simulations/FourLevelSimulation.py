@@ -1,5 +1,7 @@
 from lib.Simulations.multiSimulation import multiSimulation
 from tensorforce import Agent,Environment
+from lib.Simulations.Simulation import Simulation
+from lib.plot.plot import Plot
 
 from lib.enviroment.multiAgentEnv.FourLevelTestEnv import FourLevelTestEnv
 import pandas as pd
@@ -15,8 +17,20 @@ class FourLevelSimulation(multiSimulation):
         return super().simulation()
     
     def outputResult(self):
-        return super().outputResult()
-    
+        output = Plot(self.testResult)
+        output.remainPower()
+        output.soc()
+        output.indoorTemperature()
+        output.outdoorTemperature()
+        output.userSetTemperature()
+        output.price()
+        output.plotIntPreference()
+        output.plotUnintPreference()
+        output.plotIntLoadPower()
+        output.plotUnIntLoadPower()
+        output.plotDeltaSOCPower()
+        output.plotReward()
+        output.plotResult('lib/plot/FourLevel/')    
     def __del__(self):
         return super().__del__()
     

@@ -34,7 +34,6 @@ class multiAgentTestEnv(multiAgentTrainEnv):
         '''
         Starting State
         '''
-        
         self.i += 1
         self.Load = self.allLoad.iloc[:,self.i].tolist()
         self.interruptibleLoad.reset()
