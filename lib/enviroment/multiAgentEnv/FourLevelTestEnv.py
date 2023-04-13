@@ -4,7 +4,7 @@ import numpy as np
 class FourLevelTestEnv(multiAgentTestEnv):
     def __init__(self):
         super().__init__()
-    
+
     def states(self):
         return super().states()
     
@@ -55,7 +55,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.state = self.stateAbstraction(self.totalState)
         done =  bool(sampleTime == 95 and order == 3)
 
-        reward = sum(reward)/4
+        reward =0
         states = dict(state=self.state,action_mask = self.action_mask)
         return states, done ,reward
 
