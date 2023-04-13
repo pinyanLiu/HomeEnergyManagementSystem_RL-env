@@ -95,6 +95,8 @@ class multiSimulation(Simulation):
             self.testResult[month]['intSwitch'] = intSwitch
             self.testResult[month]['unintSwitch'] = unintSwitch
             self.testResult[month]['reward'] = Reward
+            # print("intLoadRemain",intLoadRemain)
+            # print("unLoadRemain",unLoadRemain)
             TotalReward.append(totalReward)
             totalReward=0
             sampletime.clear()
@@ -115,6 +117,7 @@ class multiSimulation(Simulation):
             unintSwitch.clear()
             order.clear()
             Reward.clear()
+
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     

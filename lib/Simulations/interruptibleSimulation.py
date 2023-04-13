@@ -16,7 +16,7 @@ class IntSimulation(Simulation):
         pv = []
         price = []
         deltaSoc = []
-        switch = []
+        intSwitch = []
         intloadRemain = []
         intUserPreference = []
         Reward = []
@@ -39,12 +39,12 @@ class IntSimulation(Simulation):
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
 
-                #1. switch on 
-                if actions == 1: # washing machine's switch
-                    switch.append(acObject.AvgPowerConsume)#power
+                #1. intSwitch on 
+                if actions == 1: # washing machine's intSwitch
+                    intSwitch.append(acObject.AvgPowerConsume)#power
                 #2. do nothing 
                 else :
-                    switch.append(0)
+                    intSwitch.append(0)
 
                 sampletime.append(states['state'][0])
                 load.append(states['state'][1])
@@ -56,7 +56,7 @@ class IntSimulation(Simulation):
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
-            switch.append(0)
+            intSwitch.append(0)
             Reward.append(0)
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
@@ -64,7 +64,7 @@ class IntSimulation(Simulation):
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['intloadRemain'] = intloadRemain
-            self.testResult[month]['switch'] = switch
+            self.testResult[month]['intSwitch'] = intSwitch
             self.testResult[month]['reward'] = Reward
             self.testResult[month]['intUserPreference'] = intUserPreference
 
@@ -75,7 +75,7 @@ class IntSimulation(Simulation):
             pv.clear()
             price.clear()
             deltaSoc.clear()
-            switch.clear()
+            intSwitch.clear()
             intloadRemain.clear()
             Reward.clear()
             intUserPreference.clear()
@@ -85,7 +85,7 @@ class IntSimulation(Simulation):
     def outputResult(self):
         output = Plot(self.testResult)
         output.remainPower()
-        output.plotLoadPower()
+        output.plotIntLoadPower()
         output.price()
         output.plotReward()
         output.plotIntPreference()

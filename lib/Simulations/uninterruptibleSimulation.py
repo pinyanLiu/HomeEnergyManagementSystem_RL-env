@@ -17,7 +17,7 @@ class UnIntSimulation(Simulation):
         pv = []
         price = []
         deltaSoc = []
-        switch = []
+        unintSwitch = []
         unloadRemain = []
         unintUserPreference = []
         Reward = []
@@ -39,12 +39,12 @@ class UnIntSimulation(Simulation):
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
-                #1. switch on 
-                if states['state'][6] == 1: # washing machine's switch
-                    switch.append(wmObject.AvgPowerConsume)#power
+                #1. unintSwitch on 
+                if states['state'][6] == 1: # washing machine's unintSwitch
+                    unintSwitch.append(wmObject.AvgPowerConsume)#power
                 #2. do nothing 
                 else :
-                    switch.append(0)
+                    unintSwitch.append(0)
 
                 sampletime.append(states['state'][0])
                 load.append(states['state'][1])
@@ -56,7 +56,7 @@ class UnIntSimulation(Simulation):
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
-            switch.append(0)
+            unintSwitch.append(0)
             Reward.append(0)
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
@@ -64,7 +64,7 @@ class UnIntSimulation(Simulation):
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['unloadRemain'] = unloadRemain
-            self.testResult[month]['switch'] = switch
+            self.testResult[month]['unintSwitch'] = unintSwitch
             self.testResult[month]['reward'] = Reward
             self.testResult[month]['unintUserPreference'] = unintUserPreference
 
@@ -75,7 +75,7 @@ class UnIntSimulation(Simulation):
             pv.clear()
             price.clear()
             deltaSoc.clear()
-            switch.clear()
+            unintSwitch.clear()
             unloadRemain.clear()
             unintUserPreference.clear()
             Reward.clear()
@@ -85,7 +85,7 @@ class UnIntSimulation(Simulation):
     def outputResult(self):
         output = Plot(self.testResult)
         output.remainPower()
-        output.plotLoadPower()
+        output.plotUnIntLoadPower()
         output.price()
         output.plotReward()
         output.plotUnintPreference()
