@@ -91,69 +91,69 @@ class UnIntEnv(HemsEnv):
         if int( self.i / 30) == 0:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Jan'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Jan'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Jan'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['1'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 1:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Feb'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Feb'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Feb'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['2'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 2:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Mar'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Mar'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Mar'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['3'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 3:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Apr'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Apr'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Apr'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['4'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 4:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['May'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['May'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['May'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['5'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 5:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Jun'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Jun'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Jun'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['6'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 6:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['July'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['July'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['July'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['7'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 7:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Aug'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Aug'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Aug'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['8'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 8:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Sep'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Sep'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Sep'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['9'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 9:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Oct'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.summerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Oct'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Oct'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['10'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 10:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Nov'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Nov'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Nov'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['11'].tolist(),self.randomDeltaPreference)]
         elif int(self.i / 30) == 11:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Dec'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
-            self.deltaSOC = [min(max(x+y,-2.5),2.5) for x,y in zip(self.allDeltaSOC['Dcb'].tolist(),self.randomDeltaSOC)]
+            self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Dcb'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['12'].tolist(),self.randomDeltaPreference)]
 
         self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=uniform(0.5,1))
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch,self.unintPreference[0]])
         #actions mask
-        PgridMaxExceed = (self.Load[0]+self.deltaSOC[0]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[0]) >= self.PgridMax
+        PgridMaxExceed = (self.Load[0]+self.deltaSOC[0]*self.batteryCapacity+self.uninterruptibleLoad.AvgPowerConsume-self.PV[0]) >= self.PgridMax
 
         self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False and not PgridMaxExceed])
         return self.state
@@ -203,7 +203,7 @@ class UnIntEnv(HemsEnv):
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch,self.unintPreference[sampleTime]])
         #actions mask
-        PgridMaxExceed = (self.Load[sampleTime]+self.deltaSOC[sampleTime]+self.uninterruptibleLoad.AvgPowerConsume-self.PV[sampleTime]) >= self.PgridMax
+        PgridMaxExceed = (self.Load[sampleTime]+self.deltaSOC[sampleTime]*self.batteryCapacity+self.uninterruptibleLoad.AvgPowerConsume-self.PV[sampleTime]) >= self.PgridMax
 
         self.action_mask = np.asarray([True,self.state[5]>0 and self.state[6]==False and not PgridMaxExceed])
         #check if all day is done

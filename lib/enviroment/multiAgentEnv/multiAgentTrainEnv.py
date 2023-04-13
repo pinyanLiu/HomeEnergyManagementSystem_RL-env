@@ -309,7 +309,7 @@ class multiAgentTrainEnv(Environment):
             "intRemain":self.interruptibleLoad.demand,
             "intSwitch":self.interruptibleLoad.switch,
             "intPreference":self.intUserPreference[0],
-            "unintRemain":self.uninterruptibleLoad.demand,
+            "unintRemain":self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod,
             "unintSwitch":self.uninterruptibleLoad.switch,
             "unintPreference":self.unintPreference[0],
             "order":0
@@ -410,12 +410,14 @@ class multiAgentTrainEnv(Environment):
             if self.action_mask[1] == True:
                 self.totalState["indoorTemperature"] = self.epsilon*self.totalState["indoorTemperature"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
             self.action_mask = [True,True,True,True,True]
-            reward.append(2*hvacState)
+            reward.append(hvacState)
             reward.append(2*intState*intPreference/self.interruptibleLoad.demand)
-            reward.append(2*unIntState*unintPreference/self.uninterruptibleLoad.demand)
+            reward.append(2*unIntState*unintPreference/(self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod))
+
             if(self.state[2]>self.PgridMax):  
                 # print("PGRID MAX OVER!!!")
-                reward.append(150*(self.PgridMax-self.state[2]))
+                reward.append(200*(self.PgridMax-self.state[2]))
+                #print(self.state[2])
             #print(self.totalState["unintRemain"],self.totalState["unintSwitch"])
         #check if all day is done
         done =  bool(sampleTime == 95 and order == 3)

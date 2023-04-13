@@ -57,7 +57,7 @@ class VoidIntTest(IntEnv):
         self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,self.interruptibleLoad.getRemainDemand(),intUserPreference])
 
         #actions mask
-        PgridMaxExceed = (load+deltaSoc+self.interruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
+        PgridMaxExceed = (load+deltaSoc*self.batteryCapacity+self.interruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
         
         self.action_mask = np.asarray([True,self.interruptibleLoad.getRemainDemand()>0 and not PgridMaxExceed])
 

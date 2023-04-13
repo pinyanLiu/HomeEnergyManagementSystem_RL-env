@@ -57,7 +57,7 @@ class VoidUnIntTest(UnIntEnv):
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch,unintPreference])
         #actions mask
-        PgridMaxExceed = (load+deltaSoc+self.uninterruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
+        PgridMaxExceed = (load+deltaSoc*self.batteryCapacity+self.uninterruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
 
         self.action_mask = np.asarray([True,self.uninterruptibleLoad.getRemainDemand()>0 and self.uninterruptibleLoad.switch==False and not PgridMaxExceed])
 
