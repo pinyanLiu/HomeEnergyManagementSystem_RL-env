@@ -64,6 +64,7 @@ class IntSimulation(Simulation):
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['intloadRemain'] = intloadRemain
+            print(intloadRemain)
             self.testResult[month]['intSwitch'] = intSwitch
             self.testResult[month]['reward'] = Reward
             self.testResult[month]['intUserPreference'] = intUserPreference

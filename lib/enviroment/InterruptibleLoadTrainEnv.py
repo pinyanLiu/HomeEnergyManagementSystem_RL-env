@@ -191,7 +191,7 @@ class IntEnv(HemsEnv):
         #reward
         reward.append(0.07-9*cost)
         if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):
-            reward.append(-10*self.interruptibleLoad.getRemainProcessPercentage())
+            reward.append(-20*self.interruptibleLoad.getRemainProcessPercentage())
         #change to next state
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],self.interruptibleLoad.getRemainDemand(),self.intUserPreference[sampleTime]])
