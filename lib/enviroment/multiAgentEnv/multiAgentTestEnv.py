@@ -147,13 +147,15 @@ class multiAgentTestEnv(multiAgentTrainEnv):
             "indoorTemperature":self.initIndoorTemperature,
             "outdoorTemperature":self.outdoorTemperature[0],
             "userSetTemperature":self.userSetTemperature[0],
+            "hvacPower":0,
             "intRemain":self.interruptibleLoad.demand,
             "intSwitch":self.interruptibleLoad.switch,
             "intPreference":self.intUserPreference[0],
-            "unintRemain":self.uninterruptibleLoad.demand,
+            "unintRemain":self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod,
             "unintSwitch":self.uninterruptibleLoad.switch,
             "unintPreference":self.unintPreference[0],
-            "order":0
+            "order":0,
+            "PgridMax":self.PgridMax
         }
         self.interruptibleLoadActionMask = [True,True]
         self.uninterruptibleLoadActionMask = [True,True]
