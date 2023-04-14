@@ -30,27 +30,15 @@ class multiSimulation(Simulation):
         order = []
         Reward = []
         TotalReward = []
+        TotalElectricPrice = []
+        TotalIntPreference = []
+        TotalUnintPreference = []
+        ExceedPgridMaxTimes = []
+        PgridMax = []
         totalReward = 0
         for month in range(12):
             states = self.environment.reset()
             totalState = self.environment.totalState
-            # sampletime.append(totalState["sampleTime"])
-            # remain.append(states[1])
-            # load.append(totalState["fixLoad"])
-            # pv.append(totalState["PV"])
-            # soc.append(totalState["SOC"])
-            # price.append(totalState["pricePerHour"])
-            # deltaSoc.append(totalState["deltaSoc"])
-            # indoorTemperature.append(totalState["indoorTemperature"])
-            # outdoorTemperature.append(totalState["outdoorTemperature"])
-            # userSetTemperature.append(totalState["userSetTemperature"])
-            # intLoadRemain.append(totalState["intRemain"])
-            # unLoadRemain.append(totalState["unintRemain"])
-            # intUserPreference.append(totalState["intUserPreference"])
-            #unintUserPreference.append(totalState["unintPreference"])
-            # intSwitch.append(totalState["intSwitch"])
-            # unintSwitch.append(totalState["unintSwitch"])
-            # order.append(totalState["order"])
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -68,7 +56,7 @@ class multiSimulation(Simulation):
                     pv.append(totalState["PV"])
                     soc.append(totalState["SOC"])
                     price.append(totalState["pricePerHour"])
-                    deltaSoc.append(totalState["deltaSoc"]*10)
+                    deltaSoc.append(totalState["deltaSoc"])
                     indoorTemperature.append(totalState["indoorTemperature"])
                     outdoorTemperature.append(totalState["outdoorTemperature"])
                     userSetTemperature.append(totalState["userSetTemperature"])
@@ -80,11 +68,21 @@ class multiSimulation(Simulation):
                     unintSwitch.append(totalState["unintSwitch"])
                     order.append(totalState["order"])
                     Reward.append(reward)
+                    TotalElectricPrice.append(0.25*totalState["pricePerHour"]*states['state'][2])
+                    TotalIntPreference.append(totalState["intSwitch"]*totalState["intPreference"])
+                    TotalUnintPreference.append(totalState["unintSwitch"]*totalState["unintPreference"])
+                    if states['state'][2]>totalState['PgridMax']:
+                        ExceedPgridMaxTimes.append(1)
+                    else:
+                        ExceedPgridMaxTimes.append(0)
+                    # ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
+                    PgridMax.append(totalState['PgridMax'])
                 totalReward += reward
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
             self.testResult[month]['price'] = price
             self.testResult[month]['soc'] = soc
+            self.testResult[month]['PV'] = pv
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['indoorTemperature'] = indoorTemperature
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
@@ -96,6 +94,11 @@ class multiSimulation(Simulation):
             self.testResult[month]['intSwitch'] = intSwitch
             self.testResult[month]['unintSwitch'] = unintSwitch
             self.testResult[month]['reward'] = Reward
+            self.testResult[month]["TotalElectricPrice"] = TotalElectricPrice
+            self.testResult[month]["TotalIntPreference"] = TotalIntPreference
+            self.testResult[month]["TotalUnintPreference"] = TotalUnintPreference
+            self.testResult[month]["ExceedPgridMaxTimes"] = ExceedPgridMaxTimes
+            self.testResult[month]["PgridMax"] = PgridMax
             # print("intLoadRemain",intLoadRemain)
             # print("unLoadRemain",unLoadRemain)
             TotalReward.append(totalReward)
@@ -118,9 +121,28 @@ class multiSimulation(Simulation):
             unintSwitch.clear()
             order.clear()
             Reward.clear()
+            TotalUnintPreference.clear()
+            TotalIntPreference.clear()
+            TotalElectricPrice.clear()
+            ExceedPgridMaxTimes.clear()
+            PgridMax.clear()
 
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
+        ExceedPgridMaxTimes = 0
+        TotalIntPreference = 0 
+        TotalUnintPreference = 0 
+        TotalElectricPrice = 0
+        for month in range(12):
+            ExceedPgridMaxTimes += sum(self.testResult[month]["ExceedPgridMaxTimes"])
+            TotalIntPreference  += sum(self.testResult[month]["TotalIntPreference"])
+            TotalUnintPreference += sum(self.testResult[month]["TotalUnintPreference"])
+            TotalElectricPrice += sum(self.testResult[month]["TotalElectricPrice"])
+        print("Exceed PgridMax Ratio :", ExceedPgridMaxTimes/12)
+        print("AVG TotalIntPreference :", TotalIntPreference/12)
+        print("AVG TotalUnintPreference:", TotalUnintPreference/12)
+        print("AVG TotalElectricPrice:", TotalElectricPrice/12)
+
     
     def outputResult(self):
         output = Plot(self.testResult)
@@ -135,6 +157,8 @@ class multiSimulation(Simulation):
         output.plotIntLoadPower()
         output.plotUnIntLoadPower()
         output.plotDeltaSOCPower()
+        output.plotPVPower()
+        output.plotPgridMax()
         output.plotReward()
         output.plotResult('lib/plot/HRL/')
 

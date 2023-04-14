@@ -4,6 +4,7 @@ from lib.Simulations.SocSimulation import SocSimulation
 from lib.Simulations.hvacSimulation import HvacSimulation
 from lib.Simulations.multiSimulation import multiSimulation
 from lib.Simulations.FourLevelSimulation import FourLevelSimulation
+from lib.Simulations.OneLevelSimulation import OneLevelSimulation
 import sys
 
 def __main__(argv):
@@ -23,11 +24,12 @@ def __main__(argv):
         simulation = multiSimulation()
     elif mode == "4":
         simulation = FourLevelSimulation()
+    elif mode == "1":
+        simulation = OneLevelSimulation()
     else:
         print('please give parameters Testing mode: "soc"/"int"/"hvac"/"unint"/"hrl"')
         return 
     simulation.simulation()
-    #print(simulation.testResult)
     simulation.outputResult()
 
 

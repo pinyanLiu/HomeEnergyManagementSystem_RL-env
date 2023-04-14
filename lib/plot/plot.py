@@ -31,11 +31,16 @@ class Plot():
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')
             self.ax[month].bar(range(96) ,self.testResult[month]['deltaSoc']*10 ,label = 'power', color ='gold')    
+            
+    def plotPVPower(self):
+        for month in range(0,12):
+            self.ax[month].set_ylabel('Power')
+            self.ax[month].bar(range(96) ,-self.testResult[month]['PV'] ,label = 'power', color ='moccasin')  
 
     def plotPgridMax(self):
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')
-            self.ax[month].plot([4]*96,range(96),linestyle='--',color='red')
+            self.ax[month].plot(range(96),self.testResult[month]['PgridMax'],linestyle='--',color='red')
     
     def price(self):
         self.sub = [sub.twinx() for sub in self.ax]
@@ -56,8 +61,6 @@ class Plot():
             self.sub5[month].tick_params(axis='y',colors = 'red')
             self.sub5[month].plot(range(96) ,self.testResult[month]['soc'] ,label = 'soc', color ='red')    
                        
-    def __pv__(self):
-        pass
 
     def indoorTemperature(self):
         self.sub2 = [sub2.twinx() for sub2 in self.ax]
