@@ -37,6 +37,11 @@ class Plot():
             self.ax[month].set_ylabel('Power')
             self.ax[month].bar(range(96) ,-self.testResult[month]['PV'] ,label = 'power', color ='moccasin')  
 
+    def plotHVACPower(self):
+        for month in range(0,12):
+            self.ax[month].set_ylabel('Power')
+            self.ax[month].bar(range(96) ,self.testResult[month]['hvacPower'] ,label = 'power', color ='slateblue')  
+
     def plotPgridMax(self):
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')

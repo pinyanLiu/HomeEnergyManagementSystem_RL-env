@@ -353,8 +353,8 @@ class multiAgentTrainEnv(Environment):
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()
-            self.socAgent.rewardStandardization()
-            reward.append(self.socAgent.reward)
+            # self.socAgent.rewardStandardization()
+            # reward.append(self.socAgent.reward)
             self.updateTotalState("soc")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True])]
         #hvac
@@ -363,8 +363,8 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent.getState(self.totalState)
             self.hvacAgent.environment.updateState(self.hvacAgent.states)
             self.hvacAgent.execute()
-            self.hvacAgent.rewardStandardization()
-            reward.append(self.hvacAgent.reward)            
+            # self.hvacAgent.rewardStandardization()
+            # # reward.append(self.hvacAgent.reward)            
             self.updateTotalState("hvac")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True])]
 
@@ -374,8 +374,8 @@ class multiAgentTrainEnv(Environment):
             self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
             self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
             self.intAgent.execute()
-            self.intAgent.rewardStandardization()
-            reward.append(self.intAgent.reward)            
+            # self.intAgent.rewardStandardization()
+            # # reward.append(self.intAgent.reward)            
             self.updateTotalState("int")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True])]
         #unint
@@ -384,8 +384,8 @@ class multiAgentTrainEnv(Environment):
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
             self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
             self.unIntAgent.execute()
-            self.unIntAgent.rewardStandardization()
-            reward.append(self.unIntAgent.reward)
+            # self.unIntAgent.rewardStandardization()
+            # # reward.append(self.unIntAgent.reward)
             self.updateTotalState("unint")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True])]
         #none
@@ -418,13 +418,13 @@ class multiAgentTrainEnv(Environment):
             if self.action_mask[1] == True:
                 self.totalState["indoorTemperature"] = self.epsilon*self.totalState["indoorTemperature"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
             self.action_mask = [True,True,True,True,True]
-            # reward.append(hvacState)
-            # reward.append(2*intState*intPreference/self.interruptibleLoad.demand)
-            # reward.append(2*unIntState*unintPreference/(self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod))
+            reward.append(hvacState)
+            reward.append(2*intState*intPreference/self.interruptibleLoad.demand)
+            reward.append(2*unIntState*unintPreference/(self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod))
 
             if(self.state[2]>self.PgridMax):  
                 # print("PGRID MAX OVER!!!")
-                reward.append(150*(self.PgridMax-self.state[2]))
+                reward.append(170*(self.PgridMax-self.state[2]))
 
             #print(self.totalState["unintRemain"],self.totalState["unintSwitch"])
         #check if all day is done

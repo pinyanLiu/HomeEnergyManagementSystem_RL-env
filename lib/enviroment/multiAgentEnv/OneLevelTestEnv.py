@@ -19,18 +19,19 @@ class OneLevelTestEnv(multiAgentTestEnv):
     
     def execute(self, actions):
         sampleTime,soc,remain,pricePreHour,hvacState,intState,unIntState,intPreference,unintPreference,order = self.state
-        self.hvacAgent.getState(self.totalState)
-        self.hvacAgent.environment.updateState(self.hvacAgent.states)
+
         self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
         self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
+        self.hvacAgent.getState(self.totalState)
+        self.hvacAgent.environment.updateState(self.hvacAgent.states)
         self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
         self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
         self.socAgent.getState(self.totalState)
         self.socAgent.environment.updateState(self.socAgent.states)
-        self.socAgent.execute()
-        self.hvacAgent.execute()
         self.intAgent.execute()
         self.unIntAgent.execute()
+        self.hvacAgent.execute()
+        self.socAgent.execute()
 
         self.updateTotalState()  
 
@@ -85,6 +86,5 @@ class OneLevelTestEnv(multiAgentTestEnv):
             self.totalState["userSetTemperature"]=self.userSetTemperature[self.totalState["sampleTime"]]
             self.totalState["unintRemain"]=self.unIntAgent.environment.uninterruptibleLoad.getRemainDemand()
             self.totalState["unintSwitch"]=self.unIntAgent.environment.uninterruptibleLoad.switch
-            self.totalState["intSwitch"] = 0
             self.totalState["intPreference"] = self.intUserPreference[self.totalState["sampleTime"]]
             self.totalState["unintPreference"] = self.unintPreference[self.totalState["sampleTime"]]

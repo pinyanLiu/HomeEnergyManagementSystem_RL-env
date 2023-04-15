@@ -12,7 +12,7 @@ class FourLevelSimulation(multiSimulation):
             self.testResult[month] = pd.DataFrame()
         self.totalReward = []        
         self.environment = Environment.create(environment = FourLevelTestEnv,max_episode_timesteps=384)
-        self.agent = Agent.load(directory = 'HLA/saver_dir',environment=self.environment)
+        self.agent = Agent.load(directory = 'HLA/FourLevelAgent/saver_dir',environment=self.environment)
     def simulation(self):
         return super().simulation()
     
@@ -29,6 +29,9 @@ class FourLevelSimulation(multiSimulation):
         output.plotIntLoadPower()
         output.plotUnIntLoadPower()
         output.plotDeltaSOCPower()
+        output.plotHVACPower()
+        output.plotPVPower()
+        output.plotPgridMax()
         output.plotReward()
         output.plotResult('lib/plot/FourLevel/')    
     def __del__(self):

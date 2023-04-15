@@ -10,7 +10,7 @@ class IntSimulation(Simulation):
         self.environment = Environment.create(environment = IntTest,max_episode_timesteps=96)
         self.agent = Agent.load(directory = 'Load/Interruptible/saver_dir',environment=self.environment)
     def simulation(self):
-        acObject = AC(AvgPowerConsume=0.3)
+        acObject = AC(AvgPowerConsume=1.5)
         sampletime = []
         load = []
         pv = []

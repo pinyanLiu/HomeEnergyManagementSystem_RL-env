@@ -181,7 +181,7 @@ class IntEnv(HemsEnv):
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv+Pess))/self.interruptibleLoad.demand
             else:
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv))/self.interruptibleLoad.demand
-            reward.append(intUserPreference/7)#preference reward
+            reward.append(intUserPreference/5)#preference reward
         if cost<0:
             cost = 0 
 
@@ -190,8 +190,11 @@ class IntEnv(HemsEnv):
 
         #reward
         reward.append(0.07-9*cost)
-        if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):
-            reward.append(-20*self.interruptibleLoad.getRemainProcessPercentage())
+        if (sampleTime == 94) :
+            if(self.interruptibleLoad.getRemainDemand()!=0):
+                reward.append(-20*self.interruptibleLoad.getRemainProcessPercentage())
+            else:
+                reward.append(10)
         #change to next state
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],self.interruptibleLoad.getRemainDemand(),self.intUserPreference[sampleTime]])

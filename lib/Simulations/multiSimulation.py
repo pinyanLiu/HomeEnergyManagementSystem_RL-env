@@ -21,6 +21,8 @@ class multiSimulation(Simulation):
         indoorTemperature = []
         outdoorTemperature = []
         userSetTemperature = []
+        TotalHvacPreference = []
+        hvacPower = []
         intLoadRemain = []
         unLoadRemain = []
         intUserPreference = []
@@ -60,6 +62,9 @@ class multiSimulation(Simulation):
                     indoorTemperature.append(totalState["indoorTemperature"])
                     outdoorTemperature.append(totalState["outdoorTemperature"])
                     userSetTemperature.append(totalState["userSetTemperature"])
+                    
+                    TotalHvacPreference.append(states['state'][4])
+                    hvacPower.append(totalState['hvacPower'])
                     intLoadRemain.append(totalState["intRemain"])
                     unLoadRemain.append(totalState["unintRemain"])
                     intUserPreference.append(totalState["intPreference"])
@@ -68,7 +73,7 @@ class multiSimulation(Simulation):
                     unintSwitch.append(totalState["unintSwitch"])
                     order.append(totalState["order"])
                     Reward.append(reward)
-                    TotalElectricPrice.append(0.25*totalState["pricePerHour"]*states['state'][2])
+                    TotalElectricPrice.append(0.25*totalState["pricePerHour"]*states['state'][2] if states['state'][2]>0 else 0)
                     TotalIntPreference.append(totalState["intSwitch"]*totalState["intPreference"])
                     TotalUnintPreference.append(totalState["unintSwitch"]*totalState["unintPreference"])
                     if states['state'][2]>totalState['PgridMax']:
@@ -87,6 +92,8 @@ class multiSimulation(Simulation):
             self.testResult[month]['indoorTemperature'] = indoorTemperature
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
             self.testResult[month]['userSetTemperature'] = userSetTemperature
+            self.testResult[month]['TotalHvacPreference'] = TotalHvacPreference
+            self.testResult[month]['hvacPower'] = hvacPower
             self.testResult[month]['intRemain'] = intLoadRemain
             self.testResult[month]['unloadRemain'] = unLoadRemain
             self.testResult[month]['intUserPreference'] = intUserPreference
@@ -113,6 +120,8 @@ class multiSimulation(Simulation):
             indoorTemperature.clear()
             outdoorTemperature.clear()
             userSetTemperature.clear()
+            TotalHvacPreference.clear()
+            hvacPower.clear()
             intLoadRemain.clear()
             unLoadRemain.clear()
             intUserPreference.clear()
@@ -133,12 +142,15 @@ class multiSimulation(Simulation):
         TotalIntPreference = 0 
         TotalUnintPreference = 0 
         TotalElectricPrice = 0
+        TotalHvacPreference = 0
         for month in range(12):
             ExceedPgridMaxTimes += sum(self.testResult[month]["ExceedPgridMaxTimes"])
+            TotalHvacPreference+= sum(self.testResult[month]["TotalHvacPreference"])
             TotalIntPreference  += sum(self.testResult[month]["TotalIntPreference"])
             TotalUnintPreference += sum(self.testResult[month]["TotalUnintPreference"])
             TotalElectricPrice += sum(self.testResult[month]["TotalElectricPrice"])
-        print("Exceed PgridMax Ratio :", ExceedPgridMaxTimes/12)
+        print("Exceed PgridMax Ratio :", ExceedPgridMaxTimes/(12*96))
+        print("AVG TotalHvacPreference :", TotalHvacPreference/12)
         print("AVG TotalIntPreference :", TotalIntPreference/12)
         print("AVG TotalUnintPreference:", TotalUnintPreference/12)
         print("AVG TotalElectricPrice:", TotalElectricPrice/12)
@@ -151,6 +163,7 @@ class multiSimulation(Simulation):
         output.indoorTemperature()
         output.outdoorTemperature()
         output.userSetTemperature()
+        output.plotHVACPower()
         output.price()
         output.plotIntPreference()
         output.plotUnintPreference()

@@ -16,7 +16,7 @@ class UnIntEnv(HemsEnv):
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.7)
-        self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=uniform(0.5,1))
+        self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=1.5)
         self.allUnintPreference = self.info.importUnIntPreference()
 
 
@@ -149,7 +149,7 @@ class UnIntEnv(HemsEnv):
             self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Dcb'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['12'].tolist(),self.randomDeltaPreference)]
 
-        self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=uniform(0.5,1))
+        self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=1.5)
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch,self.unintPreference[0]])
         #actions mask
@@ -186,7 +186,7 @@ class UnIntEnv(HemsEnv):
                 cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv+Pess))/self.uninterruptibleLoad.demand
             else:
                 cost = (pricePerHour * 0.25 * (self.uninterruptibleLoad.AvgPowerConsume-pv))/(self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod)
-            reward.append(unintPreference/7)#preference reward
+            reward.append(unintPreference/5)#preference reward
         if cost<0:
             cost = 0 
 
@@ -197,7 +197,7 @@ class UnIntEnv(HemsEnv):
             reward.append(-5*self.uninterruptibleLoad.getRemainProcessPercentage())
 
         if(unintPreference==4 and self.uninterruptibleLoad.switch==False):
-            reward.append(-unintPreference)
+            reward.append(-unintPreference*2)
 
         #change to next state
         sampleTime = int(sampleTime+1)

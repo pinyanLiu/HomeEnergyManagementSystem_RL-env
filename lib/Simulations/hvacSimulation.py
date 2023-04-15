@@ -62,6 +62,7 @@ class HvacSimulation(Simulation):
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
             self.testResult[month]['userSetTemperature'] = userSetTemperature
             self.testResult[month]['reward'] = Reward
+            print(hvac)
             TotalReward.append(totalReward)
             totalReward=0
             sampletime.clear()
