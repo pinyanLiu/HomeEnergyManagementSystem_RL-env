@@ -51,15 +51,16 @@ class socLLA(LLA):
         return super().__del__()
 
 class hvacLLA(LLA):
-    def __init__(self, mean, std , baseParameter , allOutdoorTemperature,allUserSetTemperature) -> None:
+    def __init__(self, mean, std , baseParameter , allOutdoorTemperature,allUserSetTemperature,id) -> None:
         super().__init__( mean, std ,baseParameter)
         self.environment = Environment.create(environment=VoidHvacTest(baseParameter, allOutdoorTemperature,allUserSetTemperature),max_episode_timesteps=96)
         self.agent = Agent.load(directory='HVAC/saver_dir',environment=self.environment)
         self.internals = self.agent.initial_internals()
+        self.id = id
 
     def getState(self, allStates) -> None:
         #[timeblock,load,PV,pricePerHour,deltaSoc,indoor Temperature,outdoor temperature,user set temperature]
-        self.states = np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['indoorTemperature'],allStates['outdoorTemperature'],allStates['userSetTemperature']],dtype=np.float32)
+        self.states = np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['indoorTemperature'+str(self.id)],allStates['outdoorTemperature'],allStates['userSetTemperature'+str(self.id)]],dtype=np.float32)
 
 
     def execute(self) -> None:
