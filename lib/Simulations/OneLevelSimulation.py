@@ -151,7 +151,7 @@ class OneLevelSimulation(multiSimulation):
             TotalIntPreference  += sum(self.testResult[month]["TotalIntPreference"])
             TotalUnintPreference += sum(self.testResult[month]["TotalUnintPreference"])
             TotalElectricPrice += sum(self.testResult[month]["TotalElectricPrice"])
-        print("Exceed PgridMax Ratio :", ExceedPgridMaxTimes/12)
+        print("Exceed PgridMax Ratio :", ExceedPgridMaxTimes/(12*96)*100,"%")
         print("AVG TotalHvacPreference :", TotalHvacPreference/12)
         print("AVG TotalIntPreference :", TotalIntPreference/12)
         print("AVG TotalUnintPreference:", TotalUnintPreference/12)

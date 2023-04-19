@@ -18,7 +18,7 @@ class HvacSimulation(Simulation):
         indoorTemperature = []
         outdoorTemperature = []
         userSetTemperature = []
-        hvac = []
+        hvacPower = []
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -39,7 +39,7 @@ class HvacSimulation(Simulation):
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
-                hvac.append(actions[0])
+                hvacPower.append(actions[0])
                 sampletime.append(states['state'][0])
                 load.append(states['state'][1])
                 pv.append(states['state'][2])
@@ -51,7 +51,7 @@ class HvacSimulation(Simulation):
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
-            hvac.append(0)
+            hvacPower.append(0)
             Reward.append(0)
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
@@ -61,11 +61,12 @@ class HvacSimulation(Simulation):
             self.testResult[month]['indoorTemperature'] = indoorTemperature
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
             self.testResult[month]['userSetTemperature'] = userSetTemperature
+            self.testResult[month]['hvacPower'] = hvacPower
             self.testResult[month]['reward'] = Reward
-            print(hvac)
             TotalReward.append(totalReward)
             totalReward=0
             sampletime.clear()
+            hvacPower.clear()
             load.clear()
             pv.clear()
             price.clear()
@@ -84,6 +85,7 @@ class HvacSimulation(Simulation):
         output.outdoorTemperature()
         output.userSetTemperature()
         output.price()
+        output.plotHVACPower()
         output.plotReward()
         output.plotResult('lib/plot/hvac/')
 
