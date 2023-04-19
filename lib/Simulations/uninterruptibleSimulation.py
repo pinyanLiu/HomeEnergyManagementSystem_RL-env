@@ -98,5 +98,11 @@ class UnIntSimulation(Simulation):
     def getStd(self):
         return super().getStd()
 
+    def getMax(self):
+        return super().getMax()
+    
+    def getMin(self):
+        return super().getMin()
+    
     def __del__(self):
         return super().__del__()

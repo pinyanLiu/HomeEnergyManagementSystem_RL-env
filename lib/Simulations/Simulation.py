@@ -19,6 +19,11 @@ class Simulation():
 
     def getStd(self):
         return(np.std(self.totalReward))
+
+    def getMin(self):
+        return(np.min(self.totalReward))
+    def getMax(self):
+        return(np.max(self.totalReward))
         
     def __del__(self):
         # Close agent and environment
