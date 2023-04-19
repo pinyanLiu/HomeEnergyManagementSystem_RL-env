@@ -6,9 +6,11 @@ from lib.enviroment.multiAgentEnv.voidUnInterruptibleLoadTestEnv import VoidUnIn
 import numpy as np
 
 class LLA():
-    def __init__(self,mean,std,baseParameter) -> None:
+    def __init__(self,mean,std,min,max) -> None:
         self.mean = mean 
         self.std = std
+        self.min = min
+        self.max = max
         self.states = []
         self.reward = 0
 
@@ -22,13 +24,16 @@ class LLA():
 
     def rewardStandardization(self) -> None:
         self.reward =  (self.reward - self.mean)/self.std
+    
+    def rewardNormalization(self)-> None:
+        self.reward = (self.reward-self.min)/(self.max-self.min)
 
     def __del__(self):
         pass
 
 class socLLA(LLA):
-    def __init__(self, mean, std ,baseParameter) -> None:
-        super().__init__(mean, std, baseParameter)
+    def __init__(self, mean, std,min,max,baseParameter) -> None:
+        super().__init__(mean, std,min,max )
         self.environment = Environment.create(environment=VoidSocTest(baseParameter),max_episode_timesteps=96)
         self.agent = Agent.load(directory='Soc/saver_dir',environment=self.environment)
         self.internals = self.agent.initial_internals()
@@ -47,12 +52,15 @@ class socLLA(LLA):
     def rewardStandardization(self):
         return super().rewardStandardization()
     
+    def rewardNormalization(self) -> None:
+        return super().rewardNormalization()
+    
     def __del__(self):
         return super().__del__()
 
 class hvacLLA(LLA):
-    def __init__(self, mean, std , baseParameter , allOutdoorTemperature,allUserSetTemperature,id) -> None:
-        super().__init__( mean, std ,baseParameter)
+    def __init__(self, mean, std,min,max , baseParameter , allOutdoorTemperature,allUserSetTemperature,id) -> None:
+        super().__init__(mean, std,min,max)
         self.environment = Environment.create(environment=VoidHvacTest(baseParameter, allOutdoorTemperature,allUserSetTemperature),max_episode_timesteps=96)
         self.agent = Agent.load(directory='HVAC/saver_dir',environment=self.environment)
         self.internals = self.agent.initial_internals()
@@ -72,12 +80,15 @@ class hvacLLA(LLA):
     def rewardStandardization(self):
         return super().rewardStandardization()
     
+    def rewardNormalization(self) -> None:
+        return super().rewardNormalization()
+    
     def __del__(self):
         return super().__del__()
 
 class intLLA(LLA):
-    def __init__(self, mean, std,baseParameter,Int) -> None:
-        super().__init__( mean, std ,baseParameter )
+    def __init__(self, mean, std,min,max,baseParameter,Int) -> None:
+        super().__init__(mean, std,min,max )
         self.interruptibleLoad = Int
         self.environment = Environment.create(environment=VoidIntTest(baseParameter,Int),max_episode_timesteps=96)
         self.agent = Agent.load(directory='Load/Interruptible/saver_dir',environment=self.environment)
@@ -96,12 +107,15 @@ class intLLA(LLA):
     def rewardStandardization(self):
         return super().rewardStandardization()
     
+    def rewardNormalization(self) -> None:
+        return super().rewardNormalization()
+    
     def __del__(self):
         return super().__del__()
 
 class unintLLA(LLA):
-    def __init__(self, mean, std,baseParameter ,unInt) -> None:
-        super().__init__( mean, std ,baseParameter)
+    def __init__(self, mean, std,min,max,baseParameter ,unInt) -> None:
+        super().__init__(mean, std,min,max )
         self.uninterruptibleLoad = unInt
         self.environment = Environment.create(environment=VoidUnIntTest(baseParameter,unInt),max_episode_timesteps=96)
         self.agent = Agent.load(directory='Load/UnInterruptible/saver_dir',environment=self.environment)
@@ -121,6 +135,9 @@ class unintLLA(LLA):
 
     def rewardStandardization(self):
         return super().rewardStandardization()
+    
+    def rewardNormalization(self) -> None:
+        return super().rewardNormalization()
     
     def __del__(self):
         return super().__del__()        

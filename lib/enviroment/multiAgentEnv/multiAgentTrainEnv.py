@@ -81,20 +81,20 @@ class multiAgentTrainEnv(Environment):
 
         #construct all LLAs
         
-        self.socAgent = socLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='SOC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='SOC']['std'])[0]),baseParameter=self.BaseParameter)
+        self.socAgent = socLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='SOC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='SOC']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='SOC']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='SOC']['Max'])[0]),baseParameter=self.BaseParameter)
 
         
-        self.hvacAgent1 = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]),baseParameter=self.BaseParameter,allOutdoorTemperature=self.allOutdoorTemperature,allUserSetTemperature=self.allUserSetTemperature1,id=1)
+        self.hvacAgent1 = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['Max'])[0]),baseParameter=self.BaseParameter,allOutdoorTemperature=self.allOutdoorTemperature,allUserSetTemperature=self.allUserSetTemperature1,id=1)
 
-        self.hvacAgent2 = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]),baseParameter=self.BaseParameter,allOutdoorTemperature=self.allOutdoorTemperature,allUserSetTemperature=self.allUserSetTemperature2,id=2)
+        self.hvacAgent2 = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['Max'])[0]),baseParameter=self.BaseParameter,allOutdoorTemperature=self.allOutdoorTemperature,allUserSetTemperature=self.allUserSetTemperature2,id=2)
 
-        self.hvacAgent3 = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]),baseParameter=self.BaseParameter,allOutdoorTemperature=self.allOutdoorTemperature,allUserSetTemperature=self.allUserSetTemperature3,id=3)
+        self.hvacAgent3 = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['Max'])[0]),baseParameter=self.BaseParameter,allOutdoorTemperature=self.allOutdoorTemperature,allUserSetTemperature=self.allUserSetTemperature3,id=3)
         
         
-        self.intAgent = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad)
+        self.intAgent = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Max'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad)
         
         
-        self.unIntAgent = unintLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['std'])[0]),baseParameter=self.BaseParameter,unInt=self.uninterruptibleLoad)
+        self.unIntAgent = unintLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Max'])[0]),baseParameter=self.BaseParameter,unInt=self.uninterruptibleLoad)
 
 
         self.state = None
@@ -407,8 +407,8 @@ class multiAgentTrainEnv(Environment):
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()
-            # self.socAgent.rewardStandardization()
-            # reward.append(self.socAgent.reward)
+            self.socAgent.rewardNormalization()
+            reward.append(self.socAgent.reward)
             self.updateTotalState("soc")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True,True,True])]
         #hvac1
@@ -417,8 +417,8 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent1.getState(self.totalState)
             self.hvacAgent1.environment.updateState(self.hvacAgent1.states)
             self.hvacAgent1.execute()
-            # self.hvacAgent1.rewardStandardization()
-            # # reward.append(self.hvacAgent1.reward)            
+            self.hvacAgent1.rewardNormalization()
+            reward.append(self.hvacAgent1.reward)            
             self.updateTotalState("hvac1")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True,True,True])]
         #hvac2
@@ -427,8 +427,8 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent2.getState(self.totalState)
             self.hvacAgent2.environment.updateState(self.hvacAgent2.states)
             self.hvacAgent2.execute()
-            # self.hvacAgent2.rewardStandardization()
-            # # reward.append(self.hvacAgent2.reward)            
+            self.hvacAgent2.rewardNormalization()
+            reward.append(self.hvacAgent2.reward)            
             self.updateTotalState("hvac2")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True,True,True])]
         #hvac3
@@ -437,8 +437,8 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent3.getState(self.totalState)
             self.hvacAgent3.environment.updateState(self.hvacAgent3.states)
             self.hvacAgent3.execute()
-            # self.hvacAgent3.rewardStandardization()
-            # # reward.append(self.hvacAgent3.reward)            
+            self.hvacAgent3.rewardNormalization()
+            reward.append(self.hvacAgent3.reward)            
             self.updateTotalState("hvac3")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True,True,True])]
         
@@ -448,8 +448,8 @@ class multiAgentTrainEnv(Environment):
             self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
             self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
             self.intAgent.execute()
-            # self.intAgent.rewardStandardization()
-            # # reward.append(self.intAgent.reward)            
+            self.intAgent.rewardNormalization()
+            reward.append(self.intAgent.reward)            
             self.updateTotalState("int")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,False,True,True])]
         #unint
@@ -458,8 +458,8 @@ class multiAgentTrainEnv(Environment):
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
             self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
             self.unIntAgent.execute()
-            # self.unIntAgent.rewardStandardization()
-            # # reward.append(self.unIntAgent.reward)
+            self.unIntAgent.rewardNormalization()
+            reward.append(self.unIntAgent.reward)
             self.updateTotalState("unint")
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,False,True])]
         #none
@@ -496,11 +496,11 @@ class multiAgentTrainEnv(Environment):
             if self.action_mask[5]==True:
                 self.unIntAgent.environment.uninterruptibleLoad.step()
             self.action_mask = [True,True,True,True,True,True,True]
-            reward.append(hvacState1)
-            reward.append(hvacState2)
-            reward.append(hvacState3)
-            reward.append(2*intState*intPreference/self.interruptibleLoad.demand)
-            reward.append(2*unIntState*unintPreference/(self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod))
+            # reward.append(hvacState1)
+            # reward.append(hvacState2)
+            # reward.append(hvacState3)
+            # reward.append(2*intState*intPreference/self.interruptibleLoad.demand)
+            # reward.append(2*unIntState*unintPreference/(self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod))
 
             if(self.state[2]>self.PgridMax):  
                 # print("PGRID MAX OVER!!!")
