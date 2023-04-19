@@ -487,16 +487,18 @@ class multiAgentTrainEnv(Environment):
         
 
         if order == 5:
-            if self.action_mask[5]==True:
-                self.unIntAgent.environment.uninterruptibleLoad.step()
             if self.action_mask[1] == True:
                 self.totalState["indoorTemperature1"] = self.epsilon*self.totalState["indoorTemperature1"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
             if self.action_mask[2] == True:
                 self.totalState["indoorTemperature2"] = self.epsilon*self.totalState["indoorTemperature2"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
             if self.action_mask[3] == True:
                 self.totalState["indoorTemperature3"] = self.epsilon*self.totalState["indoorTemperature3"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
+            if self.action_mask[5]==True:
+                self.unIntAgent.environment.uninterruptibleLoad.step()
             self.action_mask = [True,True,True,True,True,True,True]
             reward.append(hvacState1)
+            reward.append(hvacState2)
+            reward.append(hvacState3)
             reward.append(2*intState*intPreference/self.interruptibleLoad.demand)
             reward.append(2*unIntState*unintPreference/(self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod))
 
