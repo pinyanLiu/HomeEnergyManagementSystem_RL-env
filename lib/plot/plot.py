@@ -37,10 +37,18 @@ class Plot():
             self.ax[month].set_ylabel('Power')
             self.ax[month].bar(range(96) ,-self.testResult[month]['PV'] ,label = 'power', color ='moccasin')  
 
-    def plotHVACPower(self):
+    def plotHVACPower(self,id=1):
+        if id == 1:
+            color = 'slateblue'
+        elif id == 2:
+            color = 'aqua'
+        else:
+            color = 'dodgerblue'
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')
-            self.ax[month].bar(range(96) ,self.testResult[month]['hvacPower'] ,label = 'power', color ='slateblue')  
+            self.ax[month].bar(range(96) ,self.testResult[month]['hvacPower'+str(id)] ,label = 'power', color = color)  
+
+
 
     def plotPgridMax(self):
         for month in range(0,12):
@@ -67,22 +75,34 @@ class Plot():
             self.sub5[month].plot(range(96) ,self.testResult[month]['soc'] ,label = 'soc', color ='red')    
                        
 
-    def indoorTemperature(self):
+    def indoorTemperature(self,id=1):
+        if id == 1:
+            color = 'orange'
+        elif id == 2:
+            color = 'darkorange'
+        else:
+            color = 'orangered'
         self.sub2 = [sub2.twinx() for sub2 in self.ax]
         for month in range(0,12):
             self.sub2[month].set_ylim(35,104)
             self.sub2[month].set_ylabel('Tmp',color='orange')
             self.sub2[month].spines['right'].set_position(("axes",1.3))
             self.sub2[month].tick_params(axis='y',colors = 'orange')
-            self.sub2[month].plot(range(96) ,self.testResult[month]['indoorTemperature'] ,label = 'indoorTemperature', color ='orange') 
+            self.sub2[month].plot(range(96) ,self.testResult[month]['indoorTemperature'+str(id)] ,label = 'indoorTemperature', color = color) 
 
     def outdoorTemperature(self):
         for month in range(0,12):
             self.sub2[month].plot(range(96) ,self.testResult[month]['outdoorTemperature'] ,label = 'outdoorTemperature', color ='yellow')
 
-    def userSetTemperature(self):
+    def userSetTemperature(self,id=1):
+        if id == 1:
+            color = 'black'
+        elif id == 2:
+            color = 'dimgray'
+        else:
+            color = 'lightgray'
         for month in range(0,12):
-            self.sub2[month].plot(range(96) ,self.testResult[month]['userSetTemperature'] ,label = 'userSetTemperature', color ='black')
+            self.sub2[month].plot(range(96) ,self.testResult[month]['userSetTemperature'+str(id)] ,label = 'userSetTemperature', color =color)
 
     def plotReward(self):
         self.sub3 = [sub3.twinx() for sub3 in self.ax]

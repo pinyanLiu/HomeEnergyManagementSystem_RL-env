@@ -496,15 +496,15 @@ class multiAgentTrainEnv(Environment):
             if self.action_mask[5]==True:
                 self.unIntAgent.environment.uninterruptibleLoad.step()
             self.action_mask = [True,True,True,True,True,True,True]
+            if(self.state[2]>self.PgridMax):  
+                # print("PGRID MAX OVER!!!")
+                reward.append(200*(self.PgridMax-self.state[2]))
             # reward.append(hvacState1)
             # reward.append(hvacState2)
             # reward.append(hvacState3)
             # reward.append(2*intState*intPreference/self.interruptibleLoad.demand)
             # reward.append(2*unIntState*unintPreference/(self.uninterruptibleLoad.demand*self.uninterruptibleLoad.executePeriod))
 
-            if(self.state[2]>self.PgridMax):  
-                # print("PGRID MAX OVER!!!")
-                reward.append(170*(self.PgridMax-self.state[2]))
 
         #check if all day is done
         done =  bool(sampleTime == 95 and order == 5)

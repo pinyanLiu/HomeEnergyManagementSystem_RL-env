@@ -18,19 +18,25 @@ class OneLevelTestEnv(multiAgentTestEnv):
         return super().reset()
     
     def execute(self, actions):
-        sampleTime,soc,remain,pricePreHour,hvacState,intState,unIntState,intPreference,unintPreference,order = self.state
+        sampleTime,soc,remain,pricePreHour,hvacState1,hvacState2,hvacState3,intState,unIntState,intPreference,unintPreference,order = self.state
 
         self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
         self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
-        self.hvacAgent.getState(self.totalState)
-        self.hvacAgent.environment.updateState(self.hvacAgent.states)
+        self.hvacAgent1.getState(self.totalState)
+        self.hvacAgent1.environment.updateState(self.hvacAgent1.states)
+        self.hvacAgent2.getState(self.totalState)
+        self.hvacAgent2.environment.updateState(self.hvacAgent2.states)
+        self.hvacAgent3.getState(self.totalState)
+        self.hvacAgent3.environment.updateState(self.hvacAgent3.states)
         self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
         self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
         self.socAgent.getState(self.totalState)
         self.socAgent.environment.updateState(self.socAgent.states)
         self.intAgent.execute()
         self.unIntAgent.execute()
-        self.hvacAgent.execute()
+        self.hvacAgent1.execute()
+        self.hvacAgent2.execute()
+        self.hvacAgent3.execute()
         self.socAgent.execute()
 
         self.updateTotalState()  
@@ -54,9 +60,17 @@ class OneLevelTestEnv(multiAgentTestEnv):
         elif self.totalState["SOC"]<=0:
             self.totalState["SOC"]=0
 
-        self.totalState["fixLoad"]+=self.hvacAgent.actions[0]
-        self.totalState["indoorTemperature"] = self.hvacAgent.states["state"][5]
-        self.totalState["hvacPower"] = self.hvacAgent.actions[0]
+        self.totalState["fixLoad"]+=self.hvacAgent1.actions[0]
+        self.totalState["indoorTemperature1"] = self.hvacAgent1.states["state"][5]
+        self.totalState["hvacPower1"] = self.hvacAgent1.actions[0]
+
+        self.totalState["fixLoad"]+=self.hvacAgent2.actions[0]
+        self.totalState["indoorTemperature2"] = self.hvacAgent2.states["state"][5]
+        self.totalState["hvacPower2"] = self.hvacAgent2.actions[0]
+
+        self.totalState["fixLoad"]+=self.hvacAgent3.actions[0]
+        self.totalState["indoorTemperature3"] = self.hvacAgent3.states["state"][5]
+        self.totalState["hvacPower3"] = self.hvacAgent3.actions[0]
 
         self.interruptibleLoad = self.intAgent.environment.interruptibleLoad
         self.interruptibleLoadActionMask = self.intAgent.states["action_mask"]
@@ -81,9 +95,10 @@ class OneLevelTestEnv(multiAgentTestEnv):
             self.totalState["fixLoad"]=self.Load[self.totalState["sampleTime"]]
             self.totalState["PV"]=self.PV[self.totalState["sampleTime"]]
             self.totalState["pricePerHour"]=self.GridPrice[self.totalState["sampleTime"]]
-            self.totalState["deltaSoc"] = 0
             self.totalState["outdoorTemperature"]=self.outdoorTemperature[self.totalState["sampleTime"]]
-            self.totalState["userSetTemperature"]=self.userSetTemperature[self.totalState["sampleTime"]]
+            self.totalState["userSetTemperature1"]=self.userSetTemperature1[self.totalState["sampleTime"]]
+            self.totalState["userSetTemperature2"]=self.userSetTemperature2[self.totalState["sampleTime"]]
+            self.totalState["userSetTemperature3"]=self.userSetTemperature3[self.totalState["sampleTime"]]
             self.totalState["unintRemain"]=self.unIntAgent.environment.uninterruptibleLoad.getRemainDemand()
             self.totalState["unintSwitch"]=self.unIntAgent.environment.uninterruptibleLoad.switch
             self.totalState["intPreference"] = self.intUserPreference[self.totalState["sampleTime"]]

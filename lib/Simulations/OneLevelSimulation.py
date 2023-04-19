@@ -11,7 +11,7 @@ class OneLevelSimulation(multiSimulation):
         for month in range(12):
             self.testResult[month] = pd.DataFrame()
         self.totalReward = []        
-        self.environment = Environment.create(environment = OneLevelTestEnv,max_episode_timesteps=384)
+        self.environment = Environment.create(environment = OneLevelTestEnv,max_episode_timesteps=576)
         self.agent = Agent.load(directory = 'HLA/OneLevelAgent/saver_dir',environment=self.environment)
     def simulation(self):
         sampletime = []
@@ -21,10 +21,17 @@ class OneLevelSimulation(multiSimulation):
         soc = []
         price = []
         deltaSoc = []
-        indoorTemperature = []
+        indoorTemperature1 = []
+        indoorTemperature2 = []
+        indoorTemperature3 = []
         outdoorTemperature = []
-        userSetTemperature = []
-        hvacPower = []
+        userSetTemperature1 = []
+        userSetTemperature2 = []
+        userSetTemperature3 = []
+        TotalHvacPreference = []
+        hvacPower1 = []
+        hvacPower2 = []
+        hvacPower3 = []
         intLoadRemain = []
         unLoadRemain = []
         intUserPreference = []
@@ -34,7 +41,6 @@ class OneLevelSimulation(multiSimulation):
         order = []
         Reward = []
         TotalReward = []
-        TotalHvacPreference = []
         TotalElectricPrice = []
         TotalIntPreference = []
         TotalUnintPreference = []
@@ -62,11 +68,18 @@ class OneLevelSimulation(multiSimulation):
                 soc.append(totalState["SOC"])
                 price.append(totalState["pricePerHour"])
                 deltaSoc.append(totalState["deltaSoc"])
-                indoorTemperature.append(totalState["indoorTemperature"])
+                indoorTemperature1.append(totalState["indoorTemperature1"])
+                indoorTemperature2.append(totalState["indoorTemperature2"])
+                indoorTemperature3.append(totalState["indoorTemperature3"])
                 outdoorTemperature.append(totalState["outdoorTemperature"])
-                userSetTemperature.append(totalState["userSetTemperature"])
-                TotalHvacPreference.append(states['state'][4])
-                hvacPower.append(totalState["hvacPower"])
+                userSetTemperature1.append(totalState["userSetTemperature1"])
+                userSetTemperature2.append(totalState["userSetTemperature2"])
+                userSetTemperature3.append(totalState["userSetTemperature3"])
+                
+                TotalHvacPreference.append(states['state'][4]+states['state'][5]+states['state'][6])
+                hvacPower1.append(totalState['hvacPower1'])
+                hvacPower2.append(totalState['hvacPower2'])
+                hvacPower3.append(totalState['hvacPower3'])
                 intLoadRemain.append(totalState["intRemain"])
                 unLoadRemain.append(totalState["unintRemain"])
                 intUserPreference.append(totalState["intPreference"])
@@ -77,11 +90,9 @@ class OneLevelSimulation(multiSimulation):
                 Reward.append(reward)
                 TotalElectricPrice.append(0.25*totalState["pricePerHour"]*states['state'][2] if states['state'][2]>0 else 0)
                 TotalIntPreference.append(totalState["intSwitch"]*totalState["intPreference"])
-                TotalUnintPreference.append(totalState["unintSwitch"]*totalState["unintPreference"])
-                if states['state'][2]>totalState['PgridMax']:
-                    ExceedPgridMaxTimes.append(1)
-                else:
-                    ExceedPgridMaxTimes.append(0)
+                TotalUnintPreference.append(totalState["unintSwitch"]*totalState["unintPreference"])              
+                ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
+
                 # ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
                 PgridMax.append(totalState['PgridMax'])
             totalReward += reward
@@ -91,11 +102,17 @@ class OneLevelSimulation(multiSimulation):
             self.testResult[month]['soc'] = soc
             self.testResult[month]['PV'] = pv
             self.testResult[month]['deltaSoc'] = deltaSoc
-            self.testResult[month]['indoorTemperature'] = indoorTemperature
+            self.testResult[month]['indoorTemperature1'] = indoorTemperature1
+            self.testResult[month]['indoorTemperature2'] = indoorTemperature2
+            self.testResult[month]['indoorTemperature3'] = indoorTemperature3
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
-            self.testResult[month]['userSetTemperature'] = userSetTemperature
+            self.testResult[month]['userSetTemperature1'] = userSetTemperature1
+            self.testResult[month]['userSetTemperature2'] = userSetTemperature2
+            self.testResult[month]['userSetTemperature3'] = userSetTemperature3
             self.testResult[month]['TotalHvacPreference'] = TotalHvacPreference
-            self.testResult[month]['hvacPower'] = hvacPower
+            self.testResult[month]['hvacPower1'] = hvacPower1
+            self.testResult[month]['hvacPower2'] = hvacPower2
+            self.testResult[month]['hvacPower3'] = hvacPower3
             self.testResult[month]['intRemain'] = intLoadRemain
             self.testResult[month]['unloadRemain'] = unLoadRemain
             self.testResult[month]['intUserPreference'] = intUserPreference
@@ -119,11 +136,17 @@ class OneLevelSimulation(multiSimulation):
             soc.clear()
             price.clear()
             deltaSoc.clear()
-            indoorTemperature.clear()
+            indoorTemperature1.clear()
+            indoorTemperature2.clear()
+            indoorTemperature3.clear()
             outdoorTemperature.clear()
-            userSetTemperature.clear()
+            userSetTemperature1.clear()
+            userSetTemperature2.clear()
+            userSetTemperature3.clear()
             TotalHvacPreference.clear()
-            hvacPower.clear()
+            hvacPower1.clear()
+            hvacPower2.clear()
+            hvacPower3.clear()
             intLoadRemain.clear()
             unLoadRemain.clear()
             intUserPreference.clear()
@@ -156,20 +179,27 @@ class OneLevelSimulation(multiSimulation):
         print("AVG TotalIntPreference :", TotalIntPreference/12)
         print("AVG TotalUnintPreference:", TotalUnintPreference/12)
         print("AVG TotalElectricPrice:", TotalElectricPrice/12)    
+
     def outputResult(self):
         output = Plot(self.testResult)
         output.remainPower()
         output.soc()
-        output.indoorTemperature()
+        output.indoorTemperature(1)
+        output.indoorTemperature(2)
+        output.indoorTemperature(3)
         output.outdoorTemperature()
-        output.userSetTemperature()
+        output.userSetTemperature(1)
+        output.userSetTemperature(2)
+        output.userSetTemperature(3)
         output.price()
         output.plotIntPreference()
         output.plotUnintPreference()
         output.plotIntLoadPower()
         output.plotUnIntLoadPower()
         output.plotDeltaSOCPower()
-        output.plotHVACPower()
+        output.plotHVACPower(id=1)
+        output.plotHVACPower(id=2)
+        output.plotHVACPower(id=3)
         output.plotPVPower()
         output.plotPgridMax()
         output.plotReward()
