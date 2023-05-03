@@ -20,30 +20,32 @@ class OneLevelTestEnv(multiAgentTestEnv):
     def execute(self, actions):
         sampleTime,soc,remain,pricePreHour,hvacState1,hvacState2,hvacState3,intState,unIntState,intPreference,unintPreference,order = self.state
 
-        self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
-        self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
-        self.hvacAgent1.getState(self.totalState)
-        self.hvacAgent1.environment.updateState(self.hvacAgent1.states)
-        self.hvacAgent2.getState(self.totalState)
-        self.hvacAgent2.environment.updateState(self.hvacAgent2.states)
-        self.hvacAgent3.getState(self.totalState)
-        self.hvacAgent3.environment.updateState(self.hvacAgent3.states)
-        self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
-        self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
-        self.socAgent.getState(self.totalState)
-        self.socAgent.environment.updateState(self.socAgent.states)
-        self.intAgent.execute()
-        self.unIntAgent.execute()
-        self.hvacAgent1.execute()
-        self.hvacAgent2.execute()
-        self.hvacAgent3.execute()
-        self.socAgent.execute()
-
+        if order == 0:
+            self.socAgent.getState(self.totalState)
+            self.socAgent.environment.updateState(self.socAgent.states)
+            self.intAgent.getState(self.totalState,self.interruptibleLoadActionMask)
+            self.intAgent.environment.updateState(self.intAgent.states,self.interruptibleLoad)
+            self.hvacAgent1.getState(self.totalState)
+            self.hvacAgent1.environment.updateState(self.hvacAgent1.states)
+            self.hvacAgent2.getState(self.totalState)
+            self.hvacAgent2.environment.updateState(self.hvacAgent2.states)
+            self.hvacAgent3.getState(self.totalState)
+            self.hvacAgent3.environment.updateState(self.hvacAgent3.states)
+            self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
+            self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
+            self.socAgent.execute()
+            self.intAgent.execute()
+            self.unIntAgent.execute()
+            self.hvacAgent1.execute()
+            self.hvacAgent2.execute()
+            self.hvacAgent3.execute()
         self.updateTotalState()  
+
+        
 
             
         self.state = self.stateAbstraction(self.totalState)
-        done =  bool(sampleTime == 95)
+        done =  bool(sampleTime == 95 and order ==1)
 
         reward = 0
         states = dict(state=self.state)
@@ -53,6 +55,7 @@ class OneLevelTestEnv(multiAgentTestEnv):
         return super().stateAbstraction(totalState)
     
     def updateTotalState(self):
+        
         self.totalState["deltaSoc"] = self.socAgent.actions[0]
         self.totalState["SOC"]+=self.socAgent.actions[0]
         if self.totalState["SOC"]>=1 :
@@ -86,11 +89,10 @@ class OneLevelTestEnv(multiAgentTestEnv):
         if self.unIntAgent.states["state"][6]==1:
             self.totalState["fixLoad"]+=self.uninterruptibleLoad.AvgPowerConsume
 
-
-        #Order = 0,1,2,3
-        self.totalState["order"] = 0
+        #Order = 0,1
+        self.totalState["order"] = (self.totalState["order"]+1 if self.totalState["order"]<1 else 0 )
         #update to next step
-        if self.totalState["sampleTime"]!=95:
+        if self.totalState["order"] == 0 and self.totalState["sampleTime"]!=95:
             self.totalState["sampleTime"]+=1
             self.totalState["fixLoad"]=self.Load[self.totalState["sampleTime"]]
             self.totalState["PV"]=self.PV[self.totalState["sampleTime"]]

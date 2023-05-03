@@ -50,7 +50,7 @@
     "memory": 24000,
     "update_frequency": 0.5,
     "learning_rate": 1e-4,
-    "discount": 1.0,
+    "discount": 0.995,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,

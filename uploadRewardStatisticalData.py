@@ -42,9 +42,9 @@ upload = {"name":["SOC","HVAC","Interruptible","Uninterruptible"],
           "Max":[socMax,hvacMax,IntMax,UnIntMax]        
 }
 
+print(upload)
 tableName = "TestResult_Statistical_Data"
 dataframe = pd.DataFrame(data=upload)
-print(upload)
 
 
 engine = create_engine("mysql+pymysql://{}:{}@{}/{}?charset={}".format('root', 'fuzzy314', '140.124.42.65', 'chig_Cems_data','utf8'))

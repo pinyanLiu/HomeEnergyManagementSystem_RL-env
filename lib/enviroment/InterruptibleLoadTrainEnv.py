@@ -3,7 +3,6 @@ from  gym import spaces
 import numpy as np
 from random import randint,uniform
 from lib.enviroment.hemsTrainEnv import HemsEnv
-from tensorforce import Environment
 
 class IntEnv(HemsEnv):
     def __init__(self) :
@@ -15,6 +14,7 @@ class IntEnv(HemsEnv):
         #import Base Parameter
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
+        self.intLoadDemand=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='intload_demand']['value'])[0])
         
         self.interruptibleLoad = AC(demand=randint(1,30),AvgPowerConsume=1.5)
         self.allIntPreference = self.info.importIntPreference()
@@ -76,7 +76,7 @@ class IntEnv(HemsEnv):
         #pick one day from 360 days
         self.i = randint(1,359)
         self.Load = self.allLoad.iloc[:,self.i].tolist()
-
+        self.randomDemand = randint(-15,15)
         self.randomDeltaPrice  = [randint(-1,1) for _ in range(96)]
         self.randomDeltaPV = [uniform(-0.5,0.5) for _ in range(96)]
         self.randomDeltaSOC = [uniform(-0.05,0.05) for _ in range(96)]
@@ -143,7 +143,7 @@ class IntEnv(HemsEnv):
             self.intUserPreference = [min(max(x+y,-1),4) for x,y in zip(self.allIntPreference['12'].tolist(),self.randomDeltaPreference)]
 
 
-        self.interruptibleLoad = AC(demand=randint(1,30),AvgPowerConsume=1.5)
+        self.interruptibleLoad = AC(demand=min(max(self.intLoadDemand+self.randomDemand,15),25),AvgPowerConsume=uniform(1,1.5))
 
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.interruptibleLoad.demand,self.intUserPreference[0]])
@@ -181,20 +181,19 @@ class IntEnv(HemsEnv):
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv+Pess))/self.interruptibleLoad.demand
             else:
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv))/self.interruptibleLoad.demand
-            reward.append(intUserPreference/5)#preference reward
+            reward.append(intUserPreference/2.5)#preference reward
         if cost<0:
             cost = 0 
 
-        if(intUserPreference==4 and self.interruptibleLoad.switch==False):
-            reward.append(-intUserPreference)
+
 
         #reward
-        reward.append(0.07-9*cost)
+        reward.append(0.01-4*cost)
         if (sampleTime == 94) :
             if(self.interruptibleLoad.getRemainDemand()!=0):
                 reward.append(-20*self.interruptibleLoad.getRemainProcessPercentage())
             else:
-                reward.append(10)
+                reward.append(5)
         #change to next state
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],self.interruptibleLoad.getRemainDemand(),self.intUserPreference[sampleTime]])
@@ -213,22 +212,3 @@ class IntEnv(HemsEnv):
 
         return states,self.done,self.reward
 
-
-
-
-
-if __name__ == '__main__':
-    from tensorforce import Agent
-    environment = Environment.create(environment = IntEnv,max_episode_timesteps=96)
-    agent = Agent.create(agent='/home/hems/LIU/RL_env/projects/RL_firstry/Load/Interruptible/Load_Agent/ppo.json', environment=environment)
-
-    # Train for 100 episodes
-    for _ in range(100):
-        states = environment.reset()
-        terminal = False
-        while not terminal:
-            actions = agent.act(states=states)
-            states, terminal, reward = environment.execute(actions=actions)
-            agent.observe(terminal=terminal, reward=reward)
-        
-        

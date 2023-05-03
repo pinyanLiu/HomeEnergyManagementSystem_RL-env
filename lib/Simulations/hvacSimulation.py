@@ -15,10 +15,10 @@ class HvacSimulation(Simulation):
         pv = []
         price = []
         deltaSoc = []
-        indoorTemperature = []
+        indoorTemperature1 = []
         outdoorTemperature = []
-        userSetTemperature = []
-        hvacPower = []
+        userSetTemperature1 = []
+        hvacPower1 = []
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -29,9 +29,9 @@ class HvacSimulation(Simulation):
             pv.append(states[2])
             price.append(states[3])
             deltaSoc.append(states[4])
-            indoorTemperature.append(states[5])
+            indoorTemperature1.append(states[5])
             outdoorTemperature.append(states[6])
-            userSetTemperature.append(states[7])
+            userSetTemperature1.append(states[7])
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -39,41 +39,41 @@ class HvacSimulation(Simulation):
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
-                hvacPower.append(actions[0])
+                hvacPower1.append(actions[0])
                 sampletime.append(states['state'][0])
                 load.append(states['state'][1])
                 pv.append(states['state'][2])
                 price.append(states['state'][3])
                 deltaSoc.append(states['state'][4])
-                indoorTemperature.append(states['state'][5])
+                indoorTemperature1.append(states['state'][5])
                 outdoorTemperature.append(states['state'][6])
-                userSetTemperature.append(states['state'][7])
+                userSetTemperature1.append(states['state'][7])
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
-            hvacPower.append(0)
+            hvacPower1.append(0)
             Reward.append(0)
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
-            self.testResult[month]['indoorTemperature'] = indoorTemperature
+            self.testResult[month]['indoorTemperature1'] = indoorTemperature1
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
-            self.testResult[month]['userSetTemperature'] = userSetTemperature
-            self.testResult[month]['hvacPower'] = hvacPower
+            self.testResult[month]['userSetTemperature1'] = userSetTemperature1
+            self.testResult[month]['hvacPower1'] = hvacPower1
             self.testResult[month]['reward'] = Reward
             TotalReward.append(totalReward)
             totalReward=0
             sampletime.clear()
-            hvacPower.clear()
+            hvacPower1.clear()
             load.clear()
             pv.clear()
             price.clear()
             deltaSoc.clear()
-            indoorTemperature.clear()
+            indoorTemperature1.clear()
             outdoorTemperature.clear()
-            userSetTemperature.clear()
+            userSetTemperature1.clear()
             Reward.clear()
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
@@ -81,11 +81,11 @@ class HvacSimulation(Simulation):
     def outputResult(self):
         output = Plot(self.testResult)
         output.remainPower()
-        output.indoorTemperature()
+        output.indoorTemperature(1)
         output.outdoorTemperature()
         output.userSetTemperature()
         output.price()
-        output.plotHVACPower()
+        output.plotHVACPower(1)
         output.plotReward()
         output.plotResult('lib/plot/hvac/')
 

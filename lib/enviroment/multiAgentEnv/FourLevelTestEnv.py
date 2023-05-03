@@ -50,7 +50,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("int")   
         
     #execute uninterruptible load
-        elif order == 4:
+        elif order == 5:
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
             self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
             self.unIntAgent.execute()
@@ -58,7 +58,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("unint")   
 
     #execute SOC
-        elif order == 5:
+        elif order == 4:
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()

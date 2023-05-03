@@ -160,7 +160,7 @@ class multiAgentTrainEnv(Environment):
                 #unInt preference
                 4,
                 #Order
-                5
+                6
             ],
             dtype=np.float32,
         )
@@ -209,8 +209,9 @@ class multiAgentTrainEnv(Environment):
         #pick one day from 360 days
         self.i = randint(1,359)
         #AC/WM object
-        self.interruptibleLoad = AC(demand=self.intload_demand,AvgPowerConsume=self.intload_power)
-        self.uninterruptibleLoad = WM(demand=self.unload_demand,executePeriod=self.unload_period,AvgPowerConsume=self.unload_power)
+
+        self.interruptibleLoad = AC(demand=randint(15,25),AvgPowerConsume=uniform(1,1.5))
+        self.uninterruptibleLoad = WM(demand=randint(3,8),executePeriod=6,AvgPowerConsume=uniform(0.8,1.5))
         self.randomDeltaPrice  = [uniform(-1,1) for _ in range(96)]
         self.randomDeltaPV = [uniform(-0.5,0.5) for _ in range(96)]        
         self.randomTemperature = [uniform(-2,2)for _ in range(96)]
@@ -466,7 +467,7 @@ class multiAgentTrainEnv(Environment):
         else:
             # print('none')
             self.updateTotalState("None")
-            reward.append(-3)
+            reward.append(-1)
         # print(self.action_mask,order)
 
 
@@ -486,7 +487,7 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,False,False,False,False,True])]
         
 
-        if order == 5:
+        if order == 6:
             if self.action_mask[1] == True:
                 self.totalState["indoorTemperature1"] = self.epsilon*self.totalState["indoorTemperature1"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
             if self.action_mask[2] == True:
@@ -498,7 +499,9 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [True,True,True,True,True,True,True]
             if(self.state[2]>self.PgridMax):  
                 # print("PGRID MAX OVER!!!")
-                reward.append(200*(self.PgridMax-self.state[2]))
+                reward.append(-pow(110*(self.PgridMax-self.state[2]),2))
+            else:
+                reward.append(0.2)
             # reward.append(hvacState1)
             # reward.append(hvacState2)
             # reward.append(hvacState3)
@@ -507,7 +510,7 @@ class multiAgentTrainEnv(Environment):
 
 
         #check if all day is done
-        done =  bool(sampleTime == 95 and order == 5)
+        done =  bool(sampleTime == 95 and order == 6)
 
         reward = sum(reward)/6
         states = dict(state=self.state,action_mask = self.action_mask)
@@ -558,7 +561,7 @@ class multiAgentTrainEnv(Environment):
 
 
         #Order = 0,1,2,3,4,5
-        self.totalState["order"] = (self.totalState["order"]+1 if self.totalState["order"]<5 else 0 )
+        self.totalState["order"] = (self.totalState["order"]+1 if self.totalState["order"]<=5 else 0 )
         #update to next step
         if self.totalState["order"] == 0 and self.totalState["sampleTime"]!=95:
             self.totalState["sampleTime"]+=1

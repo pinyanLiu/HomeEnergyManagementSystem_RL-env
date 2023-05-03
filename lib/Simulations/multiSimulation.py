@@ -7,7 +7,7 @@ from lib.plot.plot import Plot
 class multiSimulation(Simulation):
     def __init__(self):
         super().__init__()
-        self.environment = Environment.create(environment = multiAgentTestEnv,max_episode_timesteps=576)
+        self.environment = Environment.create(environment = multiAgentTestEnv,max_episode_timesteps=672)
         self.agent = Agent.load(directory = 'HLA/saver_dir',environment=self.environment)
 
     def simulation(self):
@@ -57,7 +57,7 @@ class multiSimulation(Simulation):
                 states, terminal, reward = self.environment.execute(actions=actions)
                 #get total state information
                 totalState = self.environment.totalState
-                if totalState["order"]==5:
+                if totalState["order"]==6:
                     sampletime.append(totalState["sampleTime"])
                     remain.append(states['state'][2])
                     load.append(totalState["fixLoad"])
@@ -200,7 +200,7 @@ class multiSimulation(Simulation):
         output.plotHVACPower(id=3)
         output.plotPVPower()
         output.plotPgridMax()
-        output.plotReward()
+        #output.plotReward()
         output.plotResult('lib/plot/HRL/')
 
     def getMean(self):

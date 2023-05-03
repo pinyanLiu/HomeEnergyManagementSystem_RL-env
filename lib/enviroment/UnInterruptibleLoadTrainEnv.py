@@ -16,7 +16,7 @@ class UnIntEnv(HemsEnv):
         self.PgridMax = float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='PgridMax']['value'])[0])
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.7)
-        self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=1.5)
+        self.uninterruptibleLoad = WM(demand=randint(3,8),executePeriod=6,AvgPowerConsume=1.5)
         self.allUnintPreference = self.info.importUnIntPreference()
 
 
@@ -149,7 +149,7 @@ class UnIntEnv(HemsEnv):
             self.deltaSOC = [min(max(x+y,-0.25),0.25) for x,y in zip(self.allDeltaSOC['Dcb'].tolist(),self.randomDeltaSOC)]
             self.unintPreference = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference['12'].tolist(),self.randomDeltaPreference)]
 
-        self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=1.5)
+        self.uninterruptibleLoad = WM(demand=randint(3,8),executePeriod=6,AvgPowerConsume=uniform(0.8,1.5))
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.uninterruptibleLoad.demand,self.uninterruptibleLoad.switch,self.unintPreference[0]])
         #actions mask
@@ -192,12 +192,12 @@ class UnIntEnv(HemsEnv):
 
 
         #reward
-        reward.append(0.07-10*cost)
+        reward.append(0.07-cost)
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-5*self.uninterruptibleLoad.getRemainProcessPercentage())
+            reward.append(-20*self.uninterruptibleLoad.getRemainProcessPercentage())
 
         if(unintPreference==4 and self.uninterruptibleLoad.switch==False):
-            reward.append(-unintPreference*2)
+            reward.append(-1)
 
         #change to next state
         sampleTime = int(sampleTime+1)

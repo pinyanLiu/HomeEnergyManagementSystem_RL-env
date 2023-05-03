@@ -99,8 +99,11 @@ class SocEnv(HemsEnv):
 
 
 
-        if (sampleTime == 94 and soc <self.socThreshold):
-            reward.append(10*(soc-self.socThreshold))
+        if (sampleTime == 94 ):
+            if(soc <self.socThreshold):
+                reward.append(10*(soc-self.socThreshold))
+            else:
+                reward.append(15)
 
         reward.append(-cost)
 

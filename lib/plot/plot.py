@@ -12,7 +12,7 @@ class Plot():
 
     def remainPower(self):
         for month in range(0,12):
-            self.ax[month].set_ylim(-2,5)
+            self.ax[month].set_ylim(-2,8)
             self.ax[month].set_ylabel('Power')
             self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',color ='gray') 
  

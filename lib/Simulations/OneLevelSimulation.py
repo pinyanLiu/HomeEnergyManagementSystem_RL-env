@@ -13,6 +13,7 @@ class OneLevelSimulation(multiSimulation):
         self.totalReward = []        
         self.environment = Environment.create(environment = OneLevelTestEnv,max_episode_timesteps=576)
         self.agent = Agent.load(directory = 'HLA/OneLevelAgent/saver_dir',environment=self.environment)
+
     def simulation(self):
         sampletime = []
         remain = []
@@ -60,42 +61,42 @@ class OneLevelSimulation(multiSimulation):
                 states, terminal, reward = self.environment.execute(actions=actions)
                 #get total state information
                 totalState = self.environment.totalState
+                if totalState["order"]==1:
+                    sampletime.append(totalState["sampleTime"])
+                    remain.append(states['state'][2])
+                    load.append(totalState["fixLoad"])
+                    pv.append(totalState["PV"])
+                    soc.append(totalState["SOC"])
+                    price.append(totalState["pricePerHour"])
+                    deltaSoc.append(totalState["deltaSoc"])
+                    indoorTemperature1.append(totalState["indoorTemperature1"])
+                    indoorTemperature2.append(totalState["indoorTemperature2"])
+                    indoorTemperature3.append(totalState["indoorTemperature3"])
+                    outdoorTemperature.append(totalState["outdoorTemperature"])
+                    userSetTemperature1.append(totalState["userSetTemperature1"])
+                    userSetTemperature2.append(totalState["userSetTemperature2"])
+                    userSetTemperature3.append(totalState["userSetTemperature3"])
+                    
+                    TotalHvacPreference.append(states['state'][4]+states['state'][5]+states['state'][6])
+                    hvacPower1.append(totalState['hvacPower1'])
+                    hvacPower2.append(totalState['hvacPower2'])
+                    hvacPower3.append(totalState['hvacPower3'])
+                    intLoadRemain.append(totalState["intRemain"])
+                    unLoadRemain.append(totalState["unintRemain"])
+                    intUserPreference.append(totalState["intPreference"])
+                    unintUserPreference.append(totalState["unintPreference"])
+                    intSwitch.append(totalState["intSwitch"])
+                    unintSwitch.append(totalState["unintSwitch"])
+                    order.append(totalState["order"])
+                    Reward.append(reward)
+                    TotalElectricPrice.append(0.25*totalState["pricePerHour"]*states['state'][2] if states['state'][2]>0 else 0)
+                    TotalIntPreference.append(totalState["intSwitch"]*totalState["intPreference"])
+                    TotalUnintPreference.append(totalState["unintSwitch"]*totalState["unintPreference"])              
+                    ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
 
-                sampletime.append(totalState["sampleTime"])
-                remain.append(states['state'][2])
-                load.append(totalState["fixLoad"])
-                pv.append(totalState["PV"])
-                soc.append(totalState["SOC"])
-                price.append(totalState["pricePerHour"])
-                deltaSoc.append(totalState["deltaSoc"])
-                indoorTemperature1.append(totalState["indoorTemperature1"])
-                indoorTemperature2.append(totalState["indoorTemperature2"])
-                indoorTemperature3.append(totalState["indoorTemperature3"])
-                outdoorTemperature.append(totalState["outdoorTemperature"])
-                userSetTemperature1.append(totalState["userSetTemperature1"])
-                userSetTemperature2.append(totalState["userSetTemperature2"])
-                userSetTemperature3.append(totalState["userSetTemperature3"])
-                
-                TotalHvacPreference.append(states['state'][4]+states['state'][5]+states['state'][6])
-                hvacPower1.append(totalState['hvacPower1'])
-                hvacPower2.append(totalState['hvacPower2'])
-                hvacPower3.append(totalState['hvacPower3'])
-                intLoadRemain.append(totalState["intRemain"])
-                unLoadRemain.append(totalState["unintRemain"])
-                intUserPreference.append(totalState["intPreference"])
-                unintUserPreference.append(totalState["unintPreference"])
-                intSwitch.append(totalState["intSwitch"])
-                unintSwitch.append(totalState["unintSwitch"])
-                order.append(totalState["order"])
-                Reward.append(reward)
-                TotalElectricPrice.append(0.25*totalState["pricePerHour"]*states['state'][2] if states['state'][2]>0 else 0)
-                TotalIntPreference.append(totalState["intSwitch"]*totalState["intPreference"])
-                TotalUnintPreference.append(totalState["unintSwitch"]*totalState["unintPreference"])              
-                ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
-
-                # ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
-                PgridMax.append(totalState['PgridMax'])
-            totalReward += reward
+                    # ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
+                    PgridMax.append(totalState['PgridMax'])
+                totalReward += reward
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
             self.testResult[month]['price'] = price
@@ -202,7 +203,7 @@ class OneLevelSimulation(multiSimulation):
         output.plotHVACPower(id=3)
         output.plotPVPower()
         output.plotPgridMax()
-        output.plotReward()
+        #output.plotReward()
         output.plotResult('lib/plot/OneLevel/')    
     def __del__(self):
         return super().__del__()
