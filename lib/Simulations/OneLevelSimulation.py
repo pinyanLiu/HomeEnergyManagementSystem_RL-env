@@ -11,7 +11,7 @@ class OneLevelSimulation(multiSimulation):
         for month in range(12):
             self.testResult[month] = pd.DataFrame()
         self.totalReward = []        
-        self.environment = Environment.create(environment = OneLevelTestEnv,max_episode_timesteps=576)
+        self.environment = Environment.create(environment = OneLevelTestEnv,max_episode_timesteps=672)
         self.agent = Agent.load(directory = 'HLA/OneLevelAgent/saver_dir',environment=self.environment)
 
     def simulation(self):

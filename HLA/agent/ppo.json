@@ -39,7 +39,7 @@
         "shape": [],
         "num_values": 7
     },
-    "max_episode_timesteps": 576,
+    "max_episode_timesteps": 672,
     "batch_size": 128,
     "network": [
         {

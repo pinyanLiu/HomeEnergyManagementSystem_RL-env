@@ -33,12 +33,12 @@ class OneLevelTestEnv(multiAgentTestEnv):
             self.hvacAgent3.environment.updateState(self.hvacAgent3.states)
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
             self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
-            self.socAgent.execute()
             self.intAgent.execute()
             self.unIntAgent.execute()
             self.hvacAgent1.execute()
             self.hvacAgent2.execute()
             self.hvacAgent3.execute()
+            self.socAgent.execute()
         self.updateTotalState()  
 
         

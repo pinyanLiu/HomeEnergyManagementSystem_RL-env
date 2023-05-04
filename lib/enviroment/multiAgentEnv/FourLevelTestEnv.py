@@ -50,7 +50,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("int")   
         
     #execute uninterruptible load
-        elif order == 5:
+        elif order == 4:
             self.unIntAgent.getState(self.totalState,self.uninterruptibleLoadActionMask)
             self.unIntAgent.environment.updateState(self.unIntAgent.states,self.uninterruptibleLoad)
             self.unIntAgent.execute()
@@ -58,13 +58,14 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("unint")   
 
     #execute SOC
-        elif order == 4:
+        elif order == 5:
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()
             # reward.append(self.socAgent.reward)
             self.updateTotalState("soc")  
-
+        else:
+            self.updateTotalState("none")
         
 
             
@@ -79,4 +80,61 @@ class FourLevelTestEnv(multiAgentTestEnv):
         return super().stateAbstraction(totalState)
     
     def updateTotalState(self, mode):
-        return super().updateTotalState(mode)
+        if mode == "soc":
+            self.totalState["deltaSoc"] = self.socAgent.actions[0]
+            self.totalState["SOC"]+=self.socAgent.actions[0]
+            if self.totalState["SOC"]>=1 :
+                self.totalState["SOC"]=1
+            elif self.totalState["SOC"]<=0:
+                self.totalState["SOC"]=0
+
+        elif mode == "hvac1":
+            self.totalState["fixLoad"]+=self.hvacAgent1.actions[0]
+            self.totalState["indoorTemperature1"] = self.hvacAgent1.states["state"][5]
+            self.totalState["hvacPower1"] = self.hvacAgent1.actions[0]
+
+        elif mode == "hvac2":
+            self.totalState["fixLoad"]+=self.hvacAgent2.actions[0]
+            self.totalState["indoorTemperature2"] = self.hvacAgent2.states["state"][5]
+            self.totalState["hvacPower2"] = self.hvacAgent2.actions[0]
+
+        elif mode == "hvac3":
+            self.totalState["fixLoad"]+=self.hvacAgent3.actions[0]
+            self.totalState["indoorTemperature3"] = self.hvacAgent3.states["state"][5]
+            self.totalState["hvacPower3"] = self.hvacAgent3.actions[0]
+
+        elif mode == "int":
+            self.interruptibleLoad = self.intAgent.environment.interruptibleLoad
+            self.interruptibleLoadActionMask = self.intAgent.states["action_mask"]
+            self.totalState["intRemain"] = self.intAgent.states["state"][5]
+            self.totalState["intSwitch"] = self.intAgent.actions
+            if self.intAgent.actions==1:
+                self.totalState["fixLoad"]+=self.interruptibleLoad.AvgPowerConsume
+            
+        elif mode == "unint":
+            self.uninterruptibleLoad = self.unIntAgent.environment.uninterruptibleLoad
+            self.uninterruptibleLoadActionMask = self.unIntAgent.states["action_mask"]
+            self.totalState["unintRemain"]=self.unIntAgent.states["state"][5]
+            self.totalState["unintSwitch"]=self.unIntAgent.states["state"][6]
+            if self.unIntAgent.states["state"][6]==1:
+                self.totalState["fixLoad"]+=self.uninterruptibleLoad.AvgPowerConsume
+
+
+        #Order = 0,1,2,3,4,5
+        self.totalState["order"] = (self.totalState["order"]+1 if self.totalState["order"]<=5 else 0 )
+        #update to next step
+        if self.totalState["order"] == 0 and self.totalState["sampleTime"]!=95:
+            self.totalState["sampleTime"]+=1
+            self.totalState["fixLoad"]=self.Load[self.totalState["sampleTime"]]
+            self.totalState["PV"]=self.PV[self.totalState["sampleTime"]]
+            self.totalState["pricePerHour"]=self.GridPrice[self.totalState["sampleTime"]]
+            self.totalState["deltaSoc"] = 0
+            self.totalState["outdoorTemperature"]=self.outdoorTemperature[self.totalState["sampleTime"]]
+            self.totalState["userSetTemperature1"]=self.userSetTemperature1[self.totalState["sampleTime"]]
+            self.totalState["userSetTemperature2"]=self.userSetTemperature2[self.totalState["sampleTime"]]
+            self.totalState["userSetTemperature3"]=self.userSetTemperature3[self.totalState["sampleTime"]]
+            self.totalState["unintRemain"]=self.unIntAgent.environment.uninterruptibleLoad.getRemainDemand()
+            self.totalState["unintSwitch"]=self.unIntAgent.environment.uninterruptibleLoad.switch
+            self.totalState["intSwitch"] = 0
+            self.totalState["intPreference"] = self.intUserPreference[self.totalState["sampleTime"]]
+            self.totalState["unintPreference"] = self.unintPreference[self.totalState["sampleTime"]]
