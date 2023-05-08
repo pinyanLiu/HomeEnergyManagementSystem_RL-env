@@ -165,50 +165,57 @@ class IntEnv(HemsEnv):
         cost = 0
         #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,interruptible load remain)
         sampleTime,load,pv,pricePerHour,deltaSoc,intRemain,intUserPreference = self.state
-        # Turn off switch
-        if actions == 0:
-            self.interruptibleLoad.turn_off()
-        #  turn on switch 
-        elif actions == 1 : 
-            self.interruptibleLoad.turn_on()
+    #check if violate pgrid max , if violate, reset the time step until the agent give a action which pass the constrain
+        reward = []
+        if load-pv+deltaSoc*self.batteryCapacity+actions*self.interruptibleLoad.AvgPowerConsume>self.PgridMax:
+            reward.append(-5)
+            states = dict(state=self.state)
+            self.done = False
+        else:
+            # Turn off switch
+            if actions == 0:
+                self.interruptibleLoad.turn_off()
+            #  turn on switch 
+            elif actions == 1 : 
+                self.interruptibleLoad.turn_on()
 
-        self.interruptibleLoad.step()
+            self.interruptibleLoad.step()
 
-        # if the switch is on , calculate the electricity cost
-        if self.interruptibleLoad.switch:
-            Pess = deltaSoc*self.batteryCapacity
-            if Pess<0:
-                cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv+Pess))/self.interruptibleLoad.demand
-            else:
-                cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv))/self.interruptibleLoad.demand
-            reward.append(intUserPreference/2.5)#preference reward
-        if cost<0:
-            cost = 0 
+            # if the switch is on , calculate the electricity cost
+            if self.interruptibleLoad.switch:
+                Pess = deltaSoc*self.batteryCapacity
+                if Pess<0:
+                    cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv+Pess))/self.interruptibleLoad.demand
+                else:
+                    cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv))/self.interruptibleLoad.demand
+                reward.append(intUserPreference/2.5)#preference reward
+            if cost<0:
+                cost = 0 
 
 
 
-        #reward
-        reward.append(0.01-4*cost)
-        if (sampleTime == 94) :
-            if(self.interruptibleLoad.getRemainDemand()!=0):
-                reward.append(-20*self.interruptibleLoad.getRemainProcessPercentage())
-            else:
-                reward.append(5)
-        #change to next state
-        sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],self.interruptibleLoad.getRemainDemand(),self.intUserPreference[sampleTime]])
+            #reward
+            reward.append(0.01-4*cost)
+            if (sampleTime == 94) :
+                if(self.interruptibleLoad.getRemainDemand()!=0):
+                    reward.append(-20*self.interruptibleLoad.getRemainProcessPercentage())
+                else:
+                    reward.append(5)
+            #change to next state
+            sampleTime = int(sampleTime+1)
+            self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],self.interruptibleLoad.getRemainDemand(),self.intUserPreference[sampleTime]])
+            
+            #actions mask
+            PgridMaxExceed = (self.Load[sampleTime]+self.deltaSOC[sampleTime]*self.batteryCapacity+self.interruptibleLoad.AvgPowerConsume-self.PV[sampleTime]) >= self.PgridMax
+            
+            self.action_mask = np.asarray([True,self.interruptibleLoad.getRemainDemand()>0 and not PgridMaxExceed])
 
-        #actions mask
-        PgridMaxExceed = (self.Load[sampleTime]+self.deltaSOC[sampleTime]*self.batteryCapacity+self.interruptibleLoad.AvgPowerConsume-self.PV[sampleTime]) >= self.PgridMax
-        
-        self.action_mask = np.asarray([True,self.interruptibleLoad.getRemainDemand()>0 and not PgridMaxExceed])
-
-        #check if all day is done
-        self.done =  bool(sampleTime == 95)
-        
-        #REWARD
-        self.reward = sum(reward)
-        states = dict(state=self.state,action_mask=self.action_mask)
+            #check if all day is done
+            self.done =  bool(sampleTime == 95)
+            
+            #REWARD
+            self.reward = sum(reward)
+            states = dict(state=self.state,action_mask=self.action_mask)
 
         return states,self.done,self.reward
 

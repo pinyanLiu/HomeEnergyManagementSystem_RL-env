@@ -19,6 +19,7 @@ class IntSimulation(Simulation):
         intSwitch = []
         intloadRemain = []
         intUserPreference = []
+        ExceedPgridMaxTimes=[]
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -31,6 +32,7 @@ class IntSimulation(Simulation):
             deltaSoc.append(states[4])
             intloadRemain.append(states[5])
             intUserPreference.append(states[6])
+            ExceedPgridMaxTimes.append(0)
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -45,7 +47,6 @@ class IntSimulation(Simulation):
                 #2. do nothing 
                 else :
                     intSwitch.append(0)
-
                 sampletime.append(states['state'][0])
                 load.append(states['state'][1])
                 pv.append(states['state'][2])
@@ -54,6 +55,7 @@ class IntSimulation(Simulation):
                 intloadRemain.append(states['state'][5])
                 intUserPreference.append(states['state'][6])
                 self.totalReward.append(reward)
+                ExceedPgridMaxTimes.append(1 if states['state'][1]-states['state'][2]+states['state'][4]*10+actions*acObject.AvgPowerConsume>10 else 0)
                 Reward.append(reward)
                 totalReward += reward
             intSwitch.append(0)
@@ -64,7 +66,8 @@ class IntSimulation(Simulation):
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['intloadRemain'] = intloadRemain
-            print(intloadRemain)
+
+            self.testResult[month]['ExceedPgridMaxTimes'] = ExceedPgridMaxTimes
             self.testResult[month]['intSwitch'] = intSwitch
             self.testResult[month]['reward'] = Reward
             self.testResult[month]['intUserPreference'] = intUserPreference
@@ -76,10 +79,14 @@ class IntSimulation(Simulation):
             pv.clear()
             price.clear()
             deltaSoc.clear()
+            ExceedPgridMaxTimes.clear()
             intSwitch.clear()
             intloadRemain.clear()
             Reward.clear()
             intUserPreference.clear()
+            Reward.clear()
+        for month in range(12):
+            print("month ",month, " ExceedPgridMaxTimes: ",sum(self.testResult[month]["ExceedPgridMaxTimes"]))
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     

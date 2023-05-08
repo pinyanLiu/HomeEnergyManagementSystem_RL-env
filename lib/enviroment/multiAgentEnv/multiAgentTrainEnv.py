@@ -487,7 +487,7 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,False,False,False,False,True])]
         
 
-        if order == 6:
+        if order == 5:
             if self.action_mask[1] == True:
                 self.totalState["indoorTemperature1"] = self.epsilon*self.totalState["indoorTemperature1"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
             if self.action_mask[2] == True:
@@ -496,12 +496,15 @@ class multiAgentTrainEnv(Environment):
                 self.totalState["indoorTemperature3"] = self.epsilon*self.totalState["indoorTemperature3"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
             if self.action_mask[5]==True:
                 self.unIntAgent.environment.uninterruptibleLoad.step()
-            self.action_mask = [True,True,True,True,True,True,True]
-            if(self.state[2]>self.PgridMax):  
+            self.action_mask = [False,False,False,False,False,False,True]
+            if(self.state[2]-0.25>self.PgridMax):  
                 # print("PGRID MAX OVER!!!")
-                reward.append(-pow(110*(self.PgridMax-self.state[2]),2))
+                reward.append(-10)
             else:
-                reward.append(0.2)
+                reward.append(0.0001)
+
+        if order==6:
+            self.action_mask = [True,True,True,True,True,True,True]
             # reward.append(hvacState1)
             # reward.append(hvacState2)
             # reward.append(hvacState3)
@@ -560,7 +563,7 @@ class multiAgentTrainEnv(Environment):
                 self.totalState["fixLoad"]+=self.uninterruptibleLoad.AvgPowerConsume
 
 
-        #Order = 0,1,2,3,4,5
+        #Order = 0,1,2,3,4,5,6 
         self.totalState["order"] = (self.totalState["order"]+1 if self.totalState["order"]<=5 else 0 )
         #update to next step
         if self.totalState["order"] == 0 and self.totalState["sampleTime"]!=95:

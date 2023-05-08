@@ -73,55 +73,57 @@ class SocEnv(HemsEnv):
         delta_soc = float(actions)
         # actions(delta_soc) is the degree of charging/discharging power .
         # if delta_soc > 0 means charging , whereas delta_soc < 0 means discharging.
-
-
-    #interaction
+    #check if violate pgrid max , if violate, reset the time step until the agent give a action which pass the constrain
         reward = []
-        cost = 0
-        soc = soc+delta_soc
-        if soc > 1:
-            soc = 1
-            reward.append(-0.2)
-        elif soc < 0 :
-            soc = 0
-            reward.append(-0.2)
+        if load-pv+actions*self.batteryCapacity>self.PgridMax:
+            reward.append(-5)
+            states = dict(state = self.state)
+            self.done = False
+
         else:
-            #calculate cost proportion   
-            if(delta_soc>0):
-                cost = pricePerHour * 0.25 * (delta_soc*self.batteryCapacity-pv)
-                if cost<0:
-                    cost = 0
-            elif(delta_soc<=0):
-                cost = pricePerHour*0.25*delta_soc*self.batteryCapacity
-        if (load+delta_soc*self.batteryCapacity-pv)>self.PgridMax:
-            reward.append(-1)
-        else:
-            reward.append(0.001)
-
-
-
-
-        if (sampleTime == 94 ):
-            if(soc <self.socThreshold):
-                reward.append(10*(soc-self.socThreshold))
+    #interaction
+            cost = 0
+            soc = soc+delta_soc
+            if soc > 1:
+                soc = 1
+                reward.append(-0.2)
+            elif soc < 0 :
+                soc = 0
+                reward.append(-0.2)
             else:
-                reward.append(10)
-
-        reward.append(-cost)
-
-
-        #change to next state
-        sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
-
-        #check if all day has done
-        self.done = bool(sampleTime == 95)
+                #calculate cost proportion   
+                if(delta_soc>0):
+                    cost = pricePerHour * 0.25 * (delta_soc*self.batteryCapacity-pv)
+                    if cost<0:
+                        cost = 0
+                elif(delta_soc<=0):
+                    cost = pricePerHour*0.25*delta_soc*self.batteryCapacity
 
 
-        states = dict(state = self.state)
 
-        #REWARD
-        self.reward = sum(reward)
+
+
+            if (sampleTime == 94 ):
+                if(soc <self.socThreshold):
+                    reward.append(10*(soc-self.socThreshold))
+                else:
+                    reward.append(10)
+
+            reward.append(-cost)
+
+
+            #change to next state
+            sampleTime = int(sampleTime+1)
+            self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
+
+            #check if all day has done
+            self.done = bool(sampleTime == 95)
+
+
+            states = dict(state = self.state)
+
+            #REWARD
+            self.reward = sum(reward)
 
         return states,self.done,self.reward
 

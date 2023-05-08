@@ -14,6 +14,8 @@ class Simulation():
     def outputResult(self):
         print("plot result")
 
+        
+
     def getMean(self):
         return(np.mean(self.totalReward))
 

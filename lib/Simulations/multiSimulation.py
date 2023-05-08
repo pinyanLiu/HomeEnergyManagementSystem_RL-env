@@ -89,8 +89,6 @@ class multiSimulation(Simulation):
                     TotalIntPreference.append(totalState["intSwitch"]*totalState["intPreference"])
                     TotalUnintPreference.append(totalState["unintSwitch"]*totalState["unintPreference"])              
                     ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
-
-                    # ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
                     PgridMax.append(totalState['PgridMax'])
                 totalReward += reward
             self.testResult[month]['sampleTime'] = sampletime
@@ -176,6 +174,14 @@ class multiSimulation(Simulation):
         print("AVG TotalIntPreference :", TotalIntPreference/12)
         print("AVG TotalUnintPreference:", TotalUnintPreference/12)
         print("AVG TotalElectricPrice:", TotalElectricPrice/12)
+
+    def EachMonthResult(self):
+        for month in range(12):
+            print("month ",month, " ExceedPgridMaxTimes: ",sum(self.testResult[month]["ExceedPgridMaxTimes"]))
+            print("month ",month, " TotalHvacPreference: ",sum(self.testResult[month]["TotalHvacPreference"]))
+            print("month ",month, " TotalIntPreference: ",sum(self.testResult[month]["TotalIntPreference"]))
+            print("month ",month, " TotalUnintPreference: ",sum(self.testResult[month]["TotalUnintPreference"]))
+            print("month ",month, " TotalElectricPrice: ",sum(self.testResult[month]["TotalElectricPrice"]))
 
     
     def outputResult(self):

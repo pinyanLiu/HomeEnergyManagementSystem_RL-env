@@ -30,6 +30,7 @@ def __main__(argv):
         print('please give parameters Testing mode: "soc"/"int"/"hvac"/"unint"/"hrl"')
         return 
     simulation.simulation()
+    #simulation.EachMonthResult()
     simulation.outputResult()
 
 

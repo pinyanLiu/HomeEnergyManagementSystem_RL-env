@@ -20,6 +20,8 @@ class UnIntSimulation(Simulation):
         unintSwitch = []
         unloadRemain = []
         unintUserPreference = []
+        ExceedPgridMaxTimes=[]
+
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -32,6 +34,7 @@ class UnIntSimulation(Simulation):
             deltaSoc.append(states[4])
             unloadRemain.append(states[5])
             unintUserPreference.append(states[7])
+            ExceedPgridMaxTimes.append(0)
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -53,6 +56,7 @@ class UnIntSimulation(Simulation):
                 deltaSoc.append(states['state'][4])
                 unloadRemain.append(states['state'][5])
                 unintUserPreference.append(states['state'][7])
+                ExceedPgridMaxTimes.append(1 if states['state'][1]-states['state'][2]+states['state'][4]*10+states['state'][6]*wmObject.AvgPowerConsume>6 else 0)
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
@@ -65,6 +69,8 @@ class UnIntSimulation(Simulation):
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['unloadRemain'] = unloadRemain
             self.testResult[month]['unintSwitch'] = unintSwitch
+            self.testResult[month]['ExceedPgridMaxTimes'] = ExceedPgridMaxTimes
+
             self.testResult[month]['reward'] = Reward
             self.testResult[month]['unintUserPreference'] = unintUserPreference
 
@@ -78,7 +84,10 @@ class UnIntSimulation(Simulation):
             unintSwitch.clear()
             unloadRemain.clear()
             unintUserPreference.clear()
+            ExceedPgridMaxTimes.clear()
             Reward.clear()
+        for month in range(12):
+            print("month ",month, " ExceedPgridMaxTimes: ",sum(self.testResult[month]["ExceedPgridMaxTimes"]))
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     

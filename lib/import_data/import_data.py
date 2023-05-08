@@ -115,14 +115,14 @@ class ImportData:
         OccupancyTest.columns = [column[0]for column in self.cursor.description]
         return OccupancyTest
 
-    def importIntPreference(self):
-        self.cursor.execute("SELECT * FROM intPreference")
+    def importIntPreference(self,id):
+        self.cursor.execute("SELECT * FROM intPreference"+str(id))
         userPreference = pd.DataFrame(self.cursor.fetchall())
         userPreference.columns = [column[0]for column in self.cursor.description]
         return userPreference
     
-    def importUnIntPreference(self):
-        self.cursor.execute("SELECT * FROM unIntPreference")
+    def importUnIntPreference(self,id):
+        self.cursor.execute("SELECT * FROM unIntPreference"+str(id))
         unIntPreference = pd.DataFrame(self.cursor.fetchall())
         unIntPreference.columns = [column[0]for column in self.cursor.description]
         return unIntPreference

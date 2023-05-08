@@ -181,6 +181,14 @@ class OneLevelSimulation(multiSimulation):
         print("AVG TotalUnintPreference:", TotalUnintPreference/12)
         print("AVG TotalElectricPrice:", TotalElectricPrice/12)    
 
+    def EachMonthResult(self):
+        for month in range(12):
+            print("month ",month, " ExceedPgridMaxTimes: ",sum(self.testResult[month]["ExceedPgridMaxTimes"]))
+            print("month ",month, " TotalHvacPreference: ",sum(self.testResult[month]["TotalHvacPreference"]))
+            print("month ",month, " TotalIntPreference: ",sum(self.testResult[month]["TotalIntPreference"]))
+            print("month ",month, " TotalUnintPreference: ",sum(self.testResult[month]["TotalUnintPreference"]))
+            print("month ",month, " TotalElectricPrice: ",sum(self.testResult[month]["TotalElectricPrice"]))
+
     def outputResult(self):
         output = Plot(self.testResult)
         output.remainPower()

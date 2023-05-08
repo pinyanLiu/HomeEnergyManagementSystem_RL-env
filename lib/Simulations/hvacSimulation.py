@@ -18,6 +18,7 @@ class HvacSimulation(Simulation):
         indoorTemperature1 = []
         outdoorTemperature = []
         userSetTemperature1 = []
+        ExceedPgridMaxTimes = []
         hvacPower1 = []
         Reward = []
         TotalReward = []
@@ -32,6 +33,7 @@ class HvacSimulation(Simulation):
             indoorTemperature1.append(states[5])
             outdoorTemperature.append(states[6])
             userSetTemperature1.append(states[7])
+            ExceedPgridMaxTimes.append(0)
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -48,6 +50,7 @@ class HvacSimulation(Simulation):
                 indoorTemperature1.append(states['state'][5])
                 outdoorTemperature.append(states['state'][6])
                 userSetTemperature1.append(states['state'][7])
+                ExceedPgridMaxTimes.append(1 if actions[0]+states['state'][1]-states['state'][2]+states['state'][4]*10>10 else 0)
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
@@ -62,6 +65,7 @@ class HvacSimulation(Simulation):
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
             self.testResult[month]['userSetTemperature1'] = userSetTemperature1
             self.testResult[month]['hvacPower1'] = hvacPower1
+            self.testResult[month]["ExceedPgridMaxTimes"] = ExceedPgridMaxTimes
             self.testResult[month]['reward'] = Reward
             TotalReward.append(totalReward)
             totalReward=0
@@ -74,7 +78,10 @@ class HvacSimulation(Simulation):
             indoorTemperature1.clear()
             outdoorTemperature.clear()
             userSetTemperature1.clear()
+            ExceedPgridMaxTimes.clear()
             Reward.clear()
+        for month in range(12):
+            print("month ",month, " ExceedPgridMaxTimes: ",sum(self.testResult[month]["ExceedPgridMaxTimes"]))
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     

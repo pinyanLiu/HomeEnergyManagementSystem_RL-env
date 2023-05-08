@@ -85,50 +85,55 @@ class HvacEnv(HemsEnv):
     #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,indoor temperature ,outdoor temperature )
         sampleTime,load,pv,pricePerHour,deltaSoc,indoorTemperature,outdoorTemperature,userSetTemperature = self.state
         Power_HVAC = float(actions)
-
-
+        
+    #check if violate pgrid max , if violate, reset the time step until the agent give a action which pass the constrain
+        reward = []
+        if load-pv+deltaSoc*self.batteryCapacity+Power_HVAC>self.PgridMax:
+            reward.append(-5)
+            states = dict(state=self.state)
+            self.done = False
+        else:
     #interaction
 
-        #calculate the new indoor temperature for next state
-        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
+            #calculate the new indoor temperature for next state
+            nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
 
-        #calculate proportion
-        if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity) < 0:
-            cost = 0
-        else:
-            cost = Power_HVAC*pricePerHour*0.25
+            #calculate proportion
+            if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity) < 0:
+                cost = 0
+            else:
+                cost = Power_HVAC*pricePerHour*0.25
 
-        #temperature reward
-        if outdoorTemperature < userSetTemperature :
-            r1 = 0
-        else :
-            r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/100
-        #cost reward
-        r2 = -cost/2+0.2
+            #temperature reward
+            if outdoorTemperature < userSetTemperature :
+                r1 = 0
+            else :
+                r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/100
+            #cost reward
+            r2 = -cost/2+0.5
 
-        #REWARD
+            #REWARD
 
-        reward = []
-        reward.append(r1)
-        reward.append(r2)
-        #Pgrid max reward
-        if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity)>self.PgridMax:
-            reward.append(-10)
-            
-        #change to next state
-        sampleTime = int(sampleTime+1)
+            reward.append(r1)
+            reward.append(r2)
+            #Pgrid max reward
+            if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity)>self.PgridMax:
+                reward.append(-10)
+                
+            #change to next state
+            sampleTime = int(sampleTime+1)
 
-        #check if all day has done
-        self.done = bool(
-            sampleTime == 95
-        )
-
-
-        self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
-        states = dict(state=self.state)
+            #check if all day has done
+            self.done = bool(
+                sampleTime == 95
+            )
 
 
-        self.reward = sum(reward)+0.12
+            self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],nextIndoorTemperature,self.outdoorTemperature[sampleTime],self.userSetTemperature[sampleTime]])
+            states = dict(state=self.state)
+
+
+            self.reward = sum(reward)+0.12
 
         return states,self.done,self.reward
 

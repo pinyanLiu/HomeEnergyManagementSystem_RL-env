@@ -26,7 +26,7 @@
         "max_value": 0.25,
         "min_value": -0.25
     },
-    "max_episode_timesteps": 96,
+    "max_episode_timesteps": 110,
     "batch_size": 250,
     "network": [
         {
@@ -59,7 +59,7 @@
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.25,
-    "discount": 0.995,
+    "discount": 0.985,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
