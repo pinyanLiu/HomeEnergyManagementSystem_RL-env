@@ -7,7 +7,7 @@ from lib.plot.plot import Plot
 class multiSimulation(Simulation):
     def __init__(self):
         super().__init__()
-        self.environment = Environment.create(environment = multiAgentTestEnv,max_episode_timesteps=672)
+        self.environment = Environment.create(environment = multiAgentTestEnv,max_episode_timesteps=960)
         self.agent = Agent.load(directory = 'HLA/saver_dir',environment=self.environment)
 
     def simulation(self):
@@ -29,12 +29,21 @@ class multiSimulation(Simulation):
         hvacPower1 = []
         hvacPower2 = []
         hvacPower3 = []
-        intLoadRemain = []
-        unLoadRemain = []
-        intUserPreference = []
-        unintUserPreference = []
-        intSwitch = []
-        unintSwitch = []
+        intLoadRemain1 = []
+        intLoadRemain2 = []
+        intLoadRemain3 = []
+        unLoadRemain1 = []
+        unLoadRemain2 = []
+        intUserPreference1 = []
+        intUserPreference2 = []
+        intUserPreference3 = []
+        unintUserPreference1 = []
+        unintUserPreference2 = []
+        intSwitch1 = []
+        intSwitch2 = []
+        intSwitch3 = []
+        unintSwitch1 = []
+        unintSwitch2= []
         order = []
         Reward = []
         TotalReward = []
@@ -57,7 +66,7 @@ class multiSimulation(Simulation):
                 states, terminal, reward = self.environment.execute(actions=actions)
                 #get total state information
                 totalState = self.environment.totalState
-                if totalState["order"]==6:
+                if totalState["order"]==8:
                     sampletime.append(totalState["sampleTime"])
                     remain.append(states['state'][2])
                     load.append(totalState["fixLoad"])
@@ -77,17 +86,26 @@ class multiSimulation(Simulation):
                     hvacPower1.append(totalState['hvacPower1'])
                     hvacPower2.append(totalState['hvacPower2'])
                     hvacPower3.append(totalState['hvacPower3'])
-                    intLoadRemain.append(totalState["intRemain"])
-                    unLoadRemain.append(totalState["unintRemain"])
-                    intUserPreference.append(totalState["intPreference"])
-                    unintUserPreference.append(totalState["unintPreference"])
-                    intSwitch.append(totalState["intSwitch"])
-                    unintSwitch.append(totalState["unintSwitch"])
-                    order.append(totalState["order"])
+                    intLoadRemain1.append(totalState["intRemain1"])
+                    intLoadRemain2.append(totalState["intRemain2"])
+                    intLoadRemain3.append(totalState["intRemain3"])
+                    unLoadRemain1.append(totalState["unintRemain1"])
+                    unLoadRemain2.append(totalState["unintRemain2"])
+                    intUserPreference1.append(totalState["intPreference1"])
+                    intUserPreference2.append(totalState["intPreference2"])
+                    intUserPreference3.append(totalState["intPreference3"])
+                    unintUserPreference1.append(totalState["unintPreference1"])
+                    unintUserPreference2.append(totalState["unintPreference2"])
+                    intSwitch1.append(totalState["intSwitch1"])
+                    intSwitch2.append(totalState["intSwitch2"])
+                    intSwitch3.append(totalState["intSwitch3"])
+                    unintSwitch1.append(totalState["unintSwitch1"])
+                    unintSwitch2.append(totalState["unintSwitch2"])
                     Reward.append(reward)
+                    order.append(totalState["order"])
                     TotalElectricPrice.append(0.25*totalState["pricePerHour"]*states['state'][2] if states['state'][2]>0 else 0)
-                    TotalIntPreference.append(totalState["intSwitch"]*totalState["intPreference"])
-                    TotalUnintPreference.append(totalState["unintSwitch"]*totalState["unintPreference"])              
+                    TotalIntPreference.append(totalState["intSwitch1"]*totalState["intPreference1"]+totalState["intSwitch2"]*totalState["intPreference2"]+totalState["intSwitch3"]*totalState["intPreference3"])
+                    TotalUnintPreference.append(totalState["unintSwitch1"]*totalState["unintPreference1"]+totalState["unintSwitch2"]*totalState["unintPreference2"])              
                     ExceedPgridMaxTimes.append(1 if states['state'][2]>totalState['PgridMax'] else 0)
                     PgridMax.append(totalState['PgridMax'])
                 totalReward += reward
@@ -108,12 +126,21 @@ class multiSimulation(Simulation):
             self.testResult[month]['hvacPower1'] = hvacPower1
             self.testResult[month]['hvacPower2'] = hvacPower2
             self.testResult[month]['hvacPower3'] = hvacPower3
-            self.testResult[month]['intRemain'] = intLoadRemain
-            self.testResult[month]['unloadRemain'] = unLoadRemain
-            self.testResult[month]['intUserPreference'] = intUserPreference
-            self.testResult[month]['unintUserPreference'] = unintUserPreference
-            self.testResult[month]['intSwitch'] = intSwitch
-            self.testResult[month]['unintSwitch'] = unintSwitch
+            self.testResult[month]['intRemain1'] = intLoadRemain1
+            self.testResult[month]['intRemain2'] = intLoadRemain2
+            self.testResult[month]['intRemain3'] = intLoadRemain3
+            self.testResult[month]['unloadRemain1'] = unLoadRemain1
+            self.testResult[month]['unloadRemain2'] = unLoadRemain2
+            self.testResult[month]['intUserPreference1'] = intUserPreference1
+            self.testResult[month]['intUserPreference2'] = intUserPreference2
+            self.testResult[month]['intUserPreference3'] = intUserPreference3
+            self.testResult[month]['unintUserPreference1'] = unintUserPreference1
+            self.testResult[month]['unintUserPreference2'] = unintUserPreference2
+            self.testResult[month]['intSwitch1'] = intSwitch1
+            self.testResult[month]['intSwitch2'] = intSwitch2
+            self.testResult[month]['intSwitch3'] = intSwitch3
+            self.testResult[month]['unintSwitch1'] = unintSwitch1
+            self.testResult[month]['unintSwitch2'] = unintSwitch2
             self.testResult[month]['reward'] = Reward
             self.testResult[month]["TotalElectricPrice"] = TotalElectricPrice
             self.testResult[month]["TotalIntPreference"] = TotalIntPreference
@@ -142,12 +169,21 @@ class multiSimulation(Simulation):
             hvacPower1.clear()
             hvacPower2.clear()
             hvacPower3.clear()
-            intLoadRemain.clear()
-            unLoadRemain.clear()
-            intUserPreference.clear()
-            unintUserPreference.clear()
-            intSwitch.clear()
-            unintSwitch.clear()
+            intLoadRemain1.clear()
+            intLoadRemain2.clear()
+            intLoadRemain3.clear()
+            unLoadRemain1.clear()
+            unLoadRemain2.clear()
+            intUserPreference1.clear()
+            intUserPreference2.clear()
+            intUserPreference3.clear()
+            unintUserPreference1.clear()
+            unintUserPreference2.clear()
+            intSwitch1.clear()
+            intSwitch2.clear()
+            intSwitch3.clear()
+            unintSwitch1.clear()
+            unintSwitch2.clear()
             order.clear()
             Reward.clear()
             TotalUnintPreference.clear()
@@ -163,51 +199,70 @@ class multiSimulation(Simulation):
         TotalUnintPreference = 0 
         TotalElectricPrice = 0
         TotalHvacPreference = 0
-        for month in range(12):
-            ExceedPgridMaxTimes += sum(self.testResult[month]["ExceedPgridMaxTimes"])
-            TotalHvacPreference += sum(self.testResult[month]["TotalHvacPreference"])
-            TotalIntPreference  += sum(self.testResult[month]["TotalIntPreference"])
-            TotalUnintPreference += sum(self.testResult[month]["TotalUnintPreference"])
-            TotalElectricPrice += sum(self.testResult[month]["TotalElectricPrice"])
-        print("Exceed PgridMax Ratio :", ExceedPgridMaxTimes/(12*96)*100,"%")
-        print("AVG TotalHvacPreference :", TotalHvacPreference/12)
-        print("AVG TotalIntPreference :", TotalIntPreference/12)
-        print("AVG TotalUnintPreference:", TotalUnintPreference/12)
-        print("AVG TotalElectricPrice:", TotalElectricPrice/12)
 
     def EachMonthResult(self):
-        for month in range(12):
-            print("month ",month, " ExceedPgridMaxTimes: ",sum(self.testResult[month]["ExceedPgridMaxTimes"]))
-            print("month ",month, " TotalHvacPreference: ",sum(self.testResult[month]["TotalHvacPreference"]))
-            print("month ",month, " TotalIntPreference: ",sum(self.testResult[month]["TotalIntPreference"]))
-            print("month ",month, " TotalUnintPreference: ",sum(self.testResult[month]["TotalUnintPreference"]))
-            print("month ",month, " TotalElectricPrice: ",sum(self.testResult[month]["TotalElectricPrice"]))
+        return super().EachMonthResult()
 
     
-    def outputResult(self):
+    def outputResult(self,mode):
         output = Plot(self.testResult)
-        output.remainPower()
-        output.soc()
-        output.indoorTemperature(1)
-        output.indoorTemperature(2)
-        output.indoorTemperature(3)
-        output.outdoorTemperature()
-        output.userSetTemperature(1)
-        output.userSetTemperature(2)
-        output.userSetTemperature(3)
-        output.price()
-        output.plotIntPreference()
-        output.plotUnintPreference()
-        output.plotIntLoadPower()
-        output.plotUnIntLoadPower()
-        output.plotDeltaSOCPower()
-        output.plotHVACPower(id=1)
-        output.plotHVACPower(id=2)
-        output.plotHVACPower(id=3)
-        output.plotPVPower()
-        output.plotPgridMax()
-        #output.plotReward()
-        output.plotResult('lib/plot/HRL/')
+        if mode == "hvac":
+            output.remainPower()
+            output.soc()
+            output.indoorTemperature(1)
+            output.indoorTemperature(2)
+            output.indoorTemperature(3)
+            output.outdoorTemperature()
+            output.userSetTemperature(1)
+            output.userSetTemperature(2)
+            output.userSetTemperature(3)
+            output.plotHVACPower(id=1)
+            output.plotHVACPower(id=2)
+            output.plotHVACPower(id=3)
+            output.plotDeltaSOCPower()
+            output.price()
+            output.plotPgridMax()
+            output.plotPVPower()
+            output.plotResult('lib/plot/HRL/hvac/')
+
+        elif mode == "soc":
+            output.remainPower()
+            output.soc()
+            output.price()
+            output.plotPgridMax()
+            output.plotPVPower()
+            output.plotDeltaSOCPower()
+            output.plotResult('lib/plot/HRL/soc/')
+            
+        elif mode == "int":
+            output.remainPower()
+            output.soc()
+            output.price()
+            output.plotPgridMax()
+            output.plotPVPower()
+            output.plotIntPreference(1)
+            output.plotIntPreference(2)
+            output.plotIntPreference(3)
+            output.plotIntLoadPower(1)
+            output.plotIntLoadPower(2)
+            output.plotIntLoadPower(3)
+            output.plotDeltaSOCPower()
+            output.plotResult('lib/plot/HRL/int/')
+
+        elif mode == "unint":
+            output.remainPower()
+            output.soc()
+            output.price()
+            output.plotPgridMax()
+            output.plotPVPower()
+            output.plotUnintPreference(1)
+            output.plotUnintPreference(2)
+            output.plotUnIntLoadPower(1)
+            output.plotUnIntLoadPower(2)
+            output.plotResult('lib/plot/HRL/unint/')
+
+
+
 
     def getMean(self):
         return super().getMean()

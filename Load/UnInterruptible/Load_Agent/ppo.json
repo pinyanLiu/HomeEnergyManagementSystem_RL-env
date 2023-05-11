@@ -17,7 +17,7 @@
         ],
         "max_value": [
             95.0,
-            10.0,
+            12.0,
             10.0,
             6.2,
             0.25,
@@ -46,7 +46,7 @@
         }
     ],
     "use_beta_distribution": true,
-    "memory": 25000,
+    "memory": 30000,
     "update_frequency": 0.5,
     "learning_rate": 1e-4,
     "discount": 0.995,

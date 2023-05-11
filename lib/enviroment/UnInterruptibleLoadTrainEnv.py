@@ -17,18 +17,18 @@ class UnIntEnv(HemsEnv):
         self.batteryCapacity=float(list(self.BaseParameter.loc[self.BaseParameter['parameter_name']=='batteryCapacity']['value'])[0])
 #        self.uninterruptibleLoad = WM(demand=randint(1,20),executePeriod=randint(2,4),AvgPowerConsume=0.7)
         self.uninterruptibleLoad = WM(demand=randint(3,8),executePeriod=6,AvgPowerConsume=1.5)
-        self.allUnintPreference = self.info.importUnIntPreference()
+        self.allUnintPreference = self.info.importUnIntPreference(1)
 
 
 
     def states(self):
-        #observation space 
+        #observation space ppo
         upperLimit = np.array(
             [
                 #time block
                 95,
                 #load
-                10.0,
+                12.0,
                 #PV
                 10.0,
                 #price per hour

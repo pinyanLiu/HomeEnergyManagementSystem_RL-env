@@ -57,6 +57,10 @@ class HvacSimulation(Simulation):
             hvacPower1.append(0)
             Reward.append(0)
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
+            print(len(sampletime))
+            print(len(remain))
+            print(len(price))
+            print(len(deltaSoc))
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
             self.testResult[month]['price'] = price

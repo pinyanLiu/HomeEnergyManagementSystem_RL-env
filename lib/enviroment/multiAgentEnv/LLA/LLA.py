@@ -87,16 +87,16 @@ class hvacLLA(LLA):
         return super().__del__()
 
 class intLLA(LLA):
-    def __init__(self, mean, std,min,max,baseParameter,Int) -> None:
+    def __init__(self, mean, std,min,max,baseParameter,Int,id) -> None:
         super().__init__(mean, std,min,max )
         self.interruptibleLoad = Int
         self.environment = Environment.create(environment=VoidIntTest(baseParameter,Int),max_episode_timesteps=96)
         self.agent = Agent.load(directory='Load/Interruptible/saver_dir',environment=self.environment)
         self.internals = self.agent.initial_internals()
-
+        self.id = id
     def getState(self, allStates,actionMask) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , interruptible Remain]
-        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['intRemain'],allStates['intPreference']],dtype=np.float32),action_mask=actionMask)
+        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['intRemain'+str(self.id)],allStates['intPreference'+str(self.id)]],dtype=np.float32),action_mask=actionMask)
 
     def execute(self) -> None:
         self.actions, self.internals = self.agent.act(
@@ -114,17 +114,17 @@ class intLLA(LLA):
         return super().__del__()
 
 class unintLLA(LLA):
-    def __init__(self, mean, std,min,max,baseParameter ,unInt) -> None:
+    def __init__(self, mean, std,min,max,baseParameter ,unInt,id) -> None:
         super().__init__(mean, std,min,max )
         self.uninterruptibleLoad = unInt
         self.environment = Environment.create(environment=VoidUnIntTest(baseParameter,unInt),max_episode_timesteps=96)
         self.agent = Agent.load(directory='Load/UnInterruptible/saver_dir',environment=self.environment)
         self.internals = self.agent.initial_internals()
-
+        self.id = id 
 
     def getState(self, allStates , actionMask) -> None:
         #[time block , load , PV ,pricePerHour , Delta SOC , Uninterruptible Remain , Uninterruptible Switch]
-        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['unintRemain'],allStates['unintSwitch'],allStates['unintPreference']],dtype=np.float32),action_mask=actionMask)
+        self.states = dict(state=np.array([allStates['sampleTime'],allStates['fixLoad'],allStates['PV'],allStates['pricePerHour'],allStates['deltaSoc'],allStates['unintRemain'+str(self.id)],allStates['unintSwitch'+str(self.id)],allStates['unintPreference'+str(self.id)]],dtype=np.float32),action_mask=actionMask)
 
 
     def execute(self) -> None:

@@ -11,7 +11,6 @@ class UnIntSimulation(Simulation):
         self.environment = Environment.create(environment = UnIntTest,max_episode_timesteps=96)
         self.agent = Agent.load(directory = 'Load/UnInterruptible/saver_dir',environment=self.environment)
     def simulation(self):
-        wmObject = WM(AvgPowerConsume=1.5)
         sampletime = []
         load = []
         pv = []
@@ -44,7 +43,7 @@ class UnIntSimulation(Simulation):
                 states, terminal, reward = self.environment.execute(actions=actions)
                 #1. unintSwitch on 
                 if states['state'][6] == 1: # washing machine's unintSwitch
-                    unintSwitch.append(wmObject.AvgPowerConsume)#power
+                    unintSwitch.append(self.environment.uninterruptibleLoad.AvgPowerConsume)#power
                 #2. do nothing 
                 else :
                     unintSwitch.append(0)
@@ -56,7 +55,7 @@ class UnIntSimulation(Simulation):
                 deltaSoc.append(states['state'][4])
                 unloadRemain.append(states['state'][5])
                 unintUserPreference.append(states['state'][7])
-                ExceedPgridMaxTimes.append(1 if states['state'][1]-states['state'][2]+states['state'][4]*10+states['state'][6]*wmObject.AvgPowerConsume>6 else 0)
+                ExceedPgridMaxTimes.append(1 if states['state'][1]-states['state'][2]+states['state'][4]*10+states['state'][6]*self.environment.uninterruptibleLoad.AvgPowerConsume>10 else 0)
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
@@ -67,12 +66,11 @@ class UnIntSimulation(Simulation):
             self.testResult[month]['remain'] = remain
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
-            self.testResult[month]['unloadRemain'] = unloadRemain
-            self.testResult[month]['unintSwitch'] = unintSwitch
+            self.testResult[month]['unloadRemain1'] = unloadRemain
+            self.testResult[month]['unintSwitch1'] = unintSwitch
             self.testResult[month]['ExceedPgridMaxTimes'] = ExceedPgridMaxTimes
-
             self.testResult[month]['reward'] = Reward
-            self.testResult[month]['unintUserPreference'] = unintUserPreference
+            self.testResult[month]['unintUserPreference1'] = unintUserPreference
 
             TotalReward.append(totalReward)
             totalReward=0

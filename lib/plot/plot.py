@@ -12,20 +12,32 @@ class Plot():
 
     def remainPower(self):
         for month in range(0,12):
-            self.ax[month].set_ylim(-2,8)
+            self.ax[month].set_ylim(-2,11)
             self.ax[month].set_ylabel('Power')
             self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',color ='gray') 
  
 
-    def plotUnIntLoadPower(self):
+    def plotUnIntLoadPower(self,id=1):
+        if id == 1:
+            color = 'darkslategray'
+        elif id == 2:
+            color = 'c'
+        else:
+            color = 'dodgerblue'
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')
-            self.ax[month].bar(range(96) ,self.testResult[month]['unintSwitch'] ,label = 'unintSwitch', color ='green')    
+            self.ax[month].bar(range(96) ,self.testResult[month]['unintSwitch'+str(id)] ,label = 'unintSwitch', color =color)    
 
-    def plotIntLoadPower(self):
+    def plotIntLoadPower(self,id=1):
+        if id == 1:
+            color = 'lime'
+        elif id == 2:
+            color = 'seagreen'
+        else:
+            color = 'aquamarine'
         for month in range(0,12):
             self.ax[month].set_ylabel('Power')
-            self.ax[month].bar(range(96) ,self.testResult[month]['intSwitch'] ,label = 'switch', color ='lime')    
+            self.ax[month].bar(range(96) ,self.testResult[month]['intSwitch'+str(id)] ,label = 'switch', color =color)    
 
     def plotDeltaSOCPower(self):
         for month in range(0,12):
@@ -115,31 +127,35 @@ class Plot():
         custom_time = strftime(custom_format, current_time)
         self.fig.tight_layout()
         self.fig.savefig(dir+str(custom_time)+'.png')
+        
 
-    def plotOccupancy(self):
-        self.sub4= [sub4.twinx() for sub4 in self.ax]
-        for month in range(0,12):
-            self.sub4[month].set_ylim(0,6)
-            self.sub4[month].set_ylabel('OCP',color='pink')
-            self.sub4[month].spines['right'].set_position(("axes",1.2))
-            self.sub4[month].tick_params(axis='y',colors = 'pink')
-            self.sub4[month].plot(range(96) ,self.testResult[month]['occupancy'] ,label = 'Occupancy', color ='pink')            
-
-    def plotIntPreference(self):
-        self.sub4= [sub4.twinx() for sub4 in self.ax]
-        for month in range(0,12):
-            self.sub4[month].set_ylim(-1,4)
-            self.sub4[month].set_ylabel('pfr',color='pink')
-            self.sub4[month].spines['right'].set_position(("axes",1.2))
-            self.sub4[month].tick_params(axis='y',colors = 'pink')
-            self.sub4[month].plot(range(96) ,self.testResult[month]['intUserPreference'] ,label = 'intUserPreference', color ='lime')            
-
-    def plotUnintPreference(self):
+    def plotIntPreference(self,id=1):
+        if id == 1:
+            color = 'lime'
+        elif id == 2:
+            color = 'seagreen'
+        else:
+            color = 'aquamarine'
         self.sub4= [sub4.twinx() for sub4 in self.ax]
         for month in range(0,12):
             self.sub4[month].set_ylim(-1,4)
             self.sub4[month].set_ylabel('pfr',color='pink')
             self.sub4[month].spines['right'].set_position(("axes",1.2))
             self.sub4[month].tick_params(axis='y',colors = 'pink')
-            self.sub4[month].plot(range(96) ,self.testResult[month]['unintUserPreference'] ,label = 'unintUserPreference', color ='green')            
+            self.sub4[month].plot(range(96) ,self.testResult[month]['intUserPreference'+str(id)] ,label = 'intUserPreference', color =color)            
+
+    def plotUnintPreference(self,id=1):
+        if id == 1:
+            color = 'darkslategray'
+        elif id == 2:
+            color = 'c'
+        else:
+            color = 'dodgerblue'
+        self.sub4= [sub4.twinx() for sub4 in self.ax]
+        for month in range(0,12):
+            self.sub4[month].set_ylim(-1,4)
+            self.sub4[month].set_ylabel('pfr',color='pink')
+            self.sub4[month].spines['right'].set_position(("axes",1.2))
+            self.sub4[month].tick_params(axis='y',colors = 'pink')
+            self.sub4[month].plot(range(96) ,self.testResult[month]['unintUserPreference'+str(id)] ,label = 'unintUserPreference', color = color)            
 

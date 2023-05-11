@@ -29,13 +29,13 @@ def main(argv):
         runner = Runner(
             environment=environment,
             agent= agent,
-            max_episode_timesteps=672,
+            max_episode_timesteps=960,
         )
     else:
         runner = Runner(
             environment=environment,
             agent= agent,
-            max_episode_timesteps=110,
+            max_episode_timesteps=96,
         )
 
 

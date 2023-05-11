@@ -30,8 +30,15 @@ def __main__(argv):
         print('please give parameters Testing mode: "soc"/"int"/"hvac"/"unint"/"hrl"')
         return 
     simulation.simulation()
-    #simulation.EachMonthResult()
-    simulation.outputResult()
+    if mode == "hrl" or mode == "4" or mode == "1":
+        simulation.EachMonthResult()
+        simulation.outputResult("soc")
+        simulation.outputResult("hvac")
+        simulation.outputResult("int")
+        simulation.outputResult("unint")
+        simulation.avgMonthResult()
+    else:
+        simulation.outputResult()
 
 
 

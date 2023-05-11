@@ -83,8 +83,8 @@ class multiAgentTrainEnv(Environment):
         self.interruptibleLoad1 = AC(demand=self.intload_demand1,AvgPowerConsume=self.intload_power1)
         self.interruptibleLoad2 = AC(demand=self.intload_demand2,AvgPowerConsume=self.intload_power2)
         self.interruptibleLoad3 = AC(demand=self.intload_demand3,AvgPowerConsume=self.intload_power3)
-        self.uninterruptibleLoad = WM(demand=self.unload_demand1,executePeriod=self.unload_period1,AvgPowerConsume=self.unload_power1)
-        self.uninterruptibleLoad = WM(demand=self.unload_demand2,executePeriod=self.unload_period2,AvgPowerConsume=self.unload_power2)
+        self.uninterruptibleLoad1 = WM(demand=self.unload_demand1,executePeriod=self.unload_period1,AvgPowerConsume=self.unload_power1)
+        self.uninterruptibleLoad2 = WM(demand=self.unload_demand2,executePeriod=self.unload_period2,AvgPowerConsume=self.unload_power2)
 
         # self.interruptibleLoad = AC(demand=randint(1,49),AvgPowerConsume=1.5)
         # self.uninterruptibleLoad = WM(demand=randint(3,24),executePeriod=3,AvgPowerConsume=uniform(0.5,1))
@@ -108,16 +108,16 @@ class multiAgentTrainEnv(Environment):
         self.hvacAgent3 = hvacLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='HVAC']['Max'])[0]),baseParameter=self.BaseParameter,allOutdoorTemperature=self.allOutdoorTemperature,allUserSetTemperature=self.allUserSetTemperature3,id=3)
         
         
-        self.intAgent1 = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Max'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad1)
+        self.intAgent1 = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Max'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad1,id=1)
 
-        self.intAgent2 = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Max'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad2)
+        self.intAgent2 = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Max'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad2,id=2)
 
-        self.intAgent3 = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Max'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad3)
+        self.intAgent3 = intLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Interruptible']['Max'])[0]),baseParameter=self.BaseParameter,Int=self.interruptibleLoad3,id=3)
         
         
-        self.unIntAgent1 = unintLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Max'])[0]),baseParameter=self.BaseParameter,unInt=self.uninterruptibleLoad1)
+        self.unIntAgent1 = unintLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Max'])[0]),baseParameter=self.BaseParameter,unInt=self.uninterruptibleLoad1,id=1)
 
-        self.unIntAgent2 = unintLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Max'])[0]),baseParameter=self.BaseParameter,unInt=self.uninterruptibleLoad2)
+        self.unIntAgent2 = unintLLA(mean=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['mean'])[0]),std=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['std'])[0]),min=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Min'])[0]),max=float(list(self.allStatisticalData.loc[self.allStatisticalData['name']=='Uninterruptible']['Max'])[0]),baseParameter=self.BaseParameter,unInt=self.uninterruptibleLoad2,id=2)
 
 
         self.state = None
@@ -275,9 +275,9 @@ class multiAgentTrainEnv(Environment):
 
         self.interruptibleLoad3 = AC(demand=randint(15,25),AvgPowerConsume=uniform(1,1.5))
 
-        self.uninterruptibleLoad1 = WM(demand=randint(3,8),executePeriod=6,AvgPowerConsume=uniform(0.8,1.5))
+        self.uninterruptibleLoad1 = WM(demand=randint(3,8),executePeriod=randint(3,6),AvgPowerConsume=uniform(0.8,2))
 
-        self.uninterruptibleLoad2 = WM(demand=randint(3,8),executePeriod=3,AvgPowerConsume=uniform(0.8,1.5))
+        self.uninterruptibleLoad2 = WM(demand=randint(3,8),executePeriod=randint(3,6),AvgPowerConsume=uniform(0.8,2))
         self.randomDeltaPrice  = [uniform(-1,1) for _ in range(96)]
         self.randomDeltaPV = [uniform(-0.5,0.5) for _ in range(96)]        
         self.randomTemperature = [uniform(-2,2)for _ in range(96)]
@@ -462,26 +462,29 @@ class multiAgentTrainEnv(Environment):
             "hvacPower1":0,
             "hvacPower2":0,
             "hvacPower3":0,
-            "intRemain":self.interruptibleLoad1.demand,
-            "intSwitch":self.interruptibleLoad1.switch,
-            "intPreference":self.intUserPreference1[0],
-            "intRemain":self.interruptibleLoad2.demand,
-            "intSwitch":self.interruptibleLoad2.switch,
-            "intPreference":self.intUserPreference2[0],
-            "intRemain":self.interruptibleLoad3.demand,
-            "intSwitch":self.interruptibleLoad3.switch,
-            "intPreference":self.intUserPreference3[0],
-            "unintRemain":self.uninterruptibleLoad1.demand*self.uninterruptibleLoad1.executePeriod,
-            "unintSwitch":self.uninterruptibleLoad1.switch,
-            "unintPreference":self.unintPreference1[0],
-            "unintRemain":self.uninterruptibleLoad2.demand*self.uninterruptibleLoad2.executePeriod,
-            "unintSwitch":self.uninterruptibleLoad2.switch,
-            "unintPreference":self.unintPreference2[0],
+            "intRemain1":self.interruptibleLoad1.demand,
+            "intSwitch1":self.interruptibleLoad1.switch,
+            "intPreference1":self.intUserPreference1[0],
+            "intRemain2":self.interruptibleLoad2.demand,
+            "intSwitch2":self.interruptibleLoad2.switch,
+            "intPreference2":self.intUserPreference2[0],
+            "intRemain3":self.interruptibleLoad3.demand,
+            "intSwitch3":self.interruptibleLoad3.switch,
+            "intPreference3":self.intUserPreference3[0],
+            "unintRemain1":self.uninterruptibleLoad1.demand*self.uninterruptibleLoad1.executePeriod,
+            "unintSwitch1":self.uninterruptibleLoad1.switch,
+            "unintPreference1":self.unintPreference1[0],
+            "unintRemain2":self.uninterruptibleLoad2.demand*self.uninterruptibleLoad2.executePeriod,
+            "unintSwitch2":self.uninterruptibleLoad2.switch,
+            "unintPreference2":self.unintPreference2[0],
             "order":0,
             "PgridMax":self.PgridMax
         }
-        self.interruptibleLoadActionMask = [True,True]
-        self.uninterruptibleLoadActionMask = [True,True]
+        self.interruptibleLoadActionMask1 = [True,True]
+        self.interruptibleLoadActionMask2 = [True,True]
+        self.interruptibleLoadActionMask3 = [True,True]
+        self.uninterruptibleLoadActionMask1 = [True,True]
+        self.uninterruptibleLoadActionMask2 = [True,True]
         self.action_mask = [True,True,True,True,True,True,True,True,True,True]
         self.state = self.stateAbstraction(self.totalState)
         self.socAgent.agent.internals = self.socAgent.agent.initial_internals()
@@ -563,8 +566,8 @@ class multiAgentTrainEnv(Environment):
         #int
         elif actions == 4:
             # print('int')
-            self.intAgent1.getState(self.totalState,self.interruptibleLoadActionMask)
-            self.intAgent1.environment.updateState(self.intAgent1.states,self.interruptibleLoad)
+            self.intAgent1.getState(self.totalState,self.interruptibleLoadActionMask1)
+            self.intAgent1.environment.updateState(self.intAgent1.states,self.interruptibleLoad1)
             self.intAgent1.execute()
             self.intAgent1.rewardNormalization()
             reward.append(self.intAgent1.reward)            
@@ -572,8 +575,8 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,False,True,True,True,True,True])]
         elif actions == 5:
             # print('int')
-            self.intAgent2.getState(self.totalState,self.interruptibleLoadActionMask)
-            self.intAgent2.environment.updateState(self.intAgent2.states,self.interruptibleLoad)
+            self.intAgent2.getState(self.totalState,self.interruptibleLoadActionMask2)
+            self.intAgent2.environment.updateState(self.intAgent2.states,self.interruptibleLoad2)
             self.intAgent2.execute()
             self.intAgent2.rewardNormalization()
             reward.append(self.intAgent2.reward)            
@@ -581,8 +584,8 @@ class multiAgentTrainEnv(Environment):
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,False,True,True,True,True])]
         elif actions == 6:
             # print('int')
-            self.intAgent3.getState(self.totalState,self.interruptibleLoadActionMask)
-            self.intAgent3.environment.updateState(self.intAgent3.states,self.interruptibleLoad)
+            self.intAgent3.getState(self.totalState,self.interruptibleLoadActionMask3)
+            self.intAgent3.environment.updateState(self.intAgent3.states,self.interruptibleLoad3)
             self.intAgent3.execute()
             self.intAgent3.rewardNormalization()
             reward.append(self.intAgent3.reward)            
@@ -591,8 +594,8 @@ class multiAgentTrainEnv(Environment):
         #unint
         elif actions == 7:
             # print('unint')
-            self.unIntAgent1.getState(self.totalState,self.uninterruptibleLoadActionMask)
-            self.unIntAgent1.environment.updateState(self.unIntAgent1.states,self.uninterruptibleLoad)
+            self.unIntAgent1.getState(self.totalState,self.uninterruptibleLoadActionMask1)
+            self.unIntAgent1.environment.updateState(self.unIntAgent1.states,self.uninterruptibleLoad1)
             self.unIntAgent1.execute()
             self.unIntAgent1.rewardNormalization()
             reward.append(self.unIntAgent1.reward)
@@ -601,8 +604,8 @@ class multiAgentTrainEnv(Environment):
         #unint
         elif actions == 8:
             # print('unint')
-            self.unIntAgent2.getState(self.totalState,self.uninterruptibleLoadActionMask)
-            self.unIntAgent2.environment.updateState(self.unIntAgent2.states,self.uninterruptibleLoad)
+            self.unIntAgent2.getState(self.totalState,self.uninterruptibleLoadActionMask2)
+            self.unIntAgent2.environment.updateState(self.unIntAgent2.states,self.uninterruptibleLoad2)
             self.unIntAgent2.execute()
             self.unIntAgent2.rewardNormalization()
             reward.append(self.unIntAgent2.reward)
@@ -614,8 +617,6 @@ class multiAgentTrainEnv(Environment):
             self.updateTotalState("None")
             reward.append(-1)
         # print(self.action_mask,order)
-
-
         # Pgrid Max action mask
         # tempActionMask is used as a temp list to record the current action mask.
         # tempActionMaskFlag is used for recording whether previous step exceeded Pgrid Max limit.
@@ -644,21 +645,47 @@ class multiAgentTrainEnv(Environment):
             if self.action_mask[8]==True:
                 self.unIntAgent2.environment.uninterruptibleLoad.step()
             self.action_mask = [False,False,False,False,False,False,False,False,False,True]
-            if(self.state[2]-0.25>self.PgridMax):  
-                # print("PGRID MAX OVER!!!")
-                reward.append(-10)
+            if(self.state[2]-0.1>self.PgridMax):  
+                reward.append(-100)
             else:
-                reward.append(0.0001)
+                reward.append(1)
 
         if order==9:
             self.action_mask = [True,True,True,True,True,True,True,True,True,True]
+
+        if sampleTime == 95 and order==8:
+            if self.totalState["SOC"]<self.socThreshold:
+                reward.append(-50)
+            else:
+                reward.append(10)
+            if self.interruptibleLoad1.getRemainDemand()>0:
+                reward.append(-60)
+            else:
+                reward.append(10)
+            if self.interruptibleLoad2.getRemainDemand()>0:
+                reward.append(-60)
+            else:
+                reward.append(10)
+            if self.interruptibleLoad3.getRemainDemand()>0:
+                reward.append(-60)
+            else:
+                reward.append(10)
+            if self.uninterruptibleLoad1.getRemainDemand()>0:
+                reward.append(-50)
+            else:
+                reward.append(10)
+            if self.uninterruptibleLoad2.getRemainDemand()>0:
+                reward.append(-50)
+            else:
+                reward.append(10)
+            
 
 
 
         #check if all day is done
         done =  bool(sampleTime == 95 and order == 9)
 
-        reward = sum(reward)
+        reward = sum(reward)/10
         states = dict(state=self.state,action_mask = self.action_mask)
 
 
@@ -690,44 +717,44 @@ class multiAgentTrainEnv(Environment):
             self.totalState["hvacPower3"] = self.hvacAgent3.actions[0]
 
         elif mode == "int1":
-            self.interruptibleLoad = self.intAgent1.environment.interruptibleLoad
-            self.interruptibleLoadActionMask = self.intAgent1.states["action_mask"]
-            self.totalState["intRemain"] = self.intAgent1.states["state"][5]
-            self.totalState["intSwitch"] = self.intAgent1.actions
+            self.interruptibleLoad1 = self.intAgent1.environment.interruptibleLoad
+            self.interruptibleLoadActionMask1 = self.intAgent1.states["action_mask"]
+            self.totalState["intRemain1"] = self.intAgent1.states["state"][5]
+            self.totalState["intSwitch1"] = self.intAgent1.actions
             if self.intAgent1.actions==1:
-                self.totalState["fixLoad"]+=self.interruptibleLoad.AvgPowerConsume
+                self.totalState["fixLoad"]+=self.interruptibleLoad1.AvgPowerConsume
 
         elif mode == "int2":
-            self.interruptibleLoad = self.intAgent2.environment.interruptibleLoad
-            self.interruptibleLoadActionMask = self.intAgent2.states["action_mask"]
-            self.totalState["intRemain"] = self.intAgent2.states["state"][5]
-            self.totalState["intSwitch"] = self.intAgent2.actions
+            self.interruptibleLoad2 = self.intAgent2.environment.interruptibleLoad
+            self.interruptibleLoadActionMask2 = self.intAgent2.states["action_mask"]
+            self.totalState["intRemain2"] = self.intAgent2.states["state"][5]
+            self.totalState["intSwitch2"] = self.intAgent2.actions
             if self.intAgent2.actions==1:
-                self.totalState["fixLoad"]+=self.interruptibleLoad.AvgPowerConsume
+                self.totalState["fixLoad"]+=self.interruptibleLoad2.AvgPowerConsume
 
         elif mode == "int3":
-            self.interruptibleLoad = self.intAgent3.environment.interruptibleLoad
-            self.interruptibleLoadActionMask = self.intAgent3.states["action_mask"]
-            self.totalState["intRemain"] = self.intAgent3.states["state"][5]
-            self.totalState["intSwitch"] = self.intAgent3.actions
+            self.interruptibleLoad3 = self.intAgent3.environment.interruptibleLoad
+            self.interruptibleLoadActionMask3 = self.intAgent3.states["action_mask"]
+            self.totalState["intRemain3"] = self.intAgent3.states["state"][5]
+            self.totalState["intSwitch3"] = self.intAgent3.actions
             if self.intAgent3.actions==1:
-                self.totalState["fixLoad"]+=self.interruptibleLoad.AvgPowerConsume
+                self.totalState["fixLoad"]+=self.interruptibleLoad3.AvgPowerConsume
             
         elif mode == "unint1":
-            self.uninterruptibleLoad = self.unIntAgent1.environment.uninterruptibleLoad
-            self.uninterruptibleLoadActionMask = self.unIntAgent1.states["action_mask"]
-            self.totalState["unintRemain"]=self.unIntAgent1.states["state"][5]
-            self.totalState["unintSwitch"]=self.unIntAgent1.states["state"][6]
+            self.uninterruptibleLoad1 = self.unIntAgent1.environment.uninterruptibleLoad
+            self.uninterruptibleLoadActionMask1 = self.unIntAgent1.states["action_mask"]
+            self.totalState["unintRemain1"]=self.unIntAgent1.states["state"][5]
+            self.totalState["unintSwitch1"]=self.unIntAgent1.states["state"][6]
             if self.unIntAgent1.states["state"][6]==1:
-                self.totalState["fixLoad"]+=self.uninterruptibleLoad.AvgPowerConsume
+                self.totalState["fixLoad"]+=self.uninterruptibleLoad1.AvgPowerConsume
         
         elif mode == "unint2":
-            self.uninterruptibleLoad = self.unIntAgent2.environment.uninterruptibleLoad
-            self.uninterruptibleLoadActionMask = self.unIntAgent2.states["action_mask"]
+            self.uninterruptibleLoad2 = self.unIntAgent2.environment.uninterruptibleLoad
+            self.uninterruptibleLoadActionMask2 = self.unIntAgent2.states["action_mask"]
             self.totalState["unintRemain"]=self.unIntAgent2.states["state"][5]
             self.totalState["unintSwitch"]=self.unIntAgent2.states["state"][6]
             if self.unIntAgent2.states["state"][6]==1:
-                self.totalState["fixLoad"]+=self.uninterruptibleLoad.AvgPowerConsume
+                self.totalState["fixLoad"]+=self.uninterruptibleLoad2.AvgPowerConsume
 
 
         #Order = 0,1,2,3,4,5,6 

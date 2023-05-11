@@ -66,11 +66,10 @@ class IntSimulation(Simulation):
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['intloadRemain'] = intloadRemain
-
             self.testResult[month]['ExceedPgridMaxTimes'] = ExceedPgridMaxTimes
-            self.testResult[month]['intSwitch'] = intSwitch
+            self.testResult[month]['intSwitch1'] = intSwitch
             self.testResult[month]['reward'] = Reward
-            self.testResult[month]['intUserPreference'] = intUserPreference
+            self.testResult[month]['intUserPreference1'] = intUserPreference
 
             TotalReward.append(totalReward)
             totalReward=0
