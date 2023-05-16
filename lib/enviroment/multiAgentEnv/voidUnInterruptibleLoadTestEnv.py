@@ -48,9 +48,12 @@ class VoidUnIntTest(UnIntEnv):
 
 
         #reward
-        reward.append(0.07-20*cost)
+        reward.append(0.07-cost)
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-5*self.uninterruptibleLoad.getRemainProcessPercentage())
+            reward.append(-20*self.uninterruptibleLoad.getRemainProcessPercentage())
+
+        if(unintPreference==4 and self.uninterruptibleLoad.switch==False):
+            reward.append(-1)
         
 
         #change to next state

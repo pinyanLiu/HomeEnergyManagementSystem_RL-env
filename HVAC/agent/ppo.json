@@ -17,7 +17,7 @@
         ],
         "max_value": [
             95,
-            12,
+            15,
             10,
             6.2,
             0.25,
@@ -32,8 +32,8 @@
         "max_value": 2,
         "min_value": 0
     },
-    "max_episode_timesteps": 110,
-    "batch_size": 240,
+    "max_episode_timesteps": 96,
+    "batch_size": 700,
     "network": [
         {
             "type": "dense",
@@ -47,7 +47,7 @@
         }
     ],
     "use_beta_distribution": true,
-    "memory": 50000,
+    "memory": "minimum",
     "update_frequency": 0.5,
     "learning_rate": 1e-4,
     "discount": 0.995,

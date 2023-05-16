@@ -28,7 +28,7 @@ class UnIntEnv(HemsEnv):
                 #time block
                 95,
                 #load
-                12.0,
+                15.0,
                 #PV
                 10.0,
                 #price per hour

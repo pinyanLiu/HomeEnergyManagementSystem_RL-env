@@ -66,7 +66,7 @@ class multiSimulation(Simulation):
                 states, terminal, reward = self.environment.execute(actions=actions)
                 #get total state information
                 totalState = self.environment.totalState
-                if totalState["order"]==8:
+                if totalState["order"]==9:
                     sampletime.append(totalState["sampleTime"])
                     remain.append(states['state'][2])
                     load.append(totalState["fixLoad"])
@@ -260,7 +260,27 @@ class multiSimulation(Simulation):
             output.plotUnIntLoadPower(1)
             output.plotUnIntLoadPower(2)
             output.plotResult('lib/plot/HRL/unint/')
-
+        else:
+            output.remainPower()
+            output.soc()
+            output.price()
+            output.plotPgridMax()
+            output.plotDeltaSOCPower()
+            output.plotPVPower()
+            output.plotHVACPower(id=1)
+            output.plotHVACPower(id=2)
+            output.plotHVACPower(id=3)
+            output.plotIntPreference(1)
+            output.plotIntPreference(2)
+            output.plotIntPreference(3)
+            output.plotIntLoadPower(1)
+            output.plotIntLoadPower(2)
+            output.plotIntLoadPower(3)
+            output.plotUnintPreference(1)
+            output.plotUnintPreference(2)
+            output.plotUnIntLoadPower(1)
+            output.plotUnIntLoadPower(2)
+            output.plotResult('lib/plot/HRL/')
 
 
 

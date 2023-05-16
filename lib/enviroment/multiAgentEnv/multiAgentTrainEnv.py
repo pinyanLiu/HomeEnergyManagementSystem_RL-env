@@ -158,7 +158,7 @@ class multiAgentTrainEnv(Environment):
         }
         self.reward = 0
         self.done = False
-        self.action_mask = [True,True,True,True,True,True,True,True,True,True]
+        self.action_mask = [True,True,True,True,True,True,True,True,True,False]
         self.interruptibleLoadActionMask1 = [True,True]
         self.interruptibleLoadActionMask2 = [True,True]
         self.interruptibleLoadActionMask3 = [True,True]
@@ -177,7 +177,7 @@ class multiAgentTrainEnv(Environment):
                 #SOC
                 1.0,
                 #Remain
-                12.0,
+                15.0,
                 #price per hour
                 6.2,
                 #HVAC1 state
@@ -485,7 +485,7 @@ class multiAgentTrainEnv(Environment):
         self.interruptibleLoadActionMask3 = [True,True]
         self.uninterruptibleLoadActionMask1 = [True,True]
         self.uninterruptibleLoadActionMask2 = [True,True]
-        self.action_mask = [True,True,True,True,True,True,True,True,True,True]
+        self.action_mask = [True,True,True,True,True,True,True,True,True,False]
         self.state = self.stateAbstraction(self.totalState)
         self.socAgent.agent.internals = self.socAgent.agent.initial_internals()
         self.hvacAgent1.agent.internals = self.hvacAgent1.agent.initial_internals()
@@ -520,6 +520,8 @@ class multiAgentTrainEnv(Environment):
         sampleTime,soc,remain,pricePreHour,hvacState1,hvacState2,hvacState3,intState1,intState2,intState3,unIntState1,unIntState2,intPreference1,intPreference2,intPreference3,unintPreference1,unintPreference2,order = self.state
 #         #print(self.totalState)
 
+        # print("total state",self.totalState)
+        # print("action mask",self.action_mask)
         #choose one load executing in this sampleTime order .Load which has been execute in the same sampleTime would be auto block by action mask
 
         #soc
@@ -531,7 +533,7 @@ class multiAgentTrainEnv(Environment):
             self.socAgent.rewardNormalization()
             reward.append(self.socAgent.reward)
             self.updateTotalState("soc")
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True,True,True,True,True,True])]
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True,True,True,True,True,False])]
         #hvac1
         elif actions == 1:
             # print('hvac')
@@ -541,7 +543,7 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent1.rewardNormalization()
             reward.append(self.hvacAgent1.reward)            
             self.updateTotalState("hvac1")
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True,True,True,True,True,True])]
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True,True,True,True,True,False])]
         #hvac2
         elif actions == 2:
             # print('hvac')
@@ -551,7 +553,7 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent2.rewardNormalization()
             reward.append(self.hvacAgent2.reward)            
             self.updateTotalState("hvac2")
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True,True,True,True,True,True])]
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True,True,True,True,True,False])]
         #hvac3
         elif actions == 3:
             # print('hvac')
@@ -561,7 +563,7 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent3.rewardNormalization()
             reward.append(self.hvacAgent3.reward)            
             self.updateTotalState("hvac3")
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True,True,True,True,True,True])]
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True,True,True,True,True,False])]
         
         #int
         elif actions == 4:
@@ -572,7 +574,7 @@ class multiAgentTrainEnv(Environment):
             self.intAgent1.rewardNormalization()
             reward.append(self.intAgent1.reward)            
             self.updateTotalState("int1")
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,False,True,True,True,True,True])]
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,False,True,True,True,True,False])]
         elif actions == 5:
             # print('int')
             self.intAgent2.getState(self.totalState,self.interruptibleLoadActionMask2)
@@ -581,7 +583,7 @@ class multiAgentTrainEnv(Environment):
             self.intAgent2.rewardNormalization()
             reward.append(self.intAgent2.reward)            
             self.updateTotalState("int2")
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,False,True,True,True,True])]
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,False,True,True,True,False])]
         elif actions == 6:
             # print('int')
             self.intAgent3.getState(self.totalState,self.interruptibleLoadActionMask3)
@@ -590,7 +592,7 @@ class multiAgentTrainEnv(Environment):
             self.intAgent3.rewardNormalization()
             reward.append(self.intAgent3.reward)            
             self.updateTotalState("int3")
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,False,True,True,True])]
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,False,True,True,False])]
         #unint
         elif actions == 7:
             # print('unint')
@@ -600,7 +602,7 @@ class multiAgentTrainEnv(Environment):
             self.unIntAgent1.rewardNormalization()
             reward.append(self.unIntAgent1.reward)
             self.updateTotalState("unint1")
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,True,False,True,True])]
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,True,False,True,False])]
         #unint
         elif actions == 8:
             # print('unint')
@@ -610,12 +612,12 @@ class multiAgentTrainEnv(Environment):
             self.unIntAgent2.rewardNormalization()
             reward.append(self.unIntAgent2.reward)
             self.updateTotalState("unint2")
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,True,True,False,True])]
+            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,True,True,False,False])]
         #none
         else:
             # print('none')
             self.updateTotalState("None")
-            reward.append(-1)
+            #reward.append(-1)
         # print(self.action_mask,order)
         # Pgrid Max action mask
         # tempActionMask is used as a temp list to record the current action mask.
@@ -623,61 +625,49 @@ class multiAgentTrainEnv(Environment):
         # if remain exceeded the Pgrid Max limit, Flag = True, and the HLA can only choose SOC or no-action
         # if the Flag = True, current action mask have to restore the previous action mask (tempActionMask[1:])
         self.state = self.stateAbstraction(self.totalState)
-        if self.tempActionMaskFlag :
-            self.tempActionMaskFlag = False
-            self.action_mask[1:] = self.tempActionMask[1:]
+        # if self.tempActionMaskFlag :
+        #     self.tempActionMaskFlag = False
+        #     self.action_mask[1:] = self.tempActionMask[1:]
 
-        if self.state[2]>self.PgridMax:
-            self.tempActionMask = self.action_mask
-            self.tempActionMaskFlag = True
-            self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,False,False,False,False,False,False,False,True])]
+        # if self.state[2]>self.PgridMax:
+        #     self.tempActionMask = self.action_mask
+        #     self.tempActionMaskFlag = True
+        #     self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,False,False,False,False,False,False,False,False])]
         
 
         if order == 8:
-            if self.action_mask[1] == True:
-                self.totalState["indoorTemperature1"] = self.epsilon*self.totalState["indoorTemperature1"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
-            if self.action_mask[2] == True:
-                self.totalState["indoorTemperature2"] = self.epsilon*self.totalState["indoorTemperature2"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
-            if self.action_mask[3] == True:
-                self.totalState["indoorTemperature3"] = self.epsilon*self.totalState["indoorTemperature3"]+(1-self.epsilon)*(self.totalState["outdoorTemperature"])
-            if self.action_mask[7]==True:
-                self.unIntAgent1.environment.uninterruptibleLoad.step()
-            if self.action_mask[8]==True:
-                self.unIntAgent2.environment.uninterruptibleLoad.step()
             self.action_mask = [False,False,False,False,False,False,False,False,False,True]
-            if(self.state[2]-0.1>self.PgridMax):  
-                reward.append(-100)
-            else:
-                reward.append(1)
+            # if(self.state[2]>self.PgridMax):  
+            #     reward.append(-100)
+            # else:
+            #     reward.append(1)
 
-        if order==9:
-            self.action_mask = [True,True,True,True,True,True,True,True,True,True]
 
-        if sampleTime == 95 and order==8:
-            if self.totalState["SOC"]<self.socThreshold:
-                reward.append(-50)
-            else:
-                reward.append(10)
-            if self.interruptibleLoad1.getRemainDemand()>0:
-                reward.append(-60)
-            else:
-                reward.append(10)
-            if self.interruptibleLoad2.getRemainDemand()>0:
-                reward.append(-60)
-            else:
-                reward.append(10)
-            if self.interruptibleLoad3.getRemainDemand()>0:
-                reward.append(-60)
-            else:
-                reward.append(10)
-            if self.uninterruptibleLoad1.getRemainDemand()>0:
-                reward.append(-50)
-            else:
-                reward.append(10)
-            if self.uninterruptibleLoad2.getRemainDemand()>0:
-                reward.append(-50)
-            else:
-                reward.append(10)
+        # if sampleTime == 95 and order==8:
+        #     if self.totalState["SOC"]<self.socThreshold:
+        #         reward.append(-50)
+        #     else:
+        #         reward.append(10)
+        #     if self.interruptibleLoad1.getRemainDemand()>0:
+        #         reward.append(-60)
+        #     else:
+        #         reward.append(10)
+        #     if self.interruptibleLoad2.getRemainDemand()>0:
+        #         reward.append(-60)
+        #     else:
+        #         reward.append(10)
+        #     if self.interruptibleLoad3.getRemainDemand()>0:
+        #         reward.append(-60)
+        #     else:
+        #         reward.append(10)
+        #     if self.uninterruptibleLoad1.getRemainDemand()>0:
+        #         reward.append(-50)
+        #     else:
+        #         reward.append(10)
+        #     if self.uninterruptibleLoad2.getRemainDemand()>0:
+        #         reward.append(-50)
+        #     else:
+        #         reward.append(10)
             
 
 
@@ -782,6 +772,7 @@ class multiAgentTrainEnv(Environment):
             self.totalState["intPreference3"] = self.intUserPreference3[self.totalState["sampleTime"]]
             self.totalState["unintPreference1"] = self.unintPreference1[self.totalState["sampleTime"]]
             self.totalState["unintPreference2"] = self.unintPreference2[self.totalState["sampleTime"]]
+            self.action_mask = [True,True,True,True,True,True,True,True,True,False]
         
             
 

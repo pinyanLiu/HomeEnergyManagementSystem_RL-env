@@ -14,7 +14,7 @@
         ],
         "max_value": [
             95.0,
-            12,
+            15,
             10,
             1.0,
             6.2
@@ -26,22 +26,17 @@
         "max_value": 0.25,
         "min_value": -0.25
     },
-    "max_episode_timesteps": 110,
-    "batch_size": 250,
+    "max_episode_timesteps": 96,
+    "batch_size": 700,
     "network": [
         {
             "type": "dense",
-            "size": 200,
+            "size": 300,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 200,
-            "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 200,
+            "size": 600,
             "activation": "relu"
         }
     ],
@@ -66,17 +61,22 @@
     "baseline": [
         {
             "type": "dense",
-            "size": 150,
+            "size": 300,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 150,
+            "size": 600,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 150,
+            "size": 600,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
             "activation": "relu"
         }
     ],

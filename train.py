@@ -23,7 +23,7 @@ def main(argv):
         environment = dict(environment = multiAgentTrainEnv)
         
     else :
-        print('please give parameters 1.Training mode: "soc"/"intload"/"HVAC"/"unintload 2.Agent 3. training episode ')
+        print('please give parameters 1.Training mode: "soc"/"intload"/"hvac"/"unintload"/"hla" 2.Agent 3. training episode ')
         return
     if argv[1]== 'hla':
         runner = Runner(

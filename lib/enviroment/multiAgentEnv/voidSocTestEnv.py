@@ -38,14 +38,17 @@ class VoidSocTest(SocEnv):
                     cost = 0
             elif(delta_soc<=0):
                 cost = pricePerHour*0.25*delta_soc*self.batteryCapacity
-        if (load+delta_soc*self.batteryCapacity-pv)>self.PgridMax:
-            reward.append(-0.2)
+        if load-pv+actions*self.batteryCapacity>self.PgridMax:
+            reward.append(-5)
 
 
 
 
-        if (sampleTime == 94 and soc <self.socThreshold):
-            reward.append(10*(soc-self.socThreshold))
+        if (sampleTime == 95 ):
+            if(soc <self.socThreshold):
+                reward.append(10*(soc-self.socThreshold))
+            else:
+                reward.append(10)
 
         reward.append(-cost)
 

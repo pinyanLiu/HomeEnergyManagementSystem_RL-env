@@ -43,13 +43,19 @@ class VoidIntTest(IntEnv):
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv+Pess))/self.interruptibleLoad.demand
             else:
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv))/self.interruptibleLoad.demand
+            reward.append(intUserPreference/2.5)#preference reward
         if cost<0:
             cost = 0 
 
         #reward
-        reward.append(0.08-10*cost)
-        if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):
-            reward.append(-10*self.interruptibleLoad.getRemainProcessPercentage())
+        reward.append(0.01-3*cost)
+        if (sampleTime == 95) :
+            if(self.interruptibleLoad.getRemainDemand()!=0):
+                reward.append(-20*self.interruptibleLoad.getRemainProcessPercentage())
+            else:
+                reward.append(10)
+        if load-pv+deltaSoc*self.batteryCapacity+actions*self.interruptibleLoad.AvgPowerConsume>self.PgridMax:
+            reward.append(-5)
 
 
         #change to next state

@@ -26,7 +26,7 @@ class IntEnv(HemsEnv):
                 #time block
                 95,
                 #load
-                12.0,
+                15.0,
                 #PV
                 10.0,
                 #price per hour
@@ -167,12 +167,7 @@ class IntEnv(HemsEnv):
         sampleTime,load,pv,pricePerHour,deltaSoc,intRemain,intUserPreference = self.state
     #check if violate pgrid max , if violate, reset the time step until the agent give a action which pass the constrain
         reward = []
-        # if load-pv+deltaSoc*self.batteryCapacity+actions*self.interruptibleLoad.AvgPowerConsume>self.PgridMax:
-        #     reward.append(-5)
-        #     states = dict(state=self.state)
-        #     self.done = False
-        # else:
-        # Turn off switch
+
         if actions == 0:
             self.interruptibleLoad.turn_off()
         #  turn on switch 
@@ -201,6 +196,8 @@ class IntEnv(HemsEnv):
                 reward.append(-20*self.interruptibleLoad.getRemainProcessPercentage())
             else:
                 reward.append(10)
+        if load-pv+deltaSoc*self.batteryCapacity+actions*self.interruptibleLoad.AvgPowerConsume>self.PgridMax:
+            reward.append(-5)
         #change to next state
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],self.GridPrice[sampleTime],self.deltaSOC[sampleTime],self.interruptibleLoad.getRemainDemand(),self.intUserPreference[sampleTime]])

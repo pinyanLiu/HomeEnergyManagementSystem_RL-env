@@ -32,11 +32,12 @@ def __main__(argv):
     simulation.simulation()
     if mode == "hrl" or mode == "4" or mode == "1":
         simulation.EachMonthResult()
+        simulation.avgMonthResult()
         simulation.outputResult("soc")
         simulation.outputResult("hvac")
         simulation.outputResult("int")
         simulation.outputResult("unint")
-        simulation.avgMonthResult()
+        simulation.outputResult("")
     else:
         simulation.outputResult()
 

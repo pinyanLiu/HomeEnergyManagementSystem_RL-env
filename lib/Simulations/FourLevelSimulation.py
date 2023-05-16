@@ -79,8 +79,27 @@ class FourLevelSimulation(multiSimulation):
             output.plotUnIntLoadPower(1)
             output.plotUnIntLoadPower(2)
             output.plotResult('lib/plot/FourLevel/unint/')
-
-
+        else:
+            output.remainPower()
+            output.soc()
+            output.price()
+            output.plotPgridMax()
+            output.plotPVPower()
+            output.plotDeltaSOCPower()
+            output.plotHVACPower(id=1)
+            output.plotHVACPower(id=2)
+            output.plotHVACPower(id=3)
+            output.plotIntPreference(1)
+            output.plotIntPreference(2)
+            output.plotIntPreference(3)
+            output.plotIntLoadPower(1)
+            output.plotIntLoadPower(2)
+            output.plotIntLoadPower(3)
+            output.plotUnintPreference(1)
+            output.plotUnintPreference(2)
+            output.plotUnIntLoadPower(1)
+            output.plotUnIntLoadPower(2)
+            output.plotResult('lib/plot/FourLevel/')
 
     def __del__(self):
         return super().__del__()

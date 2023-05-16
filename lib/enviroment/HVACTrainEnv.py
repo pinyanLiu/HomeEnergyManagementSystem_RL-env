@@ -28,7 +28,7 @@ class HvacEnv(HemsEnv):
                 #timeblock
                 95,
                 #load
-                12,
+                15,
                 #PV
                 10,
                 #pricePerHour

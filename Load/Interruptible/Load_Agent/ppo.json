@@ -16,7 +16,7 @@
         ],
         "max_value": [
             95,
-            12.0,
+            15.0,
             10.0,
             6.2,
             0.25,
@@ -29,8 +29,8 @@
         "shape": [],
         "num_values": 2
     },
-    "max_episode_timesteps": 110,
-    "batch_size": 128,
+    "max_episode_timesteps": 96,
+    "batch_size": 700,
     "network": [
         {
             "type": "dense",
@@ -44,8 +44,8 @@
         }
     ],
     "use_beta_distribution": false,
-    "memory": 25000,
-    "update_frequency": 0.1,
+    "memory": "minimum",
+    "update_frequency": 0.5,
     "learning_rate": {
         "type": "decaying",
         "decay": "linear",
@@ -64,12 +64,22 @@
     "baseline": [
         {
             "type": "dense",
-            "size": 319,
+            "size": 300,
             "activation": "relu"
         },
         {
             "type": "dense",
-            "size": 319,
+            "size": 600,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
             "activation": "relu"
         }
     ],
