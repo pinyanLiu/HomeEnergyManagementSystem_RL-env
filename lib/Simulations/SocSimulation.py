@@ -72,12 +72,12 @@ class SocSimulation(Simulation):
         print('reward: ', TotalReward ) 
     
     def outputResult(self):
-        output = Plot(self.testResult)
-        output.remainPower()
-        output.plotDeltaSOCPower()
-        output.price()
-        output.soc()
-        output.plotReward()
+        output = Plot(self.testResult,single=True)
+        output.remainPower(1)
+        # output.plotDeltaSOCPower()
+        # output.price()
+        # output.soc()
+        #output.plotReward()
         output.plotResult('lib/plot/soc/')
 
     def getMean(self):
