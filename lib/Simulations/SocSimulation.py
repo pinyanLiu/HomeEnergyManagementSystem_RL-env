@@ -74,9 +74,9 @@ class SocSimulation(Simulation):
     def outputResult(self):
         output = Plot(self.testResult,single=True)
         output.remainPower(1)
-        # output.plotDeltaSOCPower()
-        # output.price()
-        # output.soc()
+        output.plotDeltaSOCPower(1)
+        output.price(1)
+        output.soc(1)
         #output.plotReward()
         output.plotResult('lib/plot/soc/')
 
