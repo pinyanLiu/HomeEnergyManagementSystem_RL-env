@@ -269,15 +269,15 @@ class multiAgentTrainEnv(Environment):
         self.i = randint(1,359)
         #AC/WM object
 
-        self.interruptibleLoad1 = AC(demand=randint(15,25),AvgPowerConsume=uniform(1,1.5))
+        self.interruptibleLoad1 = AC(demand=randint(15,25),AvgPowerConsume=uniform(1,2))
 
-        self.interruptibleLoad2 = AC(demand=randint(15,25),AvgPowerConsume=uniform(1,1.5))
+        self.interruptibleLoad2 = AC(demand=randint(15,25),AvgPowerConsume=uniform(1,2))
 
-        self.interruptibleLoad3 = AC(demand=randint(15,25),AvgPowerConsume=uniform(1,1.5))
+        self.interruptibleLoad3 = AC(demand=randint(15,25),AvgPowerConsume=uniform(1,2))
 
-        self.uninterruptibleLoad1 = WM(demand=randint(3,8),executePeriod=randint(3,6),AvgPowerConsume=uniform(0.8,2))
+        self.uninterruptibleLoad1 = WM(demand=randint(3,8),executePeriod=randint(3,5),AvgPowerConsume=uniform(0.8,2))
 
-        self.uninterruptibleLoad2 = WM(demand=randint(3,8),executePeriod=randint(3,6),AvgPowerConsume=uniform(0.8,2))
+        self.uninterruptibleLoad2 = WM(demand=randint(3,8),executePeriod=randint(3,5),AvgPowerConsume=uniform(0.8,2))
         self.randomDeltaPrice  = [uniform(-1,1) for _ in range(96)]
         self.randomDeltaPV = [uniform(-0.5,0.5) for _ in range(96)]        
         self.randomTemperature = [uniform(-2,2)for _ in range(96)]
@@ -518,157 +518,130 @@ class multiAgentTrainEnv(Environment):
         '''
         reward = []
         sampleTime,soc,remain,pricePreHour,hvacState1,hvacState2,hvacState3,intState1,intState2,intState3,unIntState1,unIntState2,intPreference1,intPreference2,intPreference3,unintPreference1,unintPreference2,order = self.state
-#         #print(self.totalState)
 
-        # print("total state",self.totalState)
-        # print("action mask",self.action_mask)
+
         #choose one load executing in this sampleTime order .Load which has been execute in the same sampleTime would be auto block by action mask
-
         #soc
         if actions == 0 :
-            # print('soc')
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()
-            self.socAgent.rewardNormalization()
-            reward.append(self.socAgent.reward)
+            # self.socAgent.rewardNormalization()
+            # reward.append(self.socAgent.reward)
             self.updateTotalState("soc")
+            self.state = self.stateAbstraction(self.totalState)
+            reward.append(-self.socAgent.actions[0]*self.batteryCapacity*pricePreHour)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True,True,True,True,True,False])]
+        
         #hvac1
         elif actions == 1:
-            # print('hvac')
             self.hvacAgent1.getState(self.totalState)
             self.hvacAgent1.environment.updateState(self.hvacAgent1.states)
             self.hvacAgent1.execute()
-            self.hvacAgent1.rewardNormalization()
-            reward.append(self.hvacAgent1.reward)            
+            # self.hvacAgent1.rewardNormalization()
+            # reward.append(self.hvacAgent1.reward)            
             self.updateTotalState("hvac1")
+            self.state = self.stateAbstraction(self.totalState)
+            reward.append(-self.hvacAgent1.actions[0]*pricePreHour)
+            reward.append(3*self.state[4])
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True,True,True,True,True,False])]
+
         #hvac2
         elif actions == 2:
-            # print('hvac')
             self.hvacAgent2.getState(self.totalState)
             self.hvacAgent2.environment.updateState(self.hvacAgent2.states)
             self.hvacAgent2.execute()
-            self.hvacAgent2.rewardNormalization()
-            reward.append(self.hvacAgent2.reward)            
+            # self.hvacAgent2.rewardNormalization()
+            # reward.append(self.hvacAgent2.reward)            
             self.updateTotalState("hvac2")
+            self.state = self.stateAbstraction(self.totalState)
+            reward.append(-self.hvacAgent2.actions[0]*pricePreHour)
+            reward.append(3*self.state[5])
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True,True,True,True,True,False])]
+
         #hvac3
         elif actions == 3:
-            # print('hvac')
             self.hvacAgent3.getState(self.totalState)
             self.hvacAgent3.environment.updateState(self.hvacAgent3.states)
             self.hvacAgent3.execute()
-            self.hvacAgent3.rewardNormalization()
-            reward.append(self.hvacAgent3.reward)            
+            # self.hvacAgent3.rewardNormalization()
+            # reward.append(self.hvacAgent3.reward)            
             self.updateTotalState("hvac3")
+            self.state = self.stateAbstraction(self.totalState)
+            reward.append(-self.hvacAgent3.actions[0]*pricePreHour)
+            reward.append(3*self.state[6])
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True,True,True,True,True,False])]
+        
         
         #int
         elif actions == 4:
-            # print('int')
             self.intAgent1.getState(self.totalState,self.interruptibleLoadActionMask1)
             self.intAgent1.environment.updateState(self.intAgent1.states,self.interruptibleLoad1)
             self.intAgent1.execute()
-            self.intAgent1.rewardNormalization()
-            reward.append(self.intAgent1.reward)            
+            # self.intAgent1.rewardNormalization()
+            # reward.append(self.intAgent1.reward)            
             self.updateTotalState("int1")
+            self.state = self.stateAbstraction(self.totalState)
+            reward.append(-self.intAgent1.actions*self.interruptibleLoad1.AvgPowerConsume*pricePreHour)
+            reward.append(self.intAgent1.actions*intPreference1*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,False,True,True,True,True,False])]
         elif actions == 5:
-            # print('int')
             self.intAgent2.getState(self.totalState,self.interruptibleLoadActionMask2)
             self.intAgent2.environment.updateState(self.intAgent2.states,self.interruptibleLoad2)
             self.intAgent2.execute()
-            self.intAgent2.rewardNormalization()
-            reward.append(self.intAgent2.reward)            
+            # self.intAgent2.rewardNormalization()
+            # reward.append(self.intAgent2.reward)            
             self.updateTotalState("int2")
+            self.state = self.stateAbstraction(self.totalState)
+            reward.append(-self.intAgent2.actions*self.interruptibleLoad2.AvgPowerConsume*pricePreHour)
+            reward.append(self.intAgent2.actions*intPreference2*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,False,True,True,True,False])]
         elif actions == 6:
-            # print('int')
             self.intAgent3.getState(self.totalState,self.interruptibleLoadActionMask3)
             self.intAgent3.environment.updateState(self.intAgent3.states,self.interruptibleLoad3)
             self.intAgent3.execute()
-            self.intAgent3.rewardNormalization()
-            reward.append(self.intAgent3.reward)            
+            # self.intAgent3.rewardNormalization()
+            # reward.append(self.intAgent3.reward)            
             self.updateTotalState("int3")
+            self.state = self.stateAbstraction(self.totalState)
+            reward.append(-self.intAgent3.actions*self.interruptibleLoad3.AvgPowerConsume*pricePreHour)
+            reward.append(self.intAgent3.actions*intPreference3*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,False,True,True,False])]
         #unint
         elif actions == 7:
-            # print('unint')
             self.unIntAgent1.getState(self.totalState,self.uninterruptibleLoadActionMask1)
             self.unIntAgent1.environment.updateState(self.unIntAgent1.states,self.uninterruptibleLoad1)
             self.unIntAgent1.execute()
-            self.unIntAgent1.rewardNormalization()
-            reward.append(self.unIntAgent1.reward)
+            # self.unIntAgent1.rewardNormalization()
+            # reward.append(self.unIntAgent1.reward)
             self.updateTotalState("unint1")
+            self.state = self.stateAbstraction(self.totalState)
+            reward.append(-int(self.totalState["unintSwitch1"])*self.uninterruptibleLoad1.AvgPowerConsume*pricePreHour)
+            reward.append(int(self.totalState["unintSwitch1"])*unintPreference1*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,True,False,True,False])]
         #unint
         elif actions == 8:
-            # print('unint')
             self.unIntAgent2.getState(self.totalState,self.uninterruptibleLoadActionMask2)
             self.unIntAgent2.environment.updateState(self.unIntAgent2.states,self.uninterruptibleLoad2)
             self.unIntAgent2.execute()
-            self.unIntAgent2.rewardNormalization()
-            reward.append(self.unIntAgent2.reward)
+            # self.unIntAgent2.rewardNormalization()
+            # reward.append(self.unIntAgent2.reward)
             self.updateTotalState("unint2")
+            self.state = self.stateAbstraction(self.totalState)
+            reward.append(-int(self.totalState["unintSwitch2"])*self.uninterruptibleLoad2.AvgPowerConsume*pricePreHour)
+            reward.append(int(self.totalState["unintSwitch2"])*unintPreference2*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,True,True,False,False])]
         #none
-        else:
-            # print('none')
+        elif actions==9:
             self.updateTotalState("None")
-            #reward.append(-1)
-        # print(self.action_mask,order)
-        # Pgrid Max action mask
-        # tempActionMask is used as a temp list to record the current action mask.
-        # tempActionMaskFlag is used for recording whether previous step exceeded Pgrid Max limit.
-        # if remain exceeded the Pgrid Max limit, Flag = True, and the HLA can only choose SOC or no-action
-        # if the Flag = True, current action mask have to restore the previous action mask (tempActionMask[1:])
-        self.state = self.stateAbstraction(self.totalState)
-        # if self.tempActionMaskFlag :
-        #     self.tempActionMaskFlag = False
-        #     self.action_mask[1:] = self.tempActionMask[1:]
-
-        # if self.state[2]>self.PgridMax:
-        #     self.tempActionMask = self.action_mask
-        #     self.tempActionMaskFlag = True
-        #     self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,False,False,False,False,False,False,False,False])]
-        
+            self.state = self.stateAbstraction(self.totalState)
 
         if order == 8:
             self.action_mask = [False,False,False,False,False,False,False,False,False,True]
-            # if(self.state[2]>self.PgridMax):  
-            #     reward.append(-100)
+            if(self.state[2]>self.PgridMax):  
+                reward.append(-100)
             # else:
             #     reward.append(1)
-
-
-        # if sampleTime == 95 and order==8:
-        #     if self.totalState["SOC"]<self.socThreshold:
-        #         reward.append(-50)
-        #     else:
-        #         reward.append(10)
-        #     if self.interruptibleLoad1.getRemainDemand()>0:
-        #         reward.append(-60)
-        #     else:
-        #         reward.append(10)
-        #     if self.interruptibleLoad2.getRemainDemand()>0:
-        #         reward.append(-60)
-        #     else:
-        #         reward.append(10)
-        #     if self.interruptibleLoad3.getRemainDemand()>0:
-        #         reward.append(-60)
-        #     else:
-        #         reward.append(10)
-        #     if self.uninterruptibleLoad1.getRemainDemand()>0:
-        #         reward.append(-50)
-        #     else:
-        #         reward.append(10)
-        #     if self.uninterruptibleLoad2.getRemainDemand()>0:
-        #         reward.append(-50)
-        #     else:
-        #         reward.append(10)
-            
 
 
 
@@ -678,12 +651,12 @@ class multiAgentTrainEnv(Environment):
         reward = sum(reward)/10
         states = dict(state=self.state,action_mask = self.action_mask)
 
-
         return states, done ,reward
 
 
     def updateTotalState(self,mode) :
         if mode == "soc":
+            self.totalState["fixLoad"]+=self.socAgent.actions[0]*self.batteryCapacity
             self.totalState["deltaSoc"] = self.socAgent.actions[0]
             self.totalState["SOC"]+=self.socAgent.actions[0]
             if self.totalState["SOC"]>=1 :
@@ -777,5 +750,5 @@ class multiAgentTrainEnv(Environment):
             
 
     def stateAbstraction(self,totalState) -> np.array:
-        return np.array([totalState['sampleTime'],totalState['SOC'],totalState['fixLoad']-totalState['PV']+totalState['deltaSoc']*self.batteryCapacity,totalState['pricePerHour'],1 if totalState['userSetTemperature1']>totalState['indoorTemperature1'] or totalState['outdoorTemperature']<totalState['userSetTemperature1'] else -1,1 if totalState['userSetTemperature2']>totalState['indoorTemperature2'] or totalState['outdoorTemperature']<totalState['userSetTemperature2'] else -1,1 if totalState['userSetTemperature3']>totalState['indoorTemperature3'] or totalState['outdoorTemperature']<totalState['userSetTemperature3'] else -1,totalState['intSwitch1'],totalState['intSwitch2'],totalState['intSwitch3'],totalState['unintSwitch1'],totalState['unintSwitch2'],totalState['intPreference1'],totalState['intPreference2'],totalState['intPreference3'],totalState['unintPreference1'],totalState['unintPreference2'],totalState['order']],dtype=np.float32)
+        return np.array([totalState['sampleTime'],totalState['SOC'],totalState['fixLoad']-totalState['PV'],totalState['pricePerHour'],1 if totalState['userSetTemperature1']>totalState['indoorTemperature1'] or totalState['outdoorTemperature']<totalState['userSetTemperature1'] else -1,1 if totalState['userSetTemperature2']>totalState['indoorTemperature2'] or totalState['outdoorTemperature']<totalState['userSetTemperature2'] else -1,1 if totalState['userSetTemperature3']>totalState['indoorTemperature3'] or totalState['outdoorTemperature']<totalState['userSetTemperature3'] else -1,totalState['intSwitch1'],totalState['intSwitch2'],totalState['intSwitch3'],totalState['unintSwitch1'],totalState['unintSwitch2'],totalState['intPreference1'],totalState['intPreference2'],totalState['intPreference3'],totalState['unintPreference1'],totalState['unintPreference2'],totalState['order']],dtype=np.float32)
         

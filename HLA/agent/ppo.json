@@ -52,7 +52,7 @@
         "num_values": 10
     },
     "max_episode_timesteps": 960,
-    "batch_size": 700,
+    "batch_size": 64,
     "network": [
         {
             "type": "dense",
@@ -68,23 +68,18 @@
             "type": "dense",
             "size": 600,
             "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
+            "activation": "relu"
         }
     ],
     "use_beta_distribution": true,
     "memory": "minimum",
-    "update_frequency": 0.5,
-    "learning_rate": {
-        "type": "decaying",
-        "decay": "linear",
-        "unit": "episodes",
-        "num_steps": 1000,
-        "initial_value": 1e-3,
-        "final_value": 5e-5
-    },
-    "multi_step": 10,
-    "subsampling_fraction": 0.33,
-    "likelihood_ratio_clipping": 0.25,
-    "discount": 0.985,
+    "update_frequency": 0.1,
+    "learning_rate": 1e-4,
+    "discount": 0.995,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
@@ -96,7 +91,12 @@
         },
         {
             "type": "dense",
-            "size": 300,
+            "size": 600,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
             "activation": "relu"
         },
         {
@@ -107,35 +107,20 @@
     ],
     "baseline_optimizer": {
         "optimizer": "adam",
-        "learning_rate": {
-            "type": "decaying",
-            "decay": "linear",
-            "unit": "episodes",
-            "num_steps": 1000,
-            "initial_value": 1e-3,
-            "final_value": 5e-5
-        },
-        "multi_step": 10
+        "learning_rate": 1e-4
     },
     "state_preprocessing": "linear_normalization",
     "exploration": {
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 1000,
-        "initial_value": 0.25,
+        "num_steps": 500,
+        "initial_value": 0.2,
         "final_value": 1e-5
     },
     "variable_noise": 0.0,
     "l2_regularization": 0.0,
-    "entropy_regularization": {
-        "type": "decaying",
-        "decay": "linear",
-        "unit": "episodes",
-        "num_steps": 1000,
-        "initial_value": 0.1,
-        "final_value": 0
-    },
+    "entropy_regularization": 0.0,
     "parallel_interactions": 1,
     "config": null,
     "saver": {

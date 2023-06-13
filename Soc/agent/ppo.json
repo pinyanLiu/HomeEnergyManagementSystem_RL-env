@@ -27,7 +27,7 @@
         "min_value": -0.25
     },
     "max_episode_timesteps": 96,
-    "batch_size": 700,
+    "batch_size": 256,
     "network": [
         {
             "type": "dense",
@@ -40,9 +40,9 @@
             "activation": "relu"
         }
     ],
-    "use_beta_distribution": false,
+    "use_beta_distribution": true,
     "memory": "minimum",
-    "update_frequency": 0.1,
+    "update_frequency": 0.5,
     "learning_rate": {
         "type": "decaying",
         "decay": "linear",
@@ -54,7 +54,7 @@
     "multi_step": 10,
     "subsampling_fraction": 0.33,
     "likelihood_ratio_clipping": 0.25,
-    "discount": 0.985,
+    "discount": 0.995,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,

@@ -3,21 +3,30 @@ from time import localtime , time,strftime
 
 
 class Plot():
-    def __init__(self,testResult) :
+    def __init__(self,testResult,single=False) :
         self.testResult = testResult
-        plt.rcParams["figure.figsize"] = (12.8, 9.6)
-        self.fig,self.axes = plt.subplots(6,2)
-        #ax for power
-        self.ax = [self.axes[i,j]for i in range(6) for j in range(2)]
+        if single:
+            plt.rcParams["figure.figsize"] = (2.4, 6.3)
+            self.fig,self.axes = plt.subplots()
 
-    def remainPower(self):
-        for month in range(0,12):
-            self.ax[month].set_ylim(-2,11)
-            self.ax[month].set_ylabel('Power')
-            self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',color ='gray') 
+        else:
+            plt.rcParams["figure.figsize"] = (12.8, 9.6)
+            self.fig,self.axes = plt.subplots(6,2)
+            self.ax = [self.axes[i,j]for i in range(6) for j in range(2)]
+
+    def remainPower(self,month=False):
+        if month != False:
+            self.axes.set_ylim(-2,11)
+            self.axes.set_ylabel('Power')
+            self.axes.bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',color ='gray') 
+        else:
+            for month in range(0,12):
+                self.ax[month].set_ylim(-2,11)
+                self.ax[month].set_ylabel('Power')
+                self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',color ='gray') 
  
 
-    def plotUnIntLoadPower(self,id=1):
+    def plotUnIntLoadPower(self,id=1,month=False):
         if id == 1:
             color = 'darkslategray'
         elif id == 2:
