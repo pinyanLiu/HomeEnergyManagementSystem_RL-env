@@ -73,7 +73,6 @@ class SocEnv(HemsEnv):
         delta_soc = float(actions)
         # actions(delta_soc) is the degree of charging/discharging power .
         # if delta_soc > 0 means charging , whereas delta_soc < 0 means discharging.
-    #check if violate pgrid max , if violate, reset the time step until the agent give a action which pass the constrain
         reward = []
 
     #interaction

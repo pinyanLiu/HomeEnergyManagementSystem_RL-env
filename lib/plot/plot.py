@@ -104,14 +104,22 @@ class Plot():
                 self.ax[month].set_ylabel('Power')
                 self.ax[month].plot(range(96),self.testResult[month]['PgridMax'],linestyle='--',color='red')
     
-    def price(self):
-        self.sub = [sub.twinx() for sub in self.ax]
-        for month in range(0,12):
-            self.sub[month].set_ylim(0,6.2)
-            self.sub[month].set_ylabel('price',color='blue')
-            self.sub[month].spines['right'].set_position(("axes",1.1))
-            self.sub[month].tick_params(axis='y',colors = 'blue')
-            self.sub[month].plot(range(len(self.testResult[month]['price'])),self.testResult[month]['price'], label = "price")  
+    def price(self,month=False):
+        if month != False:
+            self.sub = self.axes.twinx()
+            self.sub.set_ylim(0,6.2)
+            self.sub.set_ylabel('price',color='blue')
+            self.sub.spines['right'].set_position(("axes",1))
+            self.sub.tick_params(axis='y',colors = 'blue')
+            self.sub.plot(range(len(self.testResult[month]['price'])),self.testResult[month]['price'], label = "price")  
+        else:
+            self.sub = [sub.twinx() for sub in self.ax]
+            for month in range(0,12):
+                self.sub[month].set_ylim(0,6.2)
+                self.sub[month].set_ylabel('price',color='blue')
+                self.sub[month].spines['right'].set_position(("axes",1.1))
+                self.sub[month].tick_params(axis='y',colors = 'blue')
+                self.sub[month].plot(range(len(self.testResult[month]['price'])),self.testResult[month]['price'], label = "price")  
         
 
     def soc(self,month=False):
@@ -119,7 +127,7 @@ class Plot():
             self.sub5 = self.axes.twinx()
             self.sub5.set_ylim(0,1)
             self.sub5.set_ylabel('soc',color='red')
-            self.sub5.spines['right'].set_position(("axes",1.3))
+            self.sub5.spines['right'].set_position(("axes",1.1))
             self.sub5.tick_params(axis='y',colors = 'red')
             self.sub5.plot(range(96) ,self.testResult[month]['soc'] ,label = 'soc', color ='red')    
         else:
