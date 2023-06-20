@@ -42,7 +42,7 @@
     ],
     "use_beta_distribution": true,
     "memory": "minimum",
-    "update_frequency": 0.1,
+    "update_frequency": 0.5,
     "learning_rate": {
         "type": "decaying",
         "decay": "linear",

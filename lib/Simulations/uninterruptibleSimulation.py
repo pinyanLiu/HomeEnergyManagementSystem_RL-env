@@ -90,12 +90,11 @@ class UnIntSimulation(Simulation):
         print('reward: ', TotalReward ) 
     
     def outputResult(self):
-        output = Plot(self.testResult)
-        output.remainPower()
-        output.plotUnIntLoadPower()
-        output.price()
-        output.plotReward()
-        output.plotUnintPreference()
+        output = Plot(self.testResult,single=True)
+        output.remainPower(month=8)
+        output.plotUnIntLoadPower(month=8)
+        output.price(month=8)
+        output.plotUnintPreference(month=8)
         output.plotResult('lib/plot/uninterruptible/')
 
 

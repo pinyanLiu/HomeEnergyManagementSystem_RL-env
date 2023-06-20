@@ -86,14 +86,14 @@ class HvacSimulation(Simulation):
         print('reward: ', TotalReward ) 
     
     def outputResult(self):
-        output = Plot(self.testResult)
-        output.remainPower()
-        output.indoorTemperature(1)
-        output.outdoorTemperature()
-        output.userSetTemperature()
-        output.price()
-        output.plotHVACPower(1)
-        output.plotReward()
+        output = Plot(self.testResult,single=True)
+        output.remainPower(month=3)
+        output.indoorTemperature(id=1,month=3)
+        output.outdoorTemperature(month=3)
+        output.userSetTemperature(month=3)
+        output.price(month=3)
+        output.plotHVACPower(id=1,month=3)
+        #output.plotReward()
         output.plotResult('lib/plot/hvac/')
 
     def getMean(self):

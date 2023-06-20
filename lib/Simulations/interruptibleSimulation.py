@@ -10,7 +10,7 @@ class IntSimulation(Simulation):
         self.environment = Environment.create(environment = IntTest,max_episode_timesteps=96)
         self.agent = Agent.load(directory = 'Load/Interruptible/saver_dir',environment=self.environment)
     def simulation(self):
-        acObject = AC(AvgPowerConsume=1.5)
+        acObject = AC(AvgPowerConsume=1)
         sampletime = []
         load = []
         pv = []
@@ -90,12 +90,11 @@ class IntSimulation(Simulation):
         print('reward: ', TotalReward ) 
     
     def outputResult(self):
-        output = Plot(self.testResult)
-        output.remainPower()
-        output.plotIntLoadPower()
-        output.price()
-        output.plotReward()
-        output.plotIntPreference()
+        output = Plot(self.testResult,single=True)
+        output.remainPower(month=5)
+        output.plotIntLoadPower(month=5)
+        output.price(month=5)
+        output.plotIntPreference(month=5)
         output.plotResult('lib/plot/interruptible/')
 
     def getMean(self):

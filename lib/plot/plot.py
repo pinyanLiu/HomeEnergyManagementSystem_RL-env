@@ -21,12 +21,12 @@ class Plot():
         if month != False:
             self.axes.set_ylim(-2,11)
             self.axes.set_ylabel('Power')
-            self.axes.bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',color ='gray') 
+            self.axes.bar(range(96) ,self.testResult[month]['remain'] ,label = 'UC_power',color ='gray') 
         else:
             for month in range(0,12):
                 self.ax[month].set_ylim(-2,11)
                 self.ax[month].set_ylabel('Power')
-                self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'fixLoad',color ='gray') 
+                self.ax[month].bar(range(96) ,self.testResult[month]['remain'] ,label = 'UC_power',color ='gray') 
  
 
     def plotUnIntLoadPower(self,id=1,month=False):
@@ -38,12 +38,12 @@ class Plot():
             color = 'dodgerblue'
         if month != False:
             self.axes.set_ylabel('Power')
-            self.axes.bar(range(96) ,self.testResult[month]['unintSwitch'+str(id)] ,label = 'unintSwitch', color =color)    
-
+            self.axes.bar(range(96) ,self.testResult[month]['unintSwitch'+str(id)] ,label = 'UnintLoadPower', color =color)    
+            self.axes.legend(loc='lower right', fontsize=6, frameon=True)
         else:
             for month in range(0,12):
                 self.ax[month].set_ylabel('Power')
-                self.ax[month].bar(range(96) ,self.testResult[month]['unintSwitch'+str(id)] ,label = 'unintSwitch', color =color)    
+                self.ax[month].bar(range(96) ,self.testResult[month]['unintSwitch'+str(id)] ,label = 'UnintLoadPower', color =color)    
 
     def plotIntLoadPower(self,id=1,month=False):
         if id == 1:
@@ -54,25 +54,28 @@ class Plot():
             color = 'aquamarine'
         if month != False:
             self.axes.set_ylabel('Power')
-            self.axes.bar(range(96) ,self.testResult[month]['intSwitch'+str(id)] ,label = 'switch', color =color)    
+            self.axes.bar(range(96) ,self.testResult[month]['intSwitch'+str(id)] ,label = 'IntLoadPower', color =color)   
+            self.axes.legend(loc='lower right', fontsize=6, frameon=True)
         else:
             for month in range(0,12):
                 self.ax[month].set_ylabel('Power')
-                self.ax[month].bar(range(96) ,self.testResult[month]['intSwitch'+str(id)] ,label = 'switch', color =color)    
+                self.ax[month].bar(range(96) ,self.testResult[month]['intSwitch'+str(id)] ,label = 'IntLoadPower', color =color)    
 
     def plotDeltaSOCPower(self,month=False):
         if month != False:
             self.axes.set_ylabel('Power')
-            self.axes.bar(range(96) ,self.testResult[month]['deltaSoc']*10 ,label = 'power', color ='gold')    
+            self.axes.bar(range(96) ,self.testResult[month]['deltaSoc']*10 ,label = 'ESS_power', color ='gold')    
+            self.axes.legend(loc='lower right', fontsize=6, frameon=True)
         else:
             for month in range(0,12):
                 self.ax[month].set_ylabel('Power')
-                self.ax[month].bar(range(96) ,self.testResult[month]['deltaSoc']*10 ,label = 'power', color ='gold')    
+                self.ax[month].bar(range(96) ,self.testResult[month]['deltaSoc']*10 ,label = 'ESS_power', color ='gold')    
             
     def plotPVPower(self,month=False):
         if month != False:
             self.axes.set_ylabel('Power')
             self.axes.bar(range(96) ,-self.testResult[month]['PV'] ,label = 'power', color ='moccasin')  
+            self.axes.legend(loc='lower right', fontsize=6, frameon=True)
         else:
             for month in range(0,12):
                 self.ax[month].set_ylabel('Power')
@@ -87,11 +90,12 @@ class Plot():
             color = 'dodgerblue'
         if month != False:
             self.axes.set_ylabel('Power')
-            self.axes.bar(range(96) ,self.testResult[month]['hvacPower'+str(id)] ,label = 'power', color = color)  
+            self.axes.bar(range(96) ,self.testResult[month]['hvacPower'+str(id)] ,label = 'HVAC_power', color = color)  
+            self.axes.legend(loc='lower right', fontsize=6, frameon=True)
         else:
             for month in range(0,12):
                 self.ax[month].set_ylabel('Power')
-                self.ax[month].bar(range(96) ,self.testResult[month]['hvacPower'+str(id)] ,label = 'power', color = color)  
+                self.ax[month].bar(range(96) ,self.testResult[month]['hvacPower'+str(id)] ,label = 'HVAC_power', color = color)  
 
 
 
@@ -99,6 +103,7 @@ class Plot():
         if month != False:
             self.axes.set_ylabel('Power')
             self.axes.plot(range(96),self.testResult[month]['PgridMax'],linestyle='--',color='red')
+
         else:
             for month in range(0,12):
                 self.ax[month].set_ylabel('Power')
@@ -107,15 +112,16 @@ class Plot():
     def price(self,month=False):
         if month != False:
             self.sub = self.axes.twinx()
-            self.sub.set_ylim(0,6.2)
+            self.sub.set_ylim(0,6.5)
             self.sub.set_ylabel('price',color='blue')
             self.sub.spines['right'].set_position(("axes",1))
             self.sub.tick_params(axis='y',colors = 'blue')
             self.sub.plot(range(len(self.testResult[month]['price'])),self.testResult[month]['price'], label = "price")  
+            self.sub.legend(loc='upper right', fontsize=6, frameon=True)
         else:
             self.sub = [sub.twinx() for sub in self.ax]
             for month in range(0,12):
-                self.sub[month].set_ylim(0,6.2)
+                self.sub[month].set_ylim(0,6.5)
                 self.sub[month].set_ylabel('price',color='blue')
                 self.sub[month].spines['right'].set_position(("axes",1.1))
                 self.sub[month].tick_params(axis='y',colors = 'blue')
@@ -150,25 +156,25 @@ class Plot():
         if month != False:
             self.sub2 = self.axes.twinx()
             self.sub2.set_ylim(35,104)
-            self.sub2.set_ylabel('Tmp',color='orange')
-            self.sub2.spines['right'].set_position(("axes",1.3))
+            self.sub2.set_ylabel('Tmp(Fahrenheit)',color='orange')
+            self.sub2.spines['right'].set_position(("axes",1.1))
             self.sub2.tick_params(axis='y',colors = 'orange')
             self.sub2.plot(range(96) ,self.testResult[month]['indoorTemperature'+str(id)] ,label = 'indoorTemperature', color = color) 
         else:
             self.sub2 = [sub2.twinx() for sub2 in self.ax]
             for month in range(0,12):
                 self.sub2[month].set_ylim(35,104)
-                self.sub2[month].set_ylabel('Tmp',color='orange')
+                self.sub2[month].set_ylabel('Tmp(Fahrenheit)',color='orange')
                 self.sub2[month].spines['right'].set_position(("axes",1.3))
                 self.sub2[month].tick_params(axis='y',colors = 'orange')
                 self.sub2[month].plot(range(96) ,self.testResult[month]['indoorTemperature'+str(id)] ,label = 'indoorTemperature', color = color) 
 
     def outdoorTemperature(self,month=False):
         if month != False:
-            self.sub2[month].plot(range(96) ,self.testResult[month]['outdoorTemperature'] ,label = 'outdoorTemperature', color ='yellow')
+            self.sub2.plot(range(96) ,self.testResult[month]['outdoorTemperature'] ,label = 'outdoorTemperature', color ='goldenrod')
         else:
             for month in range(0,12):
-                self.sub2[month].plot(range(96) ,self.testResult[month]['outdoorTemperature'] ,label = 'outdoorTemperature', color ='yellow')
+                self.sub2[month].plot(range(96) ,self.testResult[month]['outdoorTemperature'] ,label = 'outdoorTemperature', color ='goldenrod')
 
     def userSetTemperature(self,id=1,month=False):
         if id == 1:
@@ -179,6 +185,7 @@ class Plot():
             color = 'lightgray'
         if month != False:
             self.sub2.plot(range(96) ,self.testResult[month]['userSetTemperature'+str(id)] ,label = 'userSetTemperature', color =color)
+            self.sub2.legend(loc='upper left', fontsize=6, frameon=True)
         else:
             for month in range(0,12):
                 self.sub2[month].plot(range(96) ,self.testResult[month]['userSetTemperature'+str(id)] ,label = 'userSetTemperature', color =color)
@@ -209,19 +216,20 @@ class Plot():
             color = 'aquamarine'
         if month != False:
             self.sub4 = self.axes.twinx() 
-            self.sub4.set_ylim(-1,4)
-            self.sub4.set_ylabel('pfr',color='pink')
-            self.sub4.spines['right'].set_position(("axes",1.2))
-            self.sub4.tick_params(axis='y',colors = 'pink')
-            self.sub4.plot(range(96) ,self.testResult[month]['intUserPreference'+str(id)] ,label = 'intUserPreference', color =color)            
+            self.sub4.set_ylim(-1.5,4.5)
+            self.sub4.set_ylabel('preference',color=color)
+            self.sub4.spines['right'].set_position(("axes",1.1))
+            self.sub4.tick_params(axis='y',colors = color)
+            self.sub4.plot(range(96) ,self.testResult[month]['intUserPreference'+str(id)] ,label = 'intUserPreference', color =color)       
+            self.sub4.legend(loc='upper left', fontsize=6, frameon=True)     
 
         else:
             self.sub4= [sub4.twinx() for sub4 in self.ax]
             for month in range(0,12):
-                self.sub4[month].set_ylim(-1,4)
-                self.sub4[month].set_ylabel('pfr',color='pink')
+                self.sub4[month].set_ylim(-1.5,4.5)
+                self.sub4[month].set_ylabel('preference',color=color)
                 self.sub4[month].spines['right'].set_position(("axes",1.2))
-                self.sub4[month].tick_params(axis='y',colors = 'pink')
+                self.sub4[month].tick_params(axis='y',colors = color)
                 self.sub4[month].plot(range(96) ,self.testResult[month]['intUserPreference'+str(id)] ,label = 'intUserPreference', color =color)            
 
     def plotUnintPreference(self,id=1,month=False):
@@ -233,17 +241,18 @@ class Plot():
             color = 'dodgerblue'
         if month!=False:
             self.sub4 = self.axes.twinx()
-            self.sub4.set_ylim(-1,4)
-            self.sub4.set_ylabel('pfr',color='pink')
-            self.sub4.spines['right'].set_position(("axes",1.2))
-            self.sub4.tick_params(axis='y',colors = 'pink')
-            self.sub4.plot(range(96) ,self.testResult[month]['unintUserPreference'+str(id)] ,label = 'unintUserPreference', color = color)            
+            self.sub4.set_ylim(-1.5,4.5)
+            self.sub4.set_ylabel('preference',color=color)
+            self.sub4.spines['right'].set_position(("axes",1.1))
+            self.sub4.tick_params(axis='y',colors = color)
+            self.sub4.plot(range(96) ,self.testResult[month]['unintUserPreference'+str(id)] ,label = 'unintUserPreference', color = color)        
+            self.sub4.legend(loc='upper left', fontsize=6, frameon=True)    
         else:
             self.sub4= [sub4.twinx() for sub4 in self.ax]
             for month in range(0,12):
-                self.sub4[month].set_ylim(-1,4)
-                self.sub4[month].set_ylabel('pfr',color='pink')
+                self.sub4[month].set_ylim(-1.5,4.5)
+                self.sub4[month].set_ylabel('preference',color=color)
                 self.sub4[month].spines['right'].set_position(("axes",1.2))
-                self.sub4[month].tick_params(axis='y',colors = 'pink')
+                self.sub4[month].tick_params(axis='y',colors = color)
                 self.sub4[month].plot(range(96) ,self.testResult[month]['unintUserPreference'+str(id)] ,label = 'unintUserPreference', color = color)            
 

@@ -39,7 +39,7 @@ def __main__(argv):
         simulation.outputResult("unint")
         simulation.outputResult("")
     else:
-        simulation.outputResult(7)
+        simulation.outputResult()
 
 
 

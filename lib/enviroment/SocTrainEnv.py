@@ -74,54 +74,32 @@ class SocEnv(HemsEnv):
         # actions(delta_soc) is the degree of charging/discharging power .
         # if delta_soc > 0 means charging , whereas delta_soc < 0 means discharging.
         reward = []
-    # 限制電池的充放電上下限
-        if delta_soc > 0:
-            delta_soc = min(delta_soc, 1 - soc)  # 充電量不超過剩餘容量
-        else:
-            delta_soc = max(delta_soc, -soc)  # 放電量不超過剩餘 SOC
-
-    # 能源平衡處理
-        power_load = load - pv
-        power_grid = power_load + delta_soc * self.batteryCapacity
-
-        if power_grid < 0:  # 放電量大於負載消耗量
-            delta_soc = power_load / self.batteryCapacity  # 放電量設為負載消耗量
-            power_grid = power_load
-    # 最大功率充電
-        if pv > load:
-            delta_soc = min(delta_soc, 1 - soc)  # 充電量設為最大充電功率
 
     #interaction
         cost = 0
-        soc += delta_soc
+        soc = soc+delta_soc
         if soc > 1:
             soc = 1
             reward.append(-0.2)
         elif soc < 0 :
             soc = 0
             reward.append(-0.2)
-        else:
-            #calculate cost proportion   
-            if(delta_soc>0):
-                cost = pricePerHour * 0.25 * (delta_soc*self.batteryCapacity-pv)
-                if cost<0:
-                    cost = 0
-            elif(delta_soc<=0):
-                cost = pricePerHour*0.25*delta_soc*self.batteryCapacity
+        Pgrid = max(0,delta_soc*self.batteryCapacity-pv+load)
+        cost = pricePerHour * 0.25 * Pgrid
 
         if load-pv+delta_soc*self.batteryCapacity>self.PgridMax:
             reward.append(-5)
 
 
 
-        if (sampleTime == 94 ):
+        if (sampleTime == 94):
             if(soc <self.socThreshold):
                 reward.append(10*(soc-self.socThreshold))
             else:
-                reward.append(1)
+                reward.append(10)
 
-        reward.append(-2*cost)
-        soc = max(0.0, min(1.0, soc))
+        reward.append(-cost)
+
 
         #change to next state
         sampleTime = int(sampleTime+1)
@@ -137,6 +115,7 @@ class SocEnv(HemsEnv):
         self.reward = sum(reward)
 
         return states,self.done,self.reward
+
 
         
 
