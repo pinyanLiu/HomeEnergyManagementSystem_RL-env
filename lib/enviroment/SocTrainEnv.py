@@ -79,11 +79,13 @@ class SocEnv(HemsEnv):
         cost = 0
         soc = soc+delta_soc
         if soc > 1:
+            delta_soc = 1-soc
             soc = 1
-            reward.append(-0.2)
+            reward.append(5*(delta_soc-float(actions)))
         elif soc < 0 :
+            delta_soc = 0-soc
             soc = 0
-            reward.append(-0.2)
+            reward.append(5*(float(actions)-delta_soc))
         Pgrid = max(0,delta_soc*self.batteryCapacity-pv+load)
         cost = pricePerHour * 0.25 * Pgrid
 
@@ -93,12 +95,12 @@ class SocEnv(HemsEnv):
 
 
         if (sampleTime == 94):
-            if(soc <self.socThreshold):
+            if(soc < self.socThreshold):
                 reward.append(10*(soc-self.socThreshold))
             else:
-                reward.append(10)
+                reward.append(2)
 
-        reward.append(-cost)
+        reward.append(-0.2*cost)
 
 
         #change to next state
