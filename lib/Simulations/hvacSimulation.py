@@ -87,12 +87,12 @@ class HvacSimulation(Simulation):
     
     def outputResult(self):
         output = Plot(self.testResult,single=True)
-        output.remainPower(month=3)
-        output.indoorTemperature(id=1,month=3)
-        output.outdoorTemperature(month=3)
-        output.userSetTemperature(month=3)
-        output.price(month=3)
-        output.plotHVACPower(id=1,month=3)
+        output.remainPower(month=5)
+        output.indoorTemperature(id=1,month=5)
+        output.outdoorTemperature(month=5)
+        output.userSetTemperature(month=5)
+        output.price(month=5)
+        output.plotHVACPower(id=1,month=5)
         #output.plotReward()
         output.plotResult('lib/plot/hvac/')
 

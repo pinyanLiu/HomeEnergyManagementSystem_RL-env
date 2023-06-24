@@ -23,8 +23,8 @@
     "actions": {
         "type": "float",
         "shape": 1,
-        "max_value": 0.25,
-        "min_value": -0.25
+        "max_value": 0.125,
+        "min_value": -0.125
     },
     "max_episode_timesteps": 96,
     "batch_size": 256,
@@ -32,6 +32,11 @@
         {
             "type": "dense",
             "size": 300,
+            "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
             "activation": "relu"
         },
         {
@@ -47,7 +52,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 5000,
+        "num_steps": 7500,
         "initial_value": 1e-3,
         "final_value": 5e-5
     },
@@ -73,11 +78,6 @@
             "type": "dense",
             "size": 600,
             "activation": "relu"
-        },
-        {
-            "type": "dense",
-            "size": 600,
-            "activation": "relu"
         }
     ],
     "baseline_optimizer": {
@@ -86,7 +86,7 @@
             "type": "decaying",
             "decay": "linear",
             "unit": "episodes",
-            "num_steps": 5000,
+            "num_steps": 7500,
             "initial_value": 1e-3,
             "final_value": 5e-5
         },
@@ -97,7 +97,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 5000,
+        "num_steps": 7500,
         "initial_value": 0.25,
         "final_value": 1e-5
     },

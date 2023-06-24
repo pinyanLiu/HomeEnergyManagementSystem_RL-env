@@ -91,10 +91,10 @@ class UnIntSimulation(Simulation):
     
     def outputResult(self):
         output = Plot(self.testResult,single=True)
-        output.remainPower(month=8)
-        output.plotUnIntLoadPower(month=8)
-        output.price(month=8)
-        output.plotUnintPreference(month=8)
+        output.remainPower(month=4)
+        output.plotUnIntLoadPower(month=4)
+        output.price(month=4)
+        output.plotUnintPreference(month=4)
         output.plotResult('lib/plot/uninterruptible/')
 
 

@@ -55,7 +55,7 @@ class SocEnv(HemsEnv):
 
     def actions(self):
         #(degree of charging/discharging power)
-        return dict(type='float',shape=(1,),min_value=-0.25,max_value=0.25)
+        return dict(type='float',shape=(1,),min_value=-0.125,max_value=0.125)
 
     def close(self):
         return super().close()
@@ -94,13 +94,13 @@ class SocEnv(HemsEnv):
 
 
 
-        if (sampleTime == 94):
+        if (sampleTime >= 94):
             if(soc < self.socThreshold):
                 reward.append(5*(soc-self.socThreshold))
             else:
                 reward.append(2)
 
-        reward.append(-0.16*cost+0.1)
+        reward.append(-0.2*cost+0.1)
 
 
         #change to next state
