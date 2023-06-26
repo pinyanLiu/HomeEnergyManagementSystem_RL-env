@@ -23,8 +23,8 @@
     "actions": {
         "type": "float",
         "shape": 1,
-        "max_value": 0.125,
-        "min_value": -0.125
+        "max_value": 0.3,
+        "min_value": -0.3
     },
     "max_episode_timesteps": 96,
     "batch_size": 256,
@@ -52,14 +52,14 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 7500,
+        "num_steps": 5000,
         "initial_value": 1e-3,
         "final_value": 5e-5
     },
     "multi_step": 10,
     "subsampling_fraction": 0.33,
-    "likelihood_ratio_clipping": 0.25,
-    "discount": 0.995,
+    "likelihood_ratio_clipping": 0.2,
+    "discount": 0.997,
     "return_processing": null,
     "advantage_processing": null,
     "predict_terminal_values": false,
@@ -86,7 +86,7 @@
             "type": "decaying",
             "decay": "linear",
             "unit": "episodes",
-            "num_steps": 7500,
+            "num_steps": 5000,
             "initial_value": 1e-3,
             "final_value": 5e-5
         },
@@ -97,8 +97,8 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 7500,
-        "initial_value": 0.25,
+        "num_steps": 5000,
+        "initial_value": 0.2,
         "final_value": 1e-5
     },
     "variable_noise": 0.0,

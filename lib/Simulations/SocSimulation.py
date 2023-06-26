@@ -85,6 +85,7 @@ class SocSimulation(Simulation):
             output.plotDeltaSOCPower()
             output.soc()
             output.price()
+            output.plotReward()
             output.plotResult('lib/plot/soc/')
 
     def getMean(self):

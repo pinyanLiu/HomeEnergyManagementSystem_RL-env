@@ -91,10 +91,10 @@ class IntSimulation(Simulation):
     
     def outputResult(self):
         output = Plot(self.testResult,single=True)
-        output.remainPower(month=5)
-        output.plotIntLoadPower(month=5)
-        output.price(month=5)
-        output.plotIntPreference(month=5)
+        output.remainPower(month=1)
+        output.plotIntLoadPower(month=1)
+        output.price(month=1)
+        output.plotIntPreference(month=1)
         output.plotResult('lib/plot/interruptible/')
 
     def getMean(self):
