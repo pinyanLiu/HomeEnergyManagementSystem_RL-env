@@ -71,22 +71,22 @@ class SocSimulation(Simulation):
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     
-    def outputResult(self,month=False):
-        if month != False:
+    def outputResult(self):
+        # if month != False:
             output = Plot(self.testResult,single=True)
-            output.remainPower(month=month)
-            output.plotDeltaSOCPower(month=month)
-            output.soc(month=month)
-            output.price(month=month)
+            output.remainPower(month=9)
+            output.plotDeltaSOCPower(month=9)
+            output.soc(month=9)
+            output.price(month=9)
             output.plotResult('lib/plot/soc/')
-        else:
-            output = Plot(self.testResult)
-            output.remainPower()
-            output.plotDeltaSOCPower()
-            output.soc()
-            output.price()
-            output.plotReward()
-            output.plotResult('lib/plot/soc/')
+        # else:
+        #     output = Plot(self.testResult)
+        #     output.remainPower()
+        #     output.plotDeltaSOCPower()
+        #     output.soc()
+        #     output.price()
+        #     output.plotReward()
+        #     output.plotResult('lib/plot/soc/')
 
     def getMean(self):
         return super().getMean()

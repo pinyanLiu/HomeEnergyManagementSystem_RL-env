@@ -31,13 +31,14 @@ def __main__(argv):
         return 
     simulation.simulation()
     if mode == "hrl" or mode == "4" or mode == "1":
-        simulation.EachMonthResult()
-        simulation.avgMonthResult()
-        simulation.outputResult("soc")
-        simulation.outputResult("hvac")
-        simulation.outputResult("int")
-        simulation.outputResult("unint")
-        simulation.outputResult("")
+        # simulation.EachMonthResult()
+        # simulation.avgMonthResult()
+        # simulation.outputResult("soc")
+        # simulation.outputResult("hvac")
+        # simulation.outputResult("int")
+        # simulation.outputResult("unint")
+        # simulation.outputResult("")
+        simulation.plotTotalResult()
     else:
         simulation.outputResult()
 

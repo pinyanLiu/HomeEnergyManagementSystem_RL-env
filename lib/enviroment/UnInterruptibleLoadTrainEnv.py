@@ -34,7 +34,7 @@ class UnIntEnv(HemsEnv):
                 #price per hour
                 6.2,
                 #Delta SOC
-                0.25,
+                0.3,
                 #Uninterruptible Remain
                 75.0,
                 #Uninterruptible Switch
@@ -55,7 +55,7 @@ class UnIntEnv(HemsEnv):
                 #pricePerHour
                 0.0,
                 #Delta SOC
-                -0.25,
+                -0.3,
                 #Uninterruptible Remain
                 0.0,
                 #Uninterruptible Switch

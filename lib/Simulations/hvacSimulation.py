@@ -8,7 +8,7 @@ class HvacSimulation(Simulation):
     def __init__(self):
         super().__init__()
         self.environment = Environment.create(environment = HvacTest,max_episode_timesteps=96)
-        self.agent = Agent.load(directory = 'HVAC/bestAgent/saver_dir',environment=self.environment)
+        self.agent = Agent.load(directory = 'HVAC/saver_dir',environment=self.environment)
     def simulation(self):
         sampletime = []
         load = []

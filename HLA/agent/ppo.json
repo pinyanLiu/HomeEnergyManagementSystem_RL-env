@@ -73,6 +73,11 @@
             "type": "dense",
             "size": 600,
             "activation": "relu"
+        },
+        {
+            "type": "dense",
+            "size": 600,
+            "activation": "relu"
         }
     ],
     "use_beta_distribution": true,
@@ -84,6 +89,11 @@
     "advantage_processing": null,
     "predict_terminal_values": false,
     "baseline": [
+        {
+            "type": "dense",
+            "size": 300,
+            "activation": "relu"
+        },
         {
             "type": "dense",
             "size": 300,

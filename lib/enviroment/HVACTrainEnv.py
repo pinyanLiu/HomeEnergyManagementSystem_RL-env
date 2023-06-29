@@ -34,7 +34,7 @@ class HvacEnv(HemsEnv):
                 #pricePerHour
                 6.2,
                 #deltaSoc
-                0.25,
+                0.3,
                 #indoor temperature
                 104,
                 #outdoor temperature
@@ -56,7 +56,7 @@ class HvacEnv(HemsEnv):
                 #pricePerHour
                 1,
                 #deltaSoc
-                -0.25,
+                -0.3,
                 #indoor temperature
                 20,
                 #outdoor temperature
@@ -71,7 +71,7 @@ class HvacEnv(HemsEnv):
 
     def actions(self):
         #action we take (degree of HVAC power)
-        return dict(type='float',shape=(1,),min_value=0,max_value=2)
+        return dict(type='float',shape=(1,),min_value=0,max_value=4)
 
     def close(self):
         return super().close()
@@ -96,7 +96,7 @@ class HvacEnv(HemsEnv):
     #interaction
 
         #calculate the new indoor temperature for next state
-        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
+        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC*0.25)
 
         #calculate proportion
         if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity) < 0:
@@ -108,7 +108,7 @@ class HvacEnv(HemsEnv):
         if outdoorTemperature < userSetTemperature :
             r1 = 0
         else :
-            r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/100
+            r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/40
         #cost reward
         r2 = -cost/2+0.5
 

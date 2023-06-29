@@ -32,7 +32,7 @@ class IntEnv(HemsEnv):
                 #price per hour
                 6.2,
                 #Delta SOC
-                0.25,
+                0.3,
                 #interruptible Remain
                 96.0,
                 #user preference
@@ -51,7 +51,7 @@ class IntEnv(HemsEnv):
                 #pricePerHour
                 0.0,
                 #Delta SOC
-                -0.25,
+                -0.3,
                 #interruptible Remain
                 0.0,
                 #user preference
