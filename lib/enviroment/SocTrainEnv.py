@@ -106,12 +106,16 @@ class SocEnv(HemsEnv):
         Pgrid = max(0,delta_soc*self.batteryCapacity-pv+load)
         cost = pricePerHour * 0.25 * Pgrid
 
+        if soc == 0:
+            reward.append(-0.5)
+
         if load-pv+delta_soc*self.batteryCapacity>self.PgridMax:
             reward.append(-5)
 
         socMask = [1-soc>0.25,1-soc>0.2,1-soc>0.15,1-soc>0.1,1-soc>0.05,True,soc>0.05,soc>0.1,soc>0.15,soc>0.2,soc>0.25]
         self.action_mask = np.asarray(socMask)
 
+        
 
 
         if (sampleTime >= 94):
@@ -120,7 +124,7 @@ class SocEnv(HemsEnv):
             else:
                 reward.append(2)
 
-        reward.append(-0.19*cost+0.1)
+        reward.append(-2*cost)
 
 
         #change to next state
