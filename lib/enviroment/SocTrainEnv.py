@@ -55,7 +55,7 @@ class SocEnv(HemsEnv):
 
     def actions(self):
         #(degree of charging/discharging power)
-        return dict(type='float',shape=(1,),min_value=-0.3,max_value=0.3)
+        return dict(type='int',num_values=11)
 
     def close(self):
         return super().close()
@@ -67,10 +67,34 @@ class SocEnv(HemsEnv):
         Rewards
         Episode Termination condition
         '''
-
+        #              0   1    2   3    4  5    6    7     8    9    10
+        # actions = [0.25,0.2,0.15,0.1,0.05,0,-0.05,-0.1,-0.15,-0.2,-0.25]
     #STATE (sampleTime,Load,PV,SOC,pricePerHour,degradationCost)
         sampleTime,load,pv,soc,pricePerHour = self.state
-        delta_soc = float(actions)
+
+        if actions == 0 :
+            delta_soc = 0.25
+        elif actions ==1:
+            delta_soc = 0.2
+        elif actions ==2:
+            delta_soc = 0.15
+        elif actions ==3:
+            delta_soc = 0.1
+        elif actions ==4:
+            delta_soc = 0.05
+        elif actions ==5:
+            delta_soc = 0.00
+        elif actions ==6:
+            delta_soc = -0.05
+        elif actions ==7:
+            delta_soc = -0.1
+        elif actions ==8:
+            delta_soc = -0.15
+        elif actions ==9:
+            delta_soc = -0.2
+        elif actions ==10:
+            delta_soc = -0.25
+
         # actions(delta_soc) is the degree of charging/discharging power .
         # if delta_soc > 0 means charging , whereas delta_soc < 0 means discharging.
         reward = []
@@ -78,19 +102,15 @@ class SocEnv(HemsEnv):
     #interaction
         cost = 0
         soc = soc+delta_soc
-        if soc > 1:
-            #delta_soc = 1-soc
-            soc = 1
-            reward.append(-0.4)
-        elif soc < 0 :
-            #delta_soc = 0-soc
-            soc = 0
-            reward.append(-0.4)
+
         Pgrid = max(0,delta_soc*self.batteryCapacity-pv+load)
         cost = pricePerHour * 0.25 * Pgrid
 
         if load-pv+delta_soc*self.batteryCapacity>self.PgridMax:
             reward.append(-5)
+
+        socMask = [1-soc>0.25,1-soc>0.2,1-soc>0.15,1-soc>0.1,1-soc>0.05,True,soc>0.05,soc>0.1,soc>0.15,soc>0.2,soc>0.25]
+        self.action_mask = np.asarray(socMask)
 
 
 
@@ -111,7 +131,7 @@ class SocEnv(HemsEnv):
         self.done = bool(sampleTime == 95)
 
 
-        states = dict(state = self.state)
+        states = dict(state = self.state,action_mask = self.action_mask)
 
         #REWARD
         self.reward = sum(reward)
@@ -168,10 +188,13 @@ class SocEnv(HemsEnv):
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Dec'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
         self.socInit = uniform(0.1,0.6)
+        socMask = [1-self.socInit>0.25,1-self.socInit>0.2,1-self.socInit>0.15,1-self.socInit>0.1,1-self.socInit>0.05,True,self.socInit>0.05,self.socInit>0.1,self.socInit>0.15,self.socInit>0.2,self.socInit>0.25]
+        self.action_mask = np.asarray(socMask)
 
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.socInit,self.GridPrice[0]])
-        return self.state
+        states = dict(state = self.state,action_mask = self.action_mask)
+        return states
 
 
 

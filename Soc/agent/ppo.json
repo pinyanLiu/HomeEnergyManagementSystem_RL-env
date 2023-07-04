@@ -21,10 +21,9 @@
         ]
     },
     "actions": {
-        "type": "float",
-        "shape": 1,
-        "max_value": 0.3,
-        "min_value": -0.3
+        "type": "int",
+        "shape": [],
+        "num_values": 11
     },
     "max_episode_timesteps": 96,
     "batch_size": 256,
