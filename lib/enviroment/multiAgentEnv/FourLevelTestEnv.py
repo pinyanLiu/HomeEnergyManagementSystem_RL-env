@@ -19,21 +19,21 @@ class FourLevelTestEnv(multiAgentTestEnv):
     
     def execute(self, actions):
         sampleTime,soc,remain,pricePreHour,hvacState1,hvacState2,hvacState3,intState1,intState2,intState3,unIntState1,unIntState2,intPreference1,intPreference2,intPreference3,unintPreference1,unintPreference2,order = self.state    #execute HVAC
-        if order == 8:
+        if order == 1:
             self.hvacAgent1.getState(self.totalState)
             self.hvacAgent1.environment.updateState(self.hvacAgent1.states)
             self.hvacAgent1.execute()
             # reward.append(self.hvacAgent1.reward)
             self.updateTotalState("hvac1")
         
-        elif order ==7:
+        elif order ==2:
             self.hvacAgent2.getState(self.totalState)
             self.hvacAgent2.environment.updateState(self.hvacAgent2.states)
             self.hvacAgent2.execute()
             # reward.append(self.hvacAgent2.reward)
             self.updateTotalState("hvac2")
 
-        elif order ==6:
+        elif order ==3:
             self.hvacAgent3.getState(self.totalState)
             self.hvacAgent3.environment.updateState(self.hvacAgent3.states)
             self.hvacAgent3.execute()
@@ -41,7 +41,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("hvac3")
         
     #execute interruptible load
-        elif order == 5:
+        elif order == 6:
             self.intAgent1.getState(self.totalState,self.interruptibleLoadActionMask1)
             self.intAgent1.environment.updateState(self.intAgent1.states,self.interruptibleLoad1)
             self.intAgent1.execute()
@@ -49,7 +49,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("int1")   
 
     #execute interruptible load
-        elif order == 4:
+        elif order == 7:
             self.intAgent2.getState(self.totalState,self.interruptibleLoadActionMask2)
             self.intAgent2.environment.updateState(self.intAgent2.states,self.interruptibleLoad2)
             self.intAgent2.execute()
@@ -57,7 +57,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("int2")   
 
     #execute interruptible load
-        elif order == 3:
+        elif order == 8:
             self.intAgent3.getState(self.totalState,self.interruptibleLoadActionMask3)
             self.intAgent3.environment.updateState(self.intAgent3.states,self.interruptibleLoad3)
             self.intAgent3.execute()
@@ -65,7 +65,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("int3")   
         
     #execute uninterruptible load
-        elif order == 2:
+        elif order == 4:
             self.unIntAgent1.getState(self.totalState,self.uninterruptibleLoadActionMask1)
             self.unIntAgent1.environment.updateState(self.unIntAgent1.states,self.uninterruptibleLoad1)
             self.unIntAgent1.execute()
@@ -73,7 +73,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("unint1")   
 
     #execute uninterruptible load
-        elif order == 1:
+        elif order == 5:
             self.unIntAgent2.getState(self.totalState,self.uninterruptibleLoadActionMask2)
             self.unIntAgent2.environment.updateState(self.unIntAgent2.states,self.uninterruptibleLoad2)
             self.unIntAgent2.execute()

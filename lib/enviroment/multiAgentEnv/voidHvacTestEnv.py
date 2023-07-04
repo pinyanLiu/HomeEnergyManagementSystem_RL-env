@@ -28,12 +28,18 @@ class VoidHvacTest(HvacEnv):
     #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,indoor temperature ,outdoor temperature )
         sampleTime,load,pv,pricePerHour,deltaSoc,indoorTemperature,outdoorTemperature,userSetTemperature = self.state
         Power_HVAC = float(actions)
-
+        
+    #check if violate pgrid max , if violate, reset the time step until the agent give a action which pass the constrain
         reward = []
+        # if load-pv+deltaSoc*self.batteryCapacity+Power_HVAC>self.PgridMax:
+        #     reward.append(-5)
+        #     states = dict(state=self.state)
+        #     self.done = False
+        # else:
     #interaction
 
         #calculate the new indoor temperature for next state
-        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
+        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC*0.25)
 
         #calculate proportion
         if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity) < 0:
@@ -45,7 +51,7 @@ class VoidHvacTest(HvacEnv):
         if outdoorTemperature < userSetTemperature :
             r1 = 0
         else :
-            r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/100
+            r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/40
         #cost reward
         r2 = -cost/2+0.5
 

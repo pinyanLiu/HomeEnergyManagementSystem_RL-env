@@ -20,37 +20,32 @@ class VoidSocTest(SocEnv):
     def execute(self, actions):
         sampleTime,load,pv,soc,pricePerHour = self.state
         delta_soc = float(actions)
-    #interaction
         reward = []
+
+    #interaction
         cost = 0
         soc = soc+delta_soc
         if soc > 1:
+            #delta_soc = 1-soc
             soc = 1
-            reward.append(-0.2)
+            reward.append(-0.4)
         elif soc < 0 :
+            #delta_soc = 0-soc
             soc = 0
-            reward.append(-0.2)
-        else:
-            #calculate cost proportion   
-            if(delta_soc>0):
-                cost = pricePerHour * 0.25 * (delta_soc*self.batteryCapacity-pv)
-                if cost<0:
-                    cost = 0
-            elif(delta_soc<=0):
-                cost = pricePerHour*0.25*delta_soc*self.batteryCapacity
-        if load-pv+actions*self.batteryCapacity>self.PgridMax:
+            reward.append(-0.4)
+        Pgrid = max(0,delta_soc*self.batteryCapacity-pv+load)
+        cost = pricePerHour * 0.25 * Pgrid
+
+        if load-pv+delta_soc*self.batteryCapacity>self.PgridMax:
             reward.append(-5)
 
-
-
-
-        if (sampleTime == 95 ):
-            if(soc <self.socThreshold):
-                reward.append(10*(soc-self.socThreshold))
+        if (sampleTime >= 94):
+            if(soc < self.socThreshold):
+                reward.append(5*(soc-self.socThreshold))
             else:
-                reward.append(10)
+                reward.append(2)
 
-        reward.append(-cost)
+        reward.append(-0.19*cost+0.1)
 
 
         #change to next state

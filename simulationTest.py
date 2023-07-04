@@ -38,7 +38,19 @@ def __main__(argv):
         # simulation.outputResult("int")
         # simulation.outputResult("unint")
         # simulation.outputResult("")
-        simulation.plotTotalResult()
+
+##        simulation.plotessResult(8)
+##        simulation.plotacResult(1,5)
+##        simulation.plotacResult(2,5)
+        simulation.plotacResult(3,5)
+
+##        simulation.plotintResult(1,8)
+##        simulation.plotintResult(2,8)
+##        simulation.plotintResult(3,8)
+
+##        simulation.plotunintResult(1,8)
+##       simulation.plotunintResult(2,8)
+
     else:
         simulation.outputResult()
 

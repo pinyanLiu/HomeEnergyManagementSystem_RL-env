@@ -218,7 +218,7 @@ class Plot():
             self.sub4 = self.axes.twinx() 
             self.sub4.set_ylim(-1.5,4.5)
             self.sub4.set_ylabel('preference',color='lime')
-            self.sub4.spines['right'].set_position(("axes",1.2))
+            self.sub4.spines['right'].set_position(("axes",1.1))
             self.sub4.tick_params(axis='y',colors = 'lime')
             self.sub4.plot(range(96) ,self.testResult[month]['intUserPreference'+str(id)] ,label = 'intUserPreference', color ='lime')       
             self.sub4.legend(loc='upper left', fontsize=6, frameon=True)     
@@ -228,7 +228,7 @@ class Plot():
             for month in range(0,12):
                 self.sub4[month].set_ylim(-1.5,4.5)
                 self.sub4[month].set_ylabel('preference',color='lime')
-                self.sub4[month].spines['right'].set_position(("axes",1.2))
+                self.sub4[month].spines['right'].set_position(("axes",1.1))
                 self.sub4[month].tick_params(axis='y',colors = 'lime')
                 self.sub4[month].plot(range(96) ,self.testResult[month]['intUserPreference'+str(id)] ,label = 'intUserPreference', color ='lime')            
 
@@ -243,7 +243,7 @@ class Plot():
             self.sub4 = self.axes.twinx()
             self.sub4.set_ylim(-1.5,4.5)
             self.sub4.set_ylabel('preference',color='darkslategray')
-            self.sub4.spines['right'].set_position(("axes",1.2))
+            self.sub4.spines['right'].set_position(("axes",1.1))
             self.sub4.tick_params(axis='y',colors = 'darkslategray')
             self.sub4.plot(range(96) ,self.testResult[month]['unintUserPreference'+str(id)] ,label = 'unintUserPreference', color = 'darkslategray')        
             self.sub4.legend(loc='upper left', fontsize=6, frameon=True)    
@@ -252,7 +252,7 @@ class Plot():
             for month in range(0,12):
                 self.sub4[month].set_ylim(-1.5,4.5)
                 self.sub4[month].set_ylabel('preference',color='darkslategray')
-                self.sub4[month].spines['right'].set_position(("axes",1.2))
+                self.sub4[month].spines['right'].set_position(("axes",1.1))
                 self.sub4[month].tick_params(axis='y',colors = 'darkslategray')
                 self.sub4[month].plot(range(96) ,self.testResult[month]['unintUserPreference'+str(id)] ,label = 'unintUserPreference', color = 'darkslategray')            
 
