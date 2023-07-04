@@ -164,6 +164,7 @@ class multiAgentTrainEnv(Environment):
         self.interruptibleLoadActionMask3 = [True,True]
         self.uninterruptibleLoadActionMask1 = [True,True]
         self.uninterruptibleLoadActionMask2 = [True,True]
+        self.socActionMask = [1-self.socInit>0.25,1-self.socInit>0.2,1-self.socInit>0.15,1-self.socInit>0.1,1-self.socInit>0.05,True,self.socInit>0.05,self.socInit>0.1,self.socInit>0.15,self.socInit>0.2,self.socInit>0.25]
         self.tempActionMaskFlag = False # use for recording whether remain>pgridmax in last step
 
 
@@ -442,7 +443,7 @@ class multiAgentTrainEnv(Environment):
             self.unintPreference1 = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference1['12'].tolist(),self.randomDeltaPreference)]
             self.unintPreference2 = [min(max(x+y,-1),4) for x,y in zip(self.allUnintPreference2['12'].tolist(),self.randomDeltaPreference)]
 
-
+        self.socInit = uniform(0.1,0.6)
 
         #reset state
         self.totalState = {
@@ -486,6 +487,7 @@ class multiAgentTrainEnv(Environment):
         self.uninterruptibleLoadActionMask1 = [True,True]
         self.uninterruptibleLoadActionMask2 = [True,True]
         self.action_mask = [True,True,True,True,True,True,True,True,True,False]
+        self.socActionMask = [1-self.socInit>0.25,1-self.socInit>0.2,1-self.socInit>0.15,1-self.socInit>0.1,1-self.socInit>0.05,True,self.socInit>0.05,self.socInit>0.1,self.socInit>0.15,self.socInit>0.2,self.socInit>0.25]
         self.state = self.stateAbstraction(self.totalState)
         self.socAgent.agent.internals = self.socAgent.agent.initial_internals()
         self.hvacAgent1.agent.internals = self.hvacAgent1.agent.initial_internals()
@@ -526,11 +528,11 @@ class multiAgentTrainEnv(Environment):
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()
-            # self.socAgent.rewardNormalization()
-            # reward.append(self.socAgent.reward)
+            self.socAgent.rewardNormalization()
+            reward.append(self.socAgent.reward)
             self.updateTotalState("soc")
             self.state = self.stateAbstraction(self.totalState)
-            reward.append(-self.socAgent.actions[0]*self.batteryCapacity*pricePreHour)
+            # reward.append(-self.socAgent.actions[0]*self.batteryCapacity*pricePreHour)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [False,True,True,True,True,True,True,True,True,False])]
         
         #hvac1
@@ -538,12 +540,12 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent1.getState(self.totalState)
             self.hvacAgent1.environment.updateState(self.hvacAgent1.states)
             self.hvacAgent1.execute()
-            # self.hvacAgent1.rewardNormalization()
-            # reward.append(self.hvacAgent1.reward)            
+            self.hvacAgent1.rewardNormalization()
+            reward.append(self.hvacAgent1.reward)            
             self.updateTotalState("hvac1")
             self.state = self.stateAbstraction(self.totalState)
-            reward.append(-self.hvacAgent1.actions[0]*pricePreHour)
-            reward.append(3*self.state[4])
+            # reward.append(-self.hvacAgent1.actions[0]*pricePreHour)
+            # reward.append(3*self.state[4])
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,False,True,True,True,True,True,True,True,False])]
 
         #hvac2
@@ -551,12 +553,12 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent2.getState(self.totalState)
             self.hvacAgent2.environment.updateState(self.hvacAgent2.states)
             self.hvacAgent2.execute()
-            # self.hvacAgent2.rewardNormalization()
-            # reward.append(self.hvacAgent2.reward)            
+            self.hvacAgent2.rewardNormalization()
+            reward.append(self.hvacAgent2.reward)            
             self.updateTotalState("hvac2")
             self.state = self.stateAbstraction(self.totalState)
-            reward.append(-self.hvacAgent2.actions[0]*pricePreHour)
-            reward.append(3*self.state[5])
+            # reward.append(-self.hvacAgent2.actions[0]*pricePreHour)
+            # reward.append(3*self.state[5])
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,False,True,True,True,True,True,True,False])]
 
         #hvac3
@@ -564,12 +566,12 @@ class multiAgentTrainEnv(Environment):
             self.hvacAgent3.getState(self.totalState)
             self.hvacAgent3.environment.updateState(self.hvacAgent3.states)
             self.hvacAgent3.execute()
-            # self.hvacAgent3.rewardNormalization()
-            # reward.append(self.hvacAgent3.reward)            
+            self.hvacAgent3.rewardNormalization()
+            reward.append(self.hvacAgent3.reward)            
             self.updateTotalState("hvac3")
             self.state = self.stateAbstraction(self.totalState)
-            reward.append(-self.hvacAgent3.actions[0]*pricePreHour)
-            reward.append(3*self.state[6])
+            # reward.append(-self.hvacAgent3.actions[0]*pricePreHour)
+            # reward.append(3*self.state[6])
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,False,True,True,True,True,True,False])]
         
         
@@ -578,58 +580,58 @@ class multiAgentTrainEnv(Environment):
             self.intAgent1.getState(self.totalState,self.interruptibleLoadActionMask1)
             self.intAgent1.environment.updateState(self.intAgent1.states,self.interruptibleLoad1)
             self.intAgent1.execute()
-            # self.intAgent1.rewardNormalization()
-            # reward.append(self.intAgent1.reward)            
+            self.intAgent1.rewardNormalization()
+            reward.append(self.intAgent1.reward)            
             self.updateTotalState("int1")
             self.state = self.stateAbstraction(self.totalState)
-            reward.append(-self.intAgent1.actions*self.interruptibleLoad1.AvgPowerConsume*pricePreHour)
-            reward.append(self.intAgent1.actions*intPreference1*3)
+            # reward.append(-self.intAgent1.actions*self.interruptibleLoad1.AvgPowerConsume*pricePreHour)
+            # reward.append(self.intAgent1.actions*intPreference1*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,False,True,True,True,True,False])]
         elif actions == 5:
             self.intAgent2.getState(self.totalState,self.interruptibleLoadActionMask2)
             self.intAgent2.environment.updateState(self.intAgent2.states,self.interruptibleLoad2)
             self.intAgent2.execute()
-            # self.intAgent2.rewardNormalization()
-            # reward.append(self.intAgent2.reward)            
+            self.intAgent2.rewardNormalization()
+            reward.append(self.intAgent2.reward)            
             self.updateTotalState("int2")
             self.state = self.stateAbstraction(self.totalState)
-            reward.append(-self.intAgent2.actions*self.interruptibleLoad2.AvgPowerConsume*pricePreHour)
-            reward.append(self.intAgent2.actions*intPreference2*3)
+            # reward.append(-self.intAgent2.actions*self.interruptibleLoad2.AvgPowerConsume*pricePreHour)
+            # reward.append(self.intAgent2.actions*intPreference2*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,False,True,True,True,False])]
         elif actions == 6:
             self.intAgent3.getState(self.totalState,self.interruptibleLoadActionMask3)
             self.intAgent3.environment.updateState(self.intAgent3.states,self.interruptibleLoad3)
             self.intAgent3.execute()
-            # self.intAgent3.rewardNormalization()
-            # reward.append(self.intAgent3.reward)            
+            self.intAgent3.rewardNormalization()
+            reward.append(self.intAgent3.reward)            
             self.updateTotalState("int3")
             self.state = self.stateAbstraction(self.totalState)
-            reward.append(-self.intAgent3.actions*self.interruptibleLoad3.AvgPowerConsume*pricePreHour)
-            reward.append(self.intAgent3.actions*intPreference3*3)
+            # reward.append(-self.intAgent3.actions*self.interruptibleLoad3.AvgPowerConsume*pricePreHour)
+            # reward.append(self.intAgent3.actions*intPreference3*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,False,True,True,False])]
         #unint
         elif actions == 7:
             self.unIntAgent1.getState(self.totalState,self.uninterruptibleLoadActionMask1)
             self.unIntAgent1.environment.updateState(self.unIntAgent1.states,self.uninterruptibleLoad1)
             self.unIntAgent1.execute()
-            # self.unIntAgent1.rewardNormalization()
-            # reward.append(self.unIntAgent1.reward)
+            self.unIntAgent1.rewardNormalization()
+            reward.append(self.unIntAgent1.reward)
             self.updateTotalState("unint1")
             self.state = self.stateAbstraction(self.totalState)
-            reward.append(-int(self.totalState["unintSwitch1"])*self.uninterruptibleLoad1.AvgPowerConsume*pricePreHour)
-            reward.append(int(self.totalState["unintSwitch1"])*unintPreference1*3)
+            # reward.append(-int(self.totalState["unintSwitch1"])*self.uninterruptibleLoad1.AvgPowerConsume*pricePreHour)
+            # reward.append(int(self.totalState["unintSwitch1"])*unintPreference1*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,True,False,True,False])]
         #unint
         elif actions == 8:
             self.unIntAgent2.getState(self.totalState,self.uninterruptibleLoadActionMask2)
             self.unIntAgent2.environment.updateState(self.unIntAgent2.states,self.uninterruptibleLoad2)
             self.unIntAgent2.execute()
-            # self.unIntAgent2.rewardNormalization()
-            # reward.append(self.unIntAgent2.reward)
+            self.unIntAgent2.rewardNormalization()
+            reward.append(self.unIntAgent2.reward)
             self.updateTotalState("unint2")
             self.state = self.stateAbstraction(self.totalState)
-            reward.append(-int(self.totalState["unintSwitch2"])*self.uninterruptibleLoad2.AvgPowerConsume*pricePreHour)
-            reward.append(int(self.totalState["unintSwitch2"])*unintPreference2*3)
+            # reward.append(-int(self.totalState["unintSwitch2"])*self.uninterruptibleLoad2.AvgPowerConsume*pricePreHour)
+            # reward.append(int(self.totalState["unintSwitch2"])*unintPreference2*3)
             self.action_mask = [a and b for a,b in zip(self.action_mask , [True,True,True,True,True,True,True,True,False,False])]
         #none
         elif actions==9:
@@ -656,13 +658,36 @@ class multiAgentTrainEnv(Environment):
 
     def updateTotalState(self,mode) :
         if mode == "soc":
-            self.totalState["fixLoad"]+=self.socAgent.actions[0]*self.batteryCapacity
-            self.totalState["deltaSoc"] = self.socAgent.actions[0]
-            self.totalState["SOC"]+=self.socAgent.actions[0]
-            if self.totalState["SOC"]>=1 :
-                self.totalState["SOC"]=1
-            elif self.totalState["SOC"]<=0:
-                self.totalState["SOC"]=0
+            if self.socAgent.actions == 0 :
+                delta_soc = 0.25
+            elif self.socAgent.actions ==1:
+                delta_soc = 0.2
+            elif self.socAgent.actions ==2:
+                delta_soc = 0.15
+            elif self.socAgent.actions ==3:
+                delta_soc = 0.1
+            elif self.socAgent.actions ==4:
+                delta_soc = 0.05
+            elif self.socAgent.actions ==5:
+                delta_soc = 0.00
+            elif self.socAgent.actions ==6:
+                delta_soc = -0.05
+            elif self.socAgent.actions ==7:
+                delta_soc = -0.1
+            elif self.socAgent.actions ==8:
+                delta_soc = -0.15
+            elif self.socAgent.actions ==9:
+                delta_soc = -0.2
+            elif self.socAgent.actions ==10:
+                delta_soc = -0.25
+            self.totalState["fixLoad"]+=delta_soc*self.batteryCapacity
+            self.totalState["deltaSoc"] = delta_soc
+            self.totalState["SOC"]+=delta_soc
+            self.socActionMask = self.socAgent.states["action_mask"]
+            # if self.totalState["SOC"]>=1 :
+            #     self.totalState["SOC"]=1
+            # elif self.totalState["SOC"]<=0:
+            #     self.totalState["SOC"]=0
 
         elif mode == "hvac1":
             self.totalState["fixLoad"]+=self.hvacAgent1.actions[0]

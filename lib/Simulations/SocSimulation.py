@@ -36,13 +36,35 @@ class SocSimulation(Simulation):
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
-                deltaSoc.append(actions[0])
+                if actions == 0 :
+                    action = 0.25
+                elif actions ==1:
+                    action = 0.2
+                elif actions ==2:
+                    action = 0.15
+                elif actions ==3:
+                    action = 0.1
+                elif actions ==4:
+                    action = 0.05
+                elif actions ==5:
+                    action = 0.00
+                elif actions ==6:
+                    action = -0.05
+                elif actions ==7:
+                    action = -0.1
+                elif actions ==8:
+                    action = -0.15
+                elif actions ==9:
+                    action = -0.2
+                elif actions ==10:
+                    action = -0.25
+                deltaSoc.append(action)
                 sampletime.append(states['state'][0])
                 load.append(states['state'][1])
                 pv.append(states['state'][2])
                 soc.append(states['state'][3])
                 price.append(states['state'][4])
-                ExceedPgridMaxTimes.append(1 if actions[0]*10+states['state'][1]-states['state'][2]>10 else 0)
+                ExceedPgridMaxTimes.append(1 if action*10+states['state'][1]-states['state'][2]>10 else 0)
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
@@ -73,11 +95,11 @@ class SocSimulation(Simulation):
     
     def outputResult(self):
         # if month != False:
-            output = Plot(self.testResult,single=True)
-            output.remainPower(month=9)
-            output.plotDeltaSOCPower(month=9)
-            output.soc(month=9)
-            output.price(month=9)
+            output = Plot(self.testResult,single=False)
+            output.remainPower(month=False)
+            output.plotDeltaSOCPower(month=False)
+            output.soc(month=False)
+            output.price(month=False)
             output.plotResult('lib/plot/soc/')
         # else:
         #     output = Plot(self.testResult)
