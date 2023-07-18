@@ -55,7 +55,7 @@ class SocEnv(HemsEnv):
 
     def actions(self):
         #(degree of charging/discharging power)
-        return dict(type='int',num_values=11)
+        return dict(type='int',num_values=21)
 
     def close(self):
         return super().close()
@@ -71,66 +71,54 @@ class SocEnv(HemsEnv):
         # actions = [0.25,0.2,0.15,0.1,0.05,0,-0.05,-0.1,-0.15,-0.2,-0.25]
     #STATE (sampleTime,Load,PV,SOC,pricePerHour,degradationCost)
         sampleTime,load,pv,soc,pricePerHour = self.state
-
-        if actions == 0 :
-            delta_soc = 0.25
-        elif actions ==1:
-            delta_soc = 0.2
-        elif actions ==2:
-            delta_soc = 0.15
-        elif actions ==3:
-            delta_soc = 0.1
-        elif actions ==4:
-            delta_soc = 0.05
-        elif actions ==5:
-            delta_soc = 0.00
-        elif actions ==6:
-            delta_soc = -0.05
-        elif actions ==7:
-            delta_soc = -0.1
-        elif actions ==8:
-            delta_soc = -0.15
-        elif actions ==9:
-            delta_soc = -0.2
-        elif actions ==10:
-            delta_soc = -0.25
+        delta_soc = -0.025*actions+0.25
 
         # actions(delta_soc) is the degree of charging/discharging power .
         # if delta_soc > 0 means charging , whereas delta_soc < 0 means discharging.
         reward = []
 
     #interaction
-        cost = 0
         soc = soc+delta_soc
+        cost = (load+delta_soc*self.batteryCapacity-pv)*pricePerHour
+        proportion = delta_soc*self.batteryCapacity/(load+delta_soc*self.batteryCapacity-pv)
+        if proportion == 0:
+            proportion = 0.00000001
+        cost= cost * proportion   
+        # if delta_soc > 0:
+        #     reward.append(delta_soc*pricePerHour)
+        # else:
+        #     reward.append(-delta_soc*pricePerHour*2)
 
-        Pgrid = max(0,delta_soc*self.batteryCapacity-pv+load)
-        cost = pricePerHour * 0.25 * Pgrid
-
-        if soc == 0:
-            reward.append(-0.5)
+        if pv>load:
+            cost = 0
+            reward.append(delta_soc*self.batteryCapacity)
+        reward.append(-cost)  
 
         if load-pv+delta_soc*self.batteryCapacity>self.PgridMax:
             reward.append(-5)
-
-        socMask = [1-soc>0.25,1-soc>0.2,1-soc>0.15,1-soc>0.1,1-soc>0.05,True,soc>0.05,soc>0.1,soc>0.15,soc>0.2,soc>0.25]
-        self.action_mask = np.asarray(socMask)
-
-        
-
 
         if (sampleTime >= 94):
             if(soc < self.socThreshold):
                 reward.append(5*(soc-self.socThreshold))
             else:
-                reward.append(2)
+                reward.append(5)
 
-        reward.append(-2*cost)
 
 
         #change to next state
         sampleTime = int(sampleTime+1)
         self.state=np.array([sampleTime,self.Load[sampleTime],self.PV[sampleTime],soc,self.GridPrice[sampleTime]])
+        remainPower = self.Load[sampleTime]-self.PV[sampleTime]
 
+        if remainPower < 0:
+            chargeMask = [True,True,True,True,True,True,True,True,True,True,True,False,False,False,False,False,False,False,False,False,False]
+        else:
+            chargeMask = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
+        # else : #remain>=0
+        #     chargeMask = [True,True,True,True,True,True,True,True,True,True,True,remainPower>1*4,remainPower>2*4,remainPower>3*4,remainPower>4*4,remainPower>5*4,remainPower>6*4,remainPower>7*4,remainPower>8*4,remainPower>9*4,remainPower>10*4]
+        socMask = [1-soc>0.25,1-soc>0.225,1-soc>0.2,1-soc>0.175,1-soc>0.15,1-soc>0.125,1-soc>0.1,1-soc>0.075,1-soc>0.05,1-soc>0.025,True,soc>0.025,soc>0.05,soc>0.075,soc>0.1,soc>0.125,soc>0.15,soc>0.175,soc>0.2,soc>0.225,soc>0.25]
+        mask = [a and b for a,b in zip(chargeMask,socMask)]
+        self.action_mask = np.asarray(mask)
         #check if all day has done
         self.done = bool(sampleTime == 95)
 
@@ -192,8 +180,17 @@ class SocEnv(HemsEnv):
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Dec'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
         self.socInit = uniform(0.1,0.6)
-        socMask = [1-self.socInit>0.25,1-self.socInit>0.2,1-self.socInit>0.15,1-self.socInit>0.1,1-self.socInit>0.05,True,self.socInit>0.05,self.socInit>0.1,self.socInit>0.15,self.socInit>0.2,self.socInit>0.25]
-        self.action_mask = np.asarray(socMask)
+        remainPower = self.Load[0]-self.PV[0]
+        if remainPower < 0:
+            chargeMask = [True,True,True,True,True,True,True,True,True,True,True,False,False,False,False,False,False,False,False,False,False]
+            dischargeMask = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
+        else : #remain>=0
+            chargeMask =  [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
+            dischargeMask = [True,True,True,True,True,True,True,True,True,True,True,remainPower>1,remainPower>2,remainPower>3,remainPower>4,remainPower>5,remainPower>6,remainPower>7,remainPower>8,remainPower>9,remainPower>10]
+        socMask = [1-self.socInit>0.25,1-self.socInit>0.225,1-self.socInit>0.2,1-self.socInit>0.175,1-self.socInit>0.15,1-self.socInit>0.125,1-self.socInit>0.1,1-self.socInit>0.075,1-self.socInit>0.05,1-self.socInit>0.025,True,self.socInit>0.025,self.socInit>0.05,self.socInit>0.075,self.socInit>0.1,self.socInit>0.125,self.socInit>0.15,self.socInit>0.175,self.socInit>0.2,self.socInit>0.225,self.socInit>0.25]
+        mask = [a and b for a,b in zip(chargeMask,dischargeMask)]
+        mask = [a and b for a,b in zip(mask,socMask)]
+        self.action_mask = np.asarray(mask)
 
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.socInit,self.GridPrice[0]])

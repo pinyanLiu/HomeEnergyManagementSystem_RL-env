@@ -23,7 +23,7 @@
     "actions": {
         "type": "int",
         "shape": [],
-        "num_values": 11
+        "num_values": 21
     },
     "max_episode_timesteps": 96,
     "batch_size": 256,
@@ -51,7 +51,7 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 5000,
+        "num_steps": 3000,
         "initial_value": 1e-3,
         "final_value": 5e-5
     },
@@ -85,7 +85,7 @@
             "type": "decaying",
             "decay": "linear",
             "unit": "episodes",
-            "num_steps": 5000,
+            "num_steps": 3000,
             "initial_value": 1e-3,
             "final_value": 5e-5
         },
@@ -96,8 +96,8 @@
         "type": "decaying",
         "decay": "linear",
         "unit": "episodes",
-        "num_steps": 5000,
-        "initial_value": 0.2,
+        "num_steps": 3000,
+        "initial_value": 0.9,
         "final_value": 1e-5
     },
     "variable_noise": 0.0,

@@ -71,10 +71,24 @@ class SocTest(SocEnv):
         elif self.i  == 11:
             self.PV = self.allPV['Dec'].tolist()
             self.GridPrice = self.notSummerGridPrice
+        
+        remainPower = self.Load[0]-self.PV[0]
+        if remainPower < 0:
+            chargeMask = [True,True,True,True,True,True,True,True,True,True,True,False,False,False,False,False,False,False,False,False,False]
+            dischargeMask = [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
+            cost = 0
+        else : #remain>=0
+            chargeMask =  [True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True,True]
+            dischargeMask = [True,True,True,True,True,True,True,True,True,True,True,remainPower>1,remainPower>2,remainPower>3,remainPower>4,remainPower>5,remainPower>6,remainPower>7,remainPower>8,remainPower>9,remainPower>10]
+        socMask = [1-self.socInit>0.25,1-self.socInit>0.225,1-self.socInit>0.2,1-self.socInit>0.175,1-self.socInit>0.15,1-self.socInit>0.125,1-self.socInit>0.1,1-self.socInit>0.075,1-self.socInit>0.05,1-self.socInit>0.025,True,self.socInit>0.025,self.socInit>0.05,self.socInit>0.075,self.socInit>0.1,self.socInit>0.125,self.socInit>0.15,self.socInit>0.175,self.socInit>0.2,self.socInit>0.225,self.socInit>0.25]
+        mask = [a and b for a,b in zip(chargeMask,dischargeMask)]
+        mask = [a and b for a,b in zip(mask,socMask)]
+        self.action_mask = np.asarray(mask)
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.socInit,self.GridPrice[0]])
+        states = dict(state = self.state,action_mask = self.action_mask)
         
-        return self.state
+        return states
 
 
 if __name__ == '__main__':
