@@ -96,7 +96,7 @@ class HvacEnv(HemsEnv):
     #interaction
 
         #calculate the new indoor temperature for next state
-        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC*0.25)
+        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC*0.6)
 
         #calculate proportion
         if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity) < 0:

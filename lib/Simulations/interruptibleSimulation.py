@@ -63,6 +63,8 @@ class IntSimulation(Simulation):
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
+            self.testResult[month]['PV'] = pv
+            self.testResult[month]['load'] = load
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['intloadRemain'] = intloadRemain
@@ -89,12 +91,13 @@ class IntSimulation(Simulation):
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     
-    def outputResult(self):
+    def outputResult(self,id,month):
         output = Plot(self.testResult,single=True)
-        output.remainPower(month=1)
-        output.plotIntLoadPower(month=1)
-        output.price(month=1)
-        output.plotIntPreference(month=1)
+        output.fixloadPower(month=month)
+        output.plotIntLoadPower(id=id,month=month)
+        output.plotPVPower(month=month)
+        output.price(month=month)
+        output.plotIntPreference(id=id,month=month)
         output.plotResult('lib/plot/interruptible/')
 
     def getMean(self):

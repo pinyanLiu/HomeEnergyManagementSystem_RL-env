@@ -39,8 +39,9 @@ def __main__(argv):
         simulation.outputResult("unint")
         simulation.outputResult("")
     else:
-        simulation.outputResult(id=1,month=5)
-        simulation.outputResult(id=1,month=1)
+        for month in range(1,12):
+            simulation.outputResult(id=1,month=month)
+    
 
 
 
