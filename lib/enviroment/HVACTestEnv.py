@@ -105,7 +105,7 @@ class HvacTest(HvacEnv):
             self.PV = self.allPV['Dec'].tolist()
             self.deltaSOC = self.allDeltaSOC['Dcb'].tolist()
             self.GridPrice = self.notSummerGridPrice
-
+        self.deltaSOC = [min(max(x,-0.25),0.25) for x in self.deltaSOC]
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.GridPrice[0],self.deltaSOC[0],self.initIndoorTemperature,self.outdoorTemperature[0],self.userSetTemperature[0]])
         return self.state

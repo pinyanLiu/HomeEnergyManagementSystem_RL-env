@@ -59,8 +59,10 @@ class HvacSimulation(Simulation):
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
+            self.testResult[month]['load'] = load
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
+            self.testResult[month]['PV'] = pv
             self.testResult[month]['indoorTemperature1'] = indoorTemperature1
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
             self.testResult[month]['userSetTemperature1'] = userSetTemperature1
@@ -85,14 +87,15 @@ class HvacSimulation(Simulation):
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     
-    def outputResult(self):
+    def outputResult(self,id,month):
         output = Plot(self.testResult,single=True)
-        output.remainPower(month=5)
-        output.indoorTemperature(id=1,month=5)
-        output.outdoorTemperature(month=5)
-        output.userSetTemperature(month=5)
-        output.price(month=5)
-        output.plotHVACPower(id=1,month=5)
+        output.fixloadPower(month=month)
+        output.indoorTemperature(id=id,month=month)
+        output.outdoorTemperature(month=month)
+        output.userSetTemperature(month=month)
+        output.plotPVPower(month=month)
+        output.price(month=month)
+        output.plotHVACPower(id=id,month=month)
         #output.plotReward()
         output.plotResult('lib/plot/hvac/')
 

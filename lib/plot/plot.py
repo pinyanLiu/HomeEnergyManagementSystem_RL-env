@@ -221,7 +221,7 @@ class Plot():
         custom_time = strftime(custom_format, current_time)
         self.fig.tight_layout()
         self.fig.savefig(dir+str(custom_time)+'.png')
-        time.sleep(0.1)
+        time.sleep(1)
         
 
     def plotIntPreference(self,id=1,month=False):
