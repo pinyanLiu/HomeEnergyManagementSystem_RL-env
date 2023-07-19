@@ -51,7 +51,9 @@ class SocSimulation(Simulation):
             remain = [load[sampletime]-pv[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
+            self.testResult[month]['load'] = load
             self.testResult[month]['soc'] = soc
+            self.testResult[month]['PV'] = pv
             self.testResult[month]['price'] = price
             self.testResult[month]['reward'] = Reward
             self.testResult[month]['deltaSoc']=deltaSoc
@@ -74,9 +76,10 @@ class SocSimulation(Simulation):
     def outputResult(self,month=False):
         if month != False:
             output = Plot(self.testResult,single=True)
-            output.remainPower(month=month)
-            output.plotDeltaSOCPower(month=month)
+            output.fixloadPower(month=month)
             output.soc(month=month)
+            output.plotPVPower(month=month)
+            output.plotDeltaSOCPower(month=month)
             output.price(month=month)
             output.plotResult('lib/plot/soc/')
         else:

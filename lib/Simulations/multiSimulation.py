@@ -81,7 +81,6 @@ class multiSimulation(Simulation):
                     userSetTemperature1.append(totalState["userSetTemperature1"])
                     userSetTemperature2.append(totalState["userSetTemperature2"])
                     userSetTemperature3.append(totalState["userSetTemperature3"])
-                    
                     TotalHvacPreference.append(states['state'][4]+states['state'][5]+states['state'][6])
                     hvacPower1.append(totalState['hvacPower1'])
                     hvacPower2.append(totalState['hvacPower2'])
@@ -111,6 +110,7 @@ class multiSimulation(Simulation):
                 totalReward += reward
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
+            self.testResult[month]['load'] = load
             self.testResult[month]['price'] = price
             self.testResult[month]['soc'] = soc
             self.testResult[month]['PV'] = pv
@@ -207,7 +207,7 @@ class multiSimulation(Simulation):
     def outputResult(self,mode):
         output = Plot(self.testResult)
         if mode == "hvac":
-            output.remainPower()
+            output.fixloadPower()
             output.soc()
             output.indoorTemperature(1)
             output.indoorTemperature(2)
@@ -226,7 +226,7 @@ class multiSimulation(Simulation):
             output.plotResult('lib/plot/HRL/hvac/')
 
         elif mode == "soc":
-            output.remainPower()
+            output.fixloadPower()
             output.soc()
             output.price()
             output.plotPgridMax()
@@ -235,7 +235,7 @@ class multiSimulation(Simulation):
             output.plotResult('lib/plot/HRL/soc/')
             
         elif mode == "int":
-            output.remainPower()
+            output.fixloadPower()
             output.soc()
             output.price()
             output.plotPgridMax()
@@ -250,7 +250,7 @@ class multiSimulation(Simulation):
             output.plotResult('lib/plot/HRL/int/')
 
         elif mode == "unint":
-            output.remainPower()
+            output.fixloadPower()
             output.soc()
             output.price()
             output.plotPgridMax()
@@ -261,7 +261,7 @@ class multiSimulation(Simulation):
             output.plotUnIntLoadPower(2)
             output.plotResult('lib/plot/HRL/unint/')
         else:
-            output.remainPower()
+            output.fixloadPower()
             output.soc()
             output.price()
             output.plotPgridMax()
