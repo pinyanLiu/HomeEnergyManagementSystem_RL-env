@@ -19,7 +19,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
     
     def execute(self, actions):
         sampleTime,soc,remain,pricePreHour,hvacState1,hvacState2,hvacState3,intState1,intState2,intState3,unIntState1,unIntState2,intPreference1,intPreference2,intPreference3,unintPreference1,unintPreference2,order = self.state    #execute HVAC
-        if order == 0:
+        if order == 8:
             self.hvacAgent1.getState(self.totalState)
             self.hvacAgent1.environment.updateState(self.hvacAgent1.states)
             self.hvacAgent1.execute()
@@ -81,7 +81,7 @@ class FourLevelTestEnv(multiAgentTestEnv):
             self.updateTotalState("unint2")   
 
     #execute SOC
-        elif order == 8:
+        elif order == 0:
             self.socAgent.getState(self.totalState)
             self.socAgent.environment.updateState(self.socAgent.states)
             self.socAgent.execute()

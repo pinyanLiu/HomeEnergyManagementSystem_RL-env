@@ -33,7 +33,7 @@ class VoidHvacTest(HvacEnv):
     #interaction
 
         #calculate the new indoor temperature for next state
-        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
+        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC*0.6)
 
         #calculate proportion
         if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity) < 0:
@@ -62,7 +62,6 @@ class VoidHvacTest(HvacEnv):
 
         #check if all day has done
         self.done = False
-
 
         self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,nextIndoorTemperature,outdoorTemperature,userSetTemperature])
         states = dict(state=self.state)

@@ -117,12 +117,12 @@ class Plot():
     def plotPgridMax(self,month=False):
         if month != False:
             self.axes.set_ylabel('Power')
-            self.axes.plot(range(96),self.testResult[month]['PgridMax'],linestyle='--',color='red')
+            self.axes.plot(range(96),self.testResult[month]['PgridMax'],label ='PgridMax',linestyle='--',color='crimson')
             self.axes.legend(loc='lower left', fontsize=7, frameon=True)
         else:
             for month in range(0,12):
                 self.ax[month].set_ylabel('Power')
-                self.ax[month].plot(range(96),self.testResult[month]['PgridMax'],linestyle='--',color='red')
+                self.ax[month].plot(range(96),self.testResult[month]['PgridMax'],linestyle='--',color='crimson')
     
     def price(self,month=False):
         if month != False:

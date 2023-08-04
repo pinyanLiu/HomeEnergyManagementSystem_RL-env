@@ -34,7 +34,7 @@ class HvacEnv(HemsEnv):
                 #pricePerHour
                 6.2,
                 #deltaSoc
-                0.25,
+                0.5,
                 #indoor temperature
                 104,
                 #outdoor temperature
@@ -56,7 +56,7 @@ class HvacEnv(HemsEnv):
                 #pricePerHour
                 1,
                 #deltaSoc
-                -0.25,
+                -0.5,
                 #indoor temperature
                 20,
                 #outdoor temperature
