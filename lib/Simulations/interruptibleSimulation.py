@@ -10,14 +10,16 @@ class IntSimulation(Simulation):
         self.environment = Environment.create(environment = IntTest,max_episode_timesteps=96)
         self.agent = Agent.load(directory = 'Load/Interruptible/saver_dir',environment=self.environment)
     def simulation(self):
-        acObject = AC(AvgPowerConsume=0.3)
+        acObject = AC(AvgPowerConsume=1)
         sampletime = []
         load = []
         pv = []
         price = []
         deltaSoc = []
-        switch = []
+        intSwitch = []
         intloadRemain = []
+        intUserPreference = []
+        ExceedPgridMaxTimes=[]
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -29,6 +31,8 @@ class IntSimulation(Simulation):
             price.append(states[3])
             deltaSoc.append(states[4])
             intloadRemain.append(states[5])
+            intUserPreference.append(states[6])
+            ExceedPgridMaxTimes.append(0)
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -36,32 +40,39 @@ class IntSimulation(Simulation):
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
-                #1. switch on 
-                if actions == 1: # washing machine's switch
-                    switch.append(acObject.AvgPowerConsume)#power
+
+                #1. intSwitch on 
+                if actions == 1: # washing machine's intSwitch
+                    intSwitch.append(acObject.AvgPowerConsume)#power
                 #2. do nothing 
                 else :
-                    switch.append(0)
-
+                    intSwitch.append(0)
                 sampletime.append(states['state'][0])
                 load.append(states['state'][1])
                 pv.append(states['state'][2])
                 price.append(states['state'][3])
                 deltaSoc.append(states['state'][4])
                 intloadRemain.append(states['state'][5])
+                intUserPreference.append(states['state'][6])
                 self.totalReward.append(reward)
+                ExceedPgridMaxTimes.append(1 if states['state'][1]-states['state'][2]+states['state'][4]*10+actions*acObject.AvgPowerConsume>10 else 0)
                 Reward.append(reward)
                 totalReward += reward
-            switch.append(0)
+            intSwitch.append(0)
             Reward.append(0)
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
+            self.testResult[month]['PV'] = pv
+            self.testResult[month]['load'] = load
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
             self.testResult[month]['intloadRemain'] = intloadRemain
-            self.testResult[month]['switch'] = switch
+            self.testResult[month]['ExceedPgridMaxTimes'] = ExceedPgridMaxTimes
+            self.testResult[month]['intSwitch1'] = intSwitch
             self.testResult[month]['reward'] = Reward
+            self.testResult[month]['intUserPreference1'] = intUserPreference
+
             TotalReward.append(totalReward)
             totalReward=0
             sampletime.clear()
@@ -69,18 +80,24 @@ class IntSimulation(Simulation):
             pv.clear()
             price.clear()
             deltaSoc.clear()
-            switch.clear()
+            ExceedPgridMaxTimes.clear()
+            intSwitch.clear()
             intloadRemain.clear()
             Reward.clear()
+            intUserPreference.clear()
+            Reward.clear()
+        for month in range(12):
+            print("month ",month, " ExceedPgridMaxTimes: ",sum(self.testResult[month]["ExceedPgridMaxTimes"]))
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     
-    def outputResult(self):
-        output = Plot(self.testResult)
-        output.remainPower()
-        output.plotLoadPower()
-        output.price()
-        output.plotReward()
+    def outputResult(self,id,month):
+        output = Plot(self.testResult,single=True)
+        output.fixloadPower(month=month)
+        output.plotIntLoadPower(id=id,month=month)
+        output.plotPVPower(month=month)
+        output.price(month=month)
+        output.plotIntPreference(id=id,month=month)
         output.plotResult('lib/plot/interruptible/')
 
     def getMean(self):
@@ -89,5 +106,11 @@ class IntSimulation(Simulation):
     def getStd(self):
         return super().getStd()
 
+    def getMax(self):
+        return super().getMax()
+    
+    def getMin(self):
+        return super().getMin()
+    
     def __del__(self):
         return super().__del__()

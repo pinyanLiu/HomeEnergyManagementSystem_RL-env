@@ -8,17 +8,18 @@ class HvacSimulation(Simulation):
     def __init__(self):
         super().__init__()
         self.environment = Environment.create(environment = HvacTest,max_episode_timesteps=96)
-        self.agent = Agent.load(directory = 'HVAC/saver_dir',environment=self.environment)
+        self.agent = Agent.load(directory = 'HVAC/bestAgent/saver_dir',environment=self.environment)
     def simulation(self):
         sampletime = []
         load = []
         pv = []
         price = []
         deltaSoc = []
-        indoorTemperature = []
+        indoorTemperature1 = []
         outdoorTemperature = []
-        userSetTemperature = []
-        hvac = []
+        userSetTemperature1 = []
+        ExceedPgridMaxTimes = []
+        hvacPower1 = []
         Reward = []
         TotalReward = []
         totalReward = 0
@@ -29,9 +30,10 @@ class HvacSimulation(Simulation):
             pv.append(states[2])
             price.append(states[3])
             deltaSoc.append(states[4])
-            indoorTemperature.append(states[5])
+            indoorTemperature1.append(states[5])
             outdoorTemperature.append(states[6])
-            userSetTemperature.append(states[7])
+            userSetTemperature1.append(states[7])
+            ExceedPgridMaxTimes.append(0)
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -39,51 +41,62 @@ class HvacSimulation(Simulation):
                     states=states, internals=internals, independent=True, deterministic=True
                 )
                 states, terminal, reward = self.environment.execute(actions=actions)
-                hvac.append(actions[0])
+                hvacPower1.append(actions[0])
                 sampletime.append(states['state'][0])
                 load.append(states['state'][1])
                 pv.append(states['state'][2])
                 price.append(states['state'][3])
                 deltaSoc.append(states['state'][4])
-                indoorTemperature.append(states['state'][5])
+                indoorTemperature1.append(states['state'][5])
                 outdoorTemperature.append(states['state'][6])
-                userSetTemperature.append(states['state'][7])
+                userSetTemperature1.append(states['state'][7])
+                ExceedPgridMaxTimes.append(1 if actions[0]+states['state'][1]-states['state'][2]+states['state'][4]*10>10 else 0)
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
-            hvac.append(0)
+            hvacPower1.append(0)
             Reward.append(0)
             remain = [load[sampletime]-pv[sampletime]-deltaSoc[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
+            self.testResult[month]['load'] = load
             self.testResult[month]['price'] = price
             self.testResult[month]['deltaSoc'] = deltaSoc
-            self.testResult[month]['indoorTemperature'] = indoorTemperature
+            self.testResult[month]['PV'] = pv
+            self.testResult[month]['indoorTemperature1'] = indoorTemperature1
             self.testResult[month]['outdoorTemperature'] = outdoorTemperature
-            self.testResult[month]['userSetTemperature'] = userSetTemperature
+            self.testResult[month]['userSetTemperature1'] = userSetTemperature1
+            self.testResult[month]['hvacPower1'] = hvacPower1
+            self.testResult[month]["ExceedPgridMaxTimes"] = ExceedPgridMaxTimes
             self.testResult[month]['reward'] = Reward
             TotalReward.append(totalReward)
             totalReward=0
             sampletime.clear()
+            hvacPower1.clear()
             load.clear()
             pv.clear()
             price.clear()
             deltaSoc.clear()
-            indoorTemperature.clear()
+            indoorTemperature1.clear()
             outdoorTemperature.clear()
-            userSetTemperature.clear()
+            userSetTemperature1.clear()
+            ExceedPgridMaxTimes.clear()
             Reward.clear()
+        for month in range(12):
+            print("month ",month, " ExceedPgridMaxTimes: ",sum(self.testResult[month]["ExceedPgridMaxTimes"]))
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     
-    def outputResult(self):
-        output = Plot(self.testResult)
-        output.remainPower()
-        output.indoorTemperature()
-        output.outdoorTemperature()
-        output.userSetTemperature()
-        output.price()
-        output.plotReward()
+    def outputResult(self,id,month):
+        output = Plot(self.testResult,single=True)
+        output.fixloadPower(month=month)
+        output.indoorTemperature(id=id,month=month)
+        output.outdoorTemperature(month=month)
+        output.userSetTemperature(month=month)
+        output.plotPVPower(month=month)
+        output.price(month=month)
+        output.plotHVACPower(id=id,month=month)
+        #output.plotReward()
         output.plotResult('lib/plot/hvac/')
 
     def getMean(self):
@@ -91,6 +104,11 @@ class HvacSimulation(Simulation):
 
     def getStd(self):
         return super().getStd()
-        
+    
+    def getMax(self):
+        return super().getMax()
+    
+    def getMin(self):
+        return super().getMin()
     def __del__(self):
         return super().__del__()

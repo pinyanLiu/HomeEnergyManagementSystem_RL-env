@@ -19,6 +19,7 @@ class SocSimulation(Simulation):
         deltaSoc = []
         Reward = []
         TotalReward = []
+        ExceedPgridMaxTimes=[]
         totalReward = 0
         for month in range(12):
             states = self.environment.reset()
@@ -27,6 +28,7 @@ class SocSimulation(Simulation):
             pv.append(states[2])
             soc.append(states[3])
             price.append(states[4])
+            ExceedPgridMaxTimes.append(0)
             internals = self.agent.initial_internals()
             terminal = False
             while not terminal:
@@ -40,6 +42,7 @@ class SocSimulation(Simulation):
                 pv.append(states['state'][2])
                 soc.append(states['state'][3])
                 price.append(states['state'][4])
+                ExceedPgridMaxTimes.append(1 if actions[0]*10+states['state'][1]-states['state'][2]>10 else 0)
                 self.totalReward.append(reward)
                 Reward.append(reward)
                 totalReward += reward
@@ -48,10 +51,13 @@ class SocSimulation(Simulation):
             remain = [load[sampletime]-pv[sampletime] for sampletime in range(96)]
             self.testResult[month]['sampleTime'] = sampletime
             self.testResult[month]['remain'] = remain
+            self.testResult[month]['load'] = load
             self.testResult[month]['soc'] = soc
+            self.testResult[month]['PV'] = pv
             self.testResult[month]['price'] = price
             self.testResult[month]['reward'] = Reward
             self.testResult[month]['deltaSoc']=deltaSoc
+            self.testResult[month]['ExceedPgridMaxTimes']=ExceedPgridMaxTimes
             TotalReward.append(totalReward)
             totalReward=0
             sampletime.clear()
@@ -60,23 +66,42 @@ class SocSimulation(Simulation):
             soc.clear()
             price.clear()
             deltaSoc.clear()
+            ExceedPgridMaxTimes.clear()
             Reward.clear()
+        for month in range(12):
+            print("month ",month, " ExceedPgridMaxTimes: ",sum(self.testResult[month]["ExceedPgridMaxTimes"]))
         print('Agent average episode reward: ', sum(TotalReward)/len(TotalReward) ) 
         print('reward: ', TotalReward ) 
     
-    def outputResult(self):
-        output = Plot(self.testResult)
-        output.remainPower()
-        output.price()
-        output.soc()
-        output.plotReward()
-        output.plotResult('lib/plot/soc/')
+    def outputResult(self,month=False):
+        if month != False:
+            output = Plot(self.testResult,single=True)
+            output.fixloadPower(month=month)
+            output.soc(month=month)
+            output.plotPVPower(month=month)
+            output.plotDeltaSOCPower(month=month)
+            output.price(month=month)
+            output.plotResult('lib/plot/soc/')
+        else:
+            output = Plot(self.testResult)
+            output.remainPower()
+            output.plotDeltaSOCPower()
+            output.soc()
+            output.price()
+            output.plotReward()
+            output.plotResult('lib/plot/soc/')
 
     def getMean(self):
         return super().getMean()
 
     def getStd(self):
         return super().getStd()
+    
+    def getMax(self):
+        return super().getMax()
+    
+    def getMin(self):
+        return super().getMin()
 
 
     def __del__(self):

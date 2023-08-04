@@ -29,11 +29,11 @@ class VoidHvacTest(HvacEnv):
         sampleTime,load,pv,pricePerHour,deltaSoc,indoorTemperature,outdoorTemperature,userSetTemperature = self.state
         Power_HVAC = float(actions)
 
-
+        reward = []
     #interaction
 
         #calculate the new indoor temperature for next state
-        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC)
+        nextIndoorTemperature = self.epsilon*indoorTemperature+(1-self.epsilon)*(outdoorTemperature-(self.eta/self.A)*Power_HVAC*0.6)
 
         #calculate proportion
         if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity) < 0:
@@ -42,30 +42,26 @@ class VoidHvacTest(HvacEnv):
             cost = Power_HVAC*pricePerHour*0.25
 
         #temperature reward
-        if indoorTemperature > userSetTemperature :
-            r1 = -pow(indoorTemperature-userSetTemperature,2)/5
-        else :
-            if indoorTemperature >= outdoorTemperature:
-                r1 = 0.01
+        if outdoorTemperature < userSetTemperature :
             r1 = 0
+        else :
+            r1 = (-pow(indoorTemperature-userSetTemperature,2)+1)/100
         #cost reward
-        r2 = -cost/2
-
+        r2 = -cost/2+0.5
 
         #REWARD
-        reward = []
+
         reward.append(r1)
         reward.append(r2)
         #Pgrid max reward
         if (load+Power_HVAC-pv+deltaSoc*self.batteryCapacity)>self.PgridMax:
-            reward.append(-1)
+            reward.append(-10)
             
         #change to next state
         sampleTime = int(sampleTime+1)
 
         #check if all day has done
         self.done = False
-
 
         self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,nextIndoorTemperature,outdoorTemperature,userSetTemperature])
         states = dict(state=self.state)

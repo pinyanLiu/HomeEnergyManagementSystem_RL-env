@@ -26,7 +26,7 @@ class VoidUnIntTest(UnIntEnv):
         reward = []
         cost = 0
         #STATE (sampleTime,Load,PV,SOC,pricePerHour,Uninterruptible load remain ,uninterruptible load remain)
-        sampleTime,load,pv,pricePerHour,deltaSoc,UnRemain,UnSwitch = self.state["state"]
+        sampleTime,load,pv,pricePerHour,deltaSoc,UnRemain,UnSwitch,unintPreference = self.state["state"]
         #  do nothing
         if actions == 0:
             pass
@@ -48,16 +48,19 @@ class VoidUnIntTest(UnIntEnv):
 
 
         #reward
-        reward.append(0.07-20*cost)
+        reward.append(0.07-cost)
         if (sampleTime == 94) and (self.uninterruptibleLoad.getRemainDemand()!=0):
-            reward.append(-5*self.uninterruptibleLoad.getRemainProcessPercentage())
+            reward.append(-20*self.uninterruptibleLoad.getRemainProcessPercentage())
+
+        if(unintPreference==4 and self.uninterruptibleLoad.switch==False):
+            reward.append(-1)
         
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch])
+        self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,self.uninterruptibleLoad.getRemainDemand(),self.uninterruptibleLoad.switch,unintPreference])
         #actions mask
-        PgridMaxExceed = (load+deltaSoc+self.uninterruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
+        PgridMaxExceed = (load+deltaSoc*self.batteryCapacity+self.uninterruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
 
         self.action_mask = np.asarray([True,self.uninterruptibleLoad.getRemainDemand()>0 and self.uninterruptibleLoad.switch==False and not PgridMaxExceed])
 
@@ -70,7 +73,7 @@ class VoidUnIntTest(UnIntEnv):
     
 
     def reset(self):
-        return  np.array([0,0.0,0.0,0.0,0.0,0.0,0.0])
+        return  np.array([0,0.0,0.0,0.0,0.0,0.0,0.0,0.0])
     
 
     def updateState(self,states,uninterruptibleLoad):

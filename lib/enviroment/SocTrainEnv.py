@@ -25,7 +25,7 @@ class SocEnv(HemsEnv):
                 #timeblock
                 95,
                 #load
-                10.0,
+                15.0,
                 #PV
                 10.0,
                 #SOC
@@ -55,7 +55,7 @@ class SocEnv(HemsEnv):
 
     def actions(self):
         #(degree of charging/discharging power)
-        return dict(type='float',shape=(1,),min_value=-0.25,max_value=0.25)
+        return dict(type='float',shape=(1,),min_value=-0.3,max_value=0.3)
 
     def close(self):
         return super().close()
@@ -73,36 +73,34 @@ class SocEnv(HemsEnv):
         delta_soc = float(actions)
         # actions(delta_soc) is the degree of charging/discharging power .
         # if delta_soc > 0 means charging , whereas delta_soc < 0 means discharging.
-
+        reward = []
 
     #interaction
-        reward = []
         cost = 0
         soc = soc+delta_soc
         if soc > 1:
+            #delta_soc = 1-soc
             soc = 1
-            reward.append(-0.2)
+            reward.append(-0.4)
         elif soc < 0 :
+            #delta_soc = 0-soc
             soc = 0
-            reward.append(-0.2)
-        else:
-            #calculate cost proportion   
-            if(delta_soc>0):
-                cost = pricePerHour * 0.25 * (delta_soc*self.batteryCapacity-pv)
-                if cost<0:
-                    cost = 0
-            elif(delta_soc<=0):
-                cost = pricePerHour*0.25*delta_soc*self.batteryCapacity
-        if (load+delta_soc*self.batteryCapacity-pv)>self.PgridMax:
-            reward.append(-0.2)
+            reward.append(-0.4)
+        Pgrid = max(0,delta_soc*self.batteryCapacity-pv+load)
+        cost = pricePerHour * 0.25 * Pgrid
+
+        if load-pv+delta_soc*self.batteryCapacity>self.PgridMax:
+            reward.append(-5)
 
 
 
+        if (sampleTime >= 94):
+            if(soc < self.socThreshold):
+                reward.append(5*(soc-self.socThreshold))
+            else:
+                reward.append(2)
 
-        if (sampleTime == 94 and soc <self.socThreshold):
-            reward.append(10*(soc-self.socThreshold))
-
-        reward.append(-cost)
+        reward.append(-0.19*cost+0.1)
 
 
         #change to next state
@@ -119,6 +117,7 @@ class SocEnv(HemsEnv):
         self.reward = sum(reward)
 
         return states,self.done,self.reward
+
 
         
 
@@ -168,7 +167,7 @@ class SocEnv(HemsEnv):
         elif int(self.i / 30) == 11:
             self.PV = [min(max(x+y,0),10) for x,y in zip(self.allPV['Dec'].tolist(),self.randomDeltaPV)]
             self.GridPrice = [min(max(x+y,0),6.2) for x,y in zip(self.notSummerGridPrice,self.randomDeltaPrice) ]
-
+        self.socInit = uniform(0.1,0.6)
 
         #reset state
         self.state=np.array([0,self.Load[0],self.PV[0],self.socInit,self.GridPrice[0]])

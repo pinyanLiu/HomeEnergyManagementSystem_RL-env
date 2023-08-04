@@ -78,6 +78,18 @@ class ImportData:
         UserSetTemperatureF = pd.DataFrame(self.cursor.fetchall())
         UserSetTemperatureF.columns = [column[0]for column in self.cursor.description]
         return UserSetTemperatureF
+    
+    def importUserSetTemperatureF2(self):
+        self.cursor.execute("SELECT * FROM userSetTemperatureF2")
+        UserSetTemperatureF2 = pd.DataFrame(self.cursor.fetchall())
+        UserSetTemperatureF2.columns = [column[0]for column in self.cursor.description]
+        return UserSetTemperatureF2
+    
+    def importUserSetTemperatureF3(self):
+        self.cursor.execute("SELECT * FROM userSetTemperatureF3")
+        UserSetTemperatureF3 = pd.DataFrame(self.cursor.fetchall())
+        UserSetTemperatureF3.columns = [column[0]for column in self.cursor.description]
+        return UserSetTemperatureF3
 
     def importUserSetTemperatureC(self):
         self.cursor.execute("SELECT * FROM userSetTemperatureC")
@@ -90,3 +102,27 @@ class ImportData:
         statisticalData = pd.DataFrame(self.cursor.fetchall())
         statisticalData.columns = [column[0]for column in self.cursor.description]
         return statisticalData
+    
+    def importOccupancy(self):
+        self.cursor.execute("SELECT * FROM occupancy")
+        Occupancy = pd.DataFrame(self.cursor.fetchall())
+        Occupancy.columns = [column[0]for column in self.cursor.description]
+        return Occupancy
+    
+    def importOccupancyTest(self):
+        self.cursor.execute("SELECT * FROM occupancyTest")
+        OccupancyTest = pd.DataFrame(self.cursor.fetchall())
+        OccupancyTest.columns = [column[0]for column in self.cursor.description]
+        return OccupancyTest
+
+    def importIntPreference(self,id):
+        self.cursor.execute("SELECT * FROM intPreference"+str(id))
+        userPreference = pd.DataFrame(self.cursor.fetchall())
+        userPreference.columns = [column[0]for column in self.cursor.description]
+        return userPreference
+    
+    def importUnIntPreference(self,id):
+        self.cursor.execute("SELECT * FROM unIntPreference"+str(id))
+        unIntPreference = pd.DataFrame(self.cursor.fetchall())
+        unIntPreference.columns = [column[0]for column in self.cursor.description]
+        return unIntPreference

@@ -27,7 +27,7 @@ class HemsEnv(Environment):
         self.allGridPrice = self.info.importGridPrice()
         self.summerGridPrice = self.allGridPrice['summer_price'].tolist()
         #self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
-        self.notSummerGridPrice = self.allGridPrice['test_price1'].tolist()
+        self.notSummerGridPrice = self.allGridPrice['not_summer_price'].tolist()
         self.allDeltaSOC = self.info.importDeltaSOC()
         #pick one day from 360 days
         self.i = randint(1,359)

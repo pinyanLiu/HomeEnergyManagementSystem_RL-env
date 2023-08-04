@@ -26,7 +26,7 @@ class VoidIntTest(IntEnv):
         reward = []
         cost = 0
         #STATE (sampleTime,Load,PV,DeltaSOC,pricePerHour,interruptible load remain)
-        sampleTime,load,pv,pricePerHour,deltaSoc,intRemain = self.state["state"]
+        sampleTime,load,pv,pricePerHour,deltaSoc,intRemain,intUserPreference = self.state["state"]
         # Turn off switch
         if actions == 0:
             self.interruptibleLoad.turn_off()
@@ -43,21 +43,27 @@ class VoidIntTest(IntEnv):
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv+Pess))/self.interruptibleLoad.demand
             else:
                 cost = (pricePerHour * 0.25 * (self.interruptibleLoad.AvgPowerConsume-pv))/self.interruptibleLoad.demand
+            reward.append(intUserPreference/2.5)#preference reward
         if cost<0:
             cost = 0 
 
         #reward
-        reward.append(0.08-10*cost)
-        if (sampleTime == 94) and (self.interruptibleLoad.getRemainDemand()!=0):
-            reward.append(-10*self.interruptibleLoad.getRemainProcessPercentage())
+        reward.append(0.01-3*cost)
+        if (sampleTime == 95) :
+            if(self.interruptibleLoad.getRemainDemand()!=0):
+                reward.append(-20*self.interruptibleLoad.getRemainProcessPercentage())
+            else:
+                reward.append(10)
+        if load-pv+deltaSoc*self.batteryCapacity+actions*self.interruptibleLoad.AvgPowerConsume>self.PgridMax:
+            reward.append(-5)
 
 
         #change to next state
         sampleTime = int(sampleTime+1)
-        self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,self.interruptibleLoad.getRemainDemand()])
+        self.state=np.array([sampleTime,load,pv,pricePerHour,deltaSoc,self.interruptibleLoad.getRemainDemand(),intUserPreference])
 
         #actions mask
-        PgridMaxExceed = (load+deltaSoc+self.interruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
+        PgridMaxExceed = (load+deltaSoc*self.batteryCapacity+self.interruptibleLoad.AvgPowerConsume-pv) >= self.PgridMax
         
         self.action_mask = np.asarray([True,self.interruptibleLoad.getRemainDemand()>0 and not PgridMaxExceed])
 
@@ -74,7 +80,7 @@ class VoidIntTest(IntEnv):
 
 
     def reset(self):
-        return  np.array([0,0.0,0.0,0.0,0.0,0.0])
+        return  np.array([0,0.0,0.0,0.0,0.0,0.0,0.0])
     
 
     def updateState(self,states,interruptibleLoad):
